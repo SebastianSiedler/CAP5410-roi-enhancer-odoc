@@ -1,3 +1,6 @@
+
+= ROI Enhancer for Optic Disc and Cup Segmentation in Fundus Images
+
 == Introduction
 @src_kinder2025optic
 
@@ -18,6 +21,7 @@ Ihr Projekt bedeutet nicht, dass Sie zwei komplett unabhängige Netzwerke erstel
 
 === Q&A
 - warum zwei module und nicht nur ein Segmentierer?
+  - damit jedes model nur genau eine Aufgabe hat
 - warum nicht nur CLAHE?
 
 
