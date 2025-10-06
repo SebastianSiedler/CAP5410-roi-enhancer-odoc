@@ -1,0 +1,2411 @@
+Processing all Training-400 samples...
+Root dir: datasets/REFUGE
+Output dir: datasets/REFUGE_cropped_masks
+
+Found 400 samples
+
+[1/400] Processing 0826...
+  Disc bounding box: (55, 751, 432, 494)
+  Saved cropped data: 494×432
+  Disc coverage: 47.9%
+  Cup coverage: 11.8%
+
+[2/400] Processing 0827...
+  Disc bounding box: (189, 819, 431, 461)
+  Saved cropped data: 461×431
+  Disc coverage: 47.3%
+  Cup coverage: 8.9%
+
+[3/400] Processing 0828...
+  Disc bounding box: (301, 777, 363, 385)
+  Saved cropped data: 385×363
+  Disc coverage: 42.4%
+  Cup coverage: 10.2%
+
+[4/400] Processing 0829...
+  Disc bounding box: (184, 769, 348, 395)
+  Saved cropped data: 395×348
+  Disc coverage: 42.1%
+  Cup coverage: 10.9%
+
+[5/400] Processing 0830...
+  Disc bounding box: (56, 745, 331, 363)
+  Saved cropped data: 363×331
+  Disc coverage: 39.8%
+  Cup coverage: 8.2%
+
+[6/400] Processing 0831...
+  Disc bounding box: (69, 782, 359, 395)
+  Saved cropped data: 395×359
+  Disc coverage: 42.4%
+  Cup coverage: 8.3%
+
+[7/400] Processing 0832...
+  Disc bounding box: (121, 787, 346, 393)
+  Saved cropped data: 393×346
+  Disc coverage: 41.5%
+  Cup coverage: 7.5%
+
+[8/400] Processing 0833...
+  Disc bounding box: (57, 815, 337, 396)
+  Saved cropped data: 396×337
+  Disc coverage: 41.8%
+  Cup coverage: 10.8%
+
+[9/400] Processing 0834...
+  Disc bounding box: (107, 764, 409, 488)
+  Saved cropped data: 488×409
+  Disc coverage: 47.1%
+  Cup coverage: 11.7%
+
+[10/400] Processing 0835...
+  Disc bounding box: (0, 619, 408, 479)
+  Saved cropped data: 479×408
+  Disc coverage: 47.6%
+  Cup coverage: 11.4%
+
+[11/400] Processing 0836...
+  Disc bounding box: (319, 611, 371, 408)
+  Saved cropped data: 408×371
+  Disc coverage: 43.5%
+  Cup coverage: 12.9%
+
+[12/400] Processing 0837...
+  Disc bounding box: (283, 546, 370, 395)
+  Saved cropped data: 395×370
+  Disc coverage: 42.6%
+  Cup coverage: 9.3%
+
+[13/400] Processing 0839...
+  Disc bounding box: (70, 798, 391, 416)
+  Saved cropped data: 416×391
+  Disc coverage: 44.8%
+  Cup coverage: 10.1%
+
+[14/400] Processing 0840...
+  Disc bounding box: (97, 731, 443, 456)
+  Saved cropped data: 456×443
+  Disc coverage: 47.5%
+  Cup coverage: 8.4%
+
+[15/400] Processing 0841...
+  Disc bounding box: (34, 677, 428, 438)
+  Saved cropped data: 438×428
+  Disc coverage: 46.5%
+  Cup coverage: 12.7%
+
+[16/400] Processing 0842...
+  Disc bounding box: (164, 715, 357, 400)
+  Saved cropped data: 400×357
+  Disc coverage: 42.7%
+  Cup coverage: 8.3%
+
+[17/400] Processing 0843...
+  Disc bounding box: (214, 876, 348, 375)
+  Saved cropped data: 375×348
+  Disc coverage: 41.7%
+  Cup coverage: 10.5%
+
+[18/400] Processing 0844...
+  Disc bounding box: (220, 695, 378, 427)
+  Saved cropped data: 427×378
+  Disc coverage: 44.3%
+  Cup coverage: 10.3%
+
+[19/400] Processing 0845...
+  Disc bounding box: (119, 694, 359, 415)
+  Saved cropped data: 415×359
+  Disc coverage: 42.9%
+  Cup coverage: 12.1%
+
+[20/400] Processing 0846...
+  Disc bounding box: (0, 745, 383, 452)
+  Saved cropped data: 452×383
+  Disc coverage: 49.2%
+  Cup coverage: 9.9%
+
+[21/400] Processing 0847...
+  Disc bounding box: (77, 683, 402, 443)
+  Saved cropped data: 443×402
+  Disc coverage: 45.8%
+  Cup coverage: 11.2%
+
+[22/400] Processing 0848...
+  Disc bounding box: (0, 675, 412, 468)
+  Saved cropped data: 468×412
+  Disc coverage: 47.3%
+  Cup coverage: 13.6%
+
+[23/400] Processing 0849...
+  Disc bounding box: (0, 791, 418, 471)
+  Saved cropped data: 471×418
+  Disc coverage: 46.8%
+  Cup coverage: 14.0%
+
+[24/400] Processing 0850...
+  Disc bounding box: (97, 722, 378, 404)
+  Saved cropped data: 404×378
+  Disc coverage: 43.7%
+  Cup coverage: 10.5%
+
+[25/400] Processing 0851...
+  Disc bounding box: (41, 656, 418, 453)
+  Saved cropped data: 453×418
+  Disc coverage: 47.0%
+  Cup coverage: 19.5%
+
+[26/400] Processing 0853...
+  Disc bounding box: (114, 757, 376, 443)
+  Saved cropped data: 443×376
+  Disc coverage: 45.2%
+  Cup coverage: 31.3%
+
+[27/400] Processing 0855...
+  Disc bounding box: (24, 719, 399, 469)
+  Saved cropped data: 469×399
+  Disc coverage: 46.3%
+  Cup coverage: 13.7%
+
+[28/400] Processing 0856...
+  Disc bounding box: (0, 738, 403, 464)
+  Saved cropped data: 464×403
+  Disc coverage: 46.9%
+  Cup coverage: 14.4%
+
+[29/400] Processing 0857...
+  Disc bounding box: (12, 719, 424, 478)
+  Saved cropped data: 478×424
+  Disc coverage: 47.5%
+  Cup coverage: 12.1%
+
+[30/400] Processing 0858...
+  Disc bounding box: (147, 733, 379, 368)
+  Saved cropped data: 368×379
+  Disc coverage: 42.0%
+  Cup coverage: 25.5%
+
+[31/400] Processing 0859...
+  Disc bounding box: (160, 760, 352, 359)
+  Saved cropped data: 359×352
+  Disc coverage: 40.5%
+  Cup coverage: 18.0%
+
+[32/400] Processing 0860...
+  Disc bounding box: (79, 704, 359, 396)
+  Saved cropped data: 396×359
+  Disc coverage: 42.4%
+  Cup coverage: 12.2%
+
+[33/400] Processing 0863...
+  Disc bounding box: (3, 693, 410, 443)
+  Saved cropped data: 443×410
+  Disc coverage: 46.5%
+  Cup coverage: 15.8%
+
+[34/400] Processing 0864...
+  Disc bounding box: (165, 488, 414, 423)
+  Saved cropped data: 423×414
+  Disc coverage: 45.9%
+  Cup coverage: 14.2%
+
+[35/400] Processing 0865...
+  Disc bounding box: (120, 917, 402, 408)
+  Saved cropped data: 408×402
+  Disc coverage: 44.6%
+  Cup coverage: 9.7%
+
+[36/400] Processing 0866...
+  Disc bounding box: (18, 796, 352, 393)
+  Saved cropped data: 393×352
+  Disc coverage: 42.1%
+  Cup coverage: 7.5%
+
+[37/400] Processing 0867...
+  Disc bounding box: (84, 767, 371, 401)
+  Saved cropped data: 401×371
+  Disc coverage: 43.7%
+  Cup coverage: 10.3%
+
+[38/400] Processing 0868...
+  Disc bounding box: (85, 755, 370, 398)
+  Saved cropped data: 398×370
+  Disc coverage: 43.0%
+  Cup coverage: 9.5%
+
+[39/400] Processing 0869...
+  Disc bounding box: (182, 699, 347, 399)
+  Saved cropped data: 399×347
+  Disc coverage: 42.5%
+  Cup coverage: 10.0%
+
+[40/400] Processing 0870...
+  Disc bounding box: (102, 752, 336, 377)
+  Saved cropped data: 377×336
+  Disc coverage: 40.5%
+  Cup coverage: 9.8%
+
+[41/400] Processing 0871...
+  Disc bounding box: (16, 766, 406, 452)
+  Saved cropped data: 452×406
+  Disc coverage: 45.9%
+  Cup coverage: 10.2%
+
+[42/400] Processing 0872...
+  Disc bounding box: (245, 707, 337, 405)
+  Saved cropped data: 405×337
+  Disc coverage: 41.8%
+  Cup coverage: 11.5%
+
+[43/400] Processing 0873...
+  Disc bounding box: (11, 798, 392, 421)
+  Saved cropped data: 421×392
+  Disc coverage: 44.7%
+  Cup coverage: 9.4%
+
+[44/400] Processing 0874...
+  Disc bounding box: (71, 711, 460, 468)
+  Saved cropped data: 468×460
+  Disc coverage: 48.4%
+  Cup coverage: 17.1%
+
+[45/400] Processing 0875...
+  Disc bounding box: (67, 728, 384, 412)
+  Saved cropped data: 412×384
+  Disc coverage: 44.2%
+  Cup coverage: 10.4%
+
+[46/400] Processing 0876...
+  Disc bounding box: (130, 637, 406, 457)
+  Saved cropped data: 457×406
+  Disc coverage: 46.8%
+  Cup coverage: 16.3%
+
+[47/400] Processing 0877...
+  Disc bounding box: (0, 865, 387, 422)
+  Saved cropped data: 422×387
+  Disc coverage: 46.5%
+  Cup coverage: 11.3%
+
+[48/400] Processing 0878...
+  Disc bounding box: (68, 741, 394, 449)
+  Saved cropped data: 449×394
+  Disc coverage: 45.3%
+  Cup coverage: 20.1%
+
+[49/400] Processing 0879...
+  Disc bounding box: (12, 745, 400, 431)
+  Saved cropped data: 431×400
+  Disc coverage: 45.9%
+  Cup coverage: 13.8%
+
+[50/400] Processing 0880...
+  Disc bounding box: (242, 673, 359, 411)
+  Saved cropped data: 411×359
+  Disc coverage: 42.6%
+  Cup coverage: 10.0%
+
+[51/400] Processing 0881...
+  Disc bounding box: (185, 659, 358, 421)
+  Saved cropped data: 421×358
+  Disc coverage: 42.4%
+  Cup coverage: 9.7%
+
+[52/400] Processing 0882...
+  Disc bounding box: (65, 810, 390, 445)
+  Saved cropped data: 445×390
+  Disc coverage: 45.6%
+  Cup coverage: 21.8%
+
+[53/400] Processing 0883...
+  Disc bounding box: (82, 801, 415, 442)
+  Saved cropped data: 442×415
+  Disc coverage: 46.3%
+  Cup coverage: 29.9%
+
+[54/400] Processing 0884...
+  Disc bounding box: (37, 770, 383, 416)
+  Saved cropped data: 416×383
+  Disc coverage: 44.2%
+  Cup coverage: 9.7%
+
+[55/400] Processing 0885...
+  Disc bounding box: (0, 796, 380, 437)
+  Saved cropped data: 437×380
+  Disc coverage: 45.1%
+  Cup coverage: 9.1%
+
+[56/400] Processing 0886...
+  Disc bounding box: (38, 754, 441, 467)
+  Saved cropped data: 467×441
+  Disc coverage: 47.3%
+  Cup coverage: 13.4%
+
+[57/400] Processing 0887...
+  Disc bounding box: (44, 663, 442, 456)
+  Saved cropped data: 456×442
+  Disc coverage: 47.6%
+  Cup coverage: 14.9%
+
+[58/400] Processing 0888...
+  Disc bounding box: (382, 785, 410, 440)
+  Saved cropped data: 440×410
+  Disc coverage: 46.2%
+  Cup coverage: 6.7%
+
+[59/400] Processing 0889...
+  Disc bounding box: (111, 797, 359, 390)
+  Saved cropped data: 390×359
+  Disc coverage: 42.6%
+  Cup coverage: 8.9%
+
+[60/400] Processing 0892...
+  Disc bounding box: (34, 756, 383, 438)
+  Saved cropped data: 438×383
+  Disc coverage: 45.0%
+  Cup coverage: 11.5%
+
+[61/400] Processing 0896...
+  Disc bounding box: (37, 664, 407, 476)
+  Saved cropped data: 476×407
+  Disc coverage: 46.3%
+  Cup coverage: 16.7%
+
+[62/400] Processing 0897...
+  Disc bounding box: (161, 655, 408, 390)
+  Saved cropped data: 390×408
+  Disc coverage: 44.4%
+  Cup coverage: 10.6%
+
+[63/400] Processing 0898...
+  Disc bounding box: (136, 664, 439, 398)
+  Saved cropped data: 398×439
+  Disc coverage: 45.7%
+  Cup coverage: 9.4%
+
+[64/400] Processing 0899...
+  Disc bounding box: (91, 804, 375, 383)
+  Saved cropped data: 383×375
+  Disc coverage: 43.4%
+  Cup coverage: 9.8%
+
+[65/400] Processing 0900...
+  Disc bounding box: (143, 753, 409, 471)
+  Saved cropped data: 471×409
+  Disc coverage: 46.7%
+  Cup coverage: 11.3%
+
+[66/400] Processing 0901...
+  Disc bounding box: (81, 759, 367, 417)
+  Saved cropped data: 417×367
+  Disc coverage: 43.4%
+  Cup coverage: 14.2%
+
+[67/400] Processing 0902...
+  Disc bounding box: (101, 753, 367, 418)
+  Saved cropped data: 418×367
+  Disc coverage: 43.4%
+  Cup coverage: 11.7%
+
+[68/400] Processing 0903...
+  Disc bounding box: (52, 666, 366, 426)
+  Saved cropped data: 426×366
+  Disc coverage: 43.9%
+  Cup coverage: 9.9%
+
+[69/400] Processing 0904...
+  Disc bounding box: (0, 718, 398, 441)
+  Saved cropped data: 441×398
+  Disc coverage: 45.8%
+  Cup coverage: 8.6%
+
+[70/400] Processing 0905...
+  Disc bounding box: (35, 687, 396, 452)
+  Saved cropped data: 452×396
+  Disc coverage: 46.0%
+  Cup coverage: 8.3%
+
+[71/400] Processing 0907...
+  Disc bounding box: (124, 770, 384, 397)
+  Saved cropped data: 397×384
+  Disc coverage: 44.0%
+  Cup coverage: 9.8%
+
+[72/400] Processing 0908...
+  Disc bounding box: (155, 679, 385, 407)
+  Saved cropped data: 407×385
+  Disc coverage: 43.7%
+  Cup coverage: 9.6%
+
+[73/400] Processing 0909...
+  Disc bounding box: (272, 832, 391, 407)
+  Saved cropped data: 407×391
+  Disc coverage: 44.7%
+  Cup coverage: 8.8%
+
+[74/400] Processing 0910...
+  Disc bounding box: (150, 752, 415, 436)
+  Saved cropped data: 436×415
+  Disc coverage: 46.0%
+  Cup coverage: 11.7%
+
+[75/400] Processing 0911...
+  Disc bounding box: (0, 710, 384, 436)
+  Saved cropped data: 436×384
+  Disc coverage: 45.0%
+  Cup coverage: 11.6%
+
+[76/400] Processing 0912...
+  Disc bounding box: (74, 679, 376, 427)
+  Saved cropped data: 427×376
+  Disc coverage: 44.1%
+  Cup coverage: 9.1%
+
+[77/400] Processing 0913...
+  Disc bounding box: (53, 719, 384, 401)
+  Saved cropped data: 401×384
+  Disc coverage: 44.2%
+  Cup coverage: 8.2%
+
+[78/400] Processing 0914...
+  Disc bounding box: (113, 755, 364, 440)
+  Saved cropped data: 440×364
+  Disc coverage: 44.3%
+  Cup coverage: 8.5%
+
+[79/400] Processing 0916...
+  Disc bounding box: (108, 719, 373, 402)
+  Saved cropped data: 402×373
+  Disc coverage: 43.5%
+  Cup coverage: 7.0%
+
+[80/400] Processing 0917...
+  Disc bounding box: (88, 676, 430, 441)
+  Saved cropped data: 441×430
+  Disc coverage: 46.6%
+  Cup coverage: 10.7%
+
+[81/400] Processing 0918...
+  Disc bounding box: (156, 684, 443, 478)
+  Saved cropped data: 478×443
+  Disc coverage: 48.5%
+  Cup coverage: 10.8%
+
+[82/400] Processing 0919...
+  Disc bounding box: (47, 715, 377, 399)
+  Saved cropped data: 399×377
+  Disc coverage: 43.4%
+  Cup coverage: 8.6%
+
+[83/400] Processing 0920...
+  Disc bounding box: (80, 816, 375, 396)
+  Saved cropped data: 396×375
+  Disc coverage: 43.1%
+  Cup coverage: 9.5%
+
+[84/400] Processing 0921...
+  Disc bounding box: (120, 759, 436, 430)
+  Saved cropped data: 430×436
+  Disc coverage: 46.4%
+  Cup coverage: 11.6%
+
+[85/400] Processing 0922...
+  Disc bounding box: (76, 699, 444, 452)
+  Saved cropped data: 452×444
+  Disc coverage: 47.5%
+  Cup coverage: 8.4%
+
+[86/400] Processing 0924...
+  Disc bounding box: (197, 727, 362, 406)
+  Saved cropped data: 406×362
+  Disc coverage: 43.2%
+  Cup coverage: 10.4%
+
+[87/400] Processing 0925...
+  Disc bounding box: (36, 805, 369, 422)
+  Saved cropped data: 422×369
+  Disc coverage: 44.4%
+  Cup coverage: 11.7%
+
+[88/400] Processing 0926...
+  Disc bounding box: (287, 788, 389, 419)
+  Saved cropped data: 419×389
+  Disc coverage: 44.6%
+  Cup coverage: 8.1%
+
+[89/400] Processing 0927...
+  Disc bounding box: (444, 831, 392, 416)
+  Saved cropped data: 416×392
+  Disc coverage: 44.2%
+  Cup coverage: 7.4%
+
+[90/400] Processing 0928...
+  Disc bounding box: (218, 923, 349, 362)
+  Saved cropped data: 362×349
+  Disc coverage: 40.8%
+  Cup coverage: 7.2%
+
+[91/400] Processing 0929...
+  Disc bounding box: (244, 825, 334, 376)
+  Saved cropped data: 376×334
+  Disc coverage: 40.9%
+  Cup coverage: 8.2%
+
+[92/400] Processing 0931...
+  Disc bounding box: (386, 765, 347, 405)
+  Saved cropped data: 405×347
+  Disc coverage: 41.4%
+  Cup coverage: 8.3%
+
+[93/400] Processing 0932...
+  Disc bounding box: (30, 696, 400, 413)
+  Saved cropped data: 413×400
+  Disc coverage: 44.8%
+  Cup coverage: 8.8%
+
+[94/400] Processing 0933...
+  Disc bounding box: (0, 674, 407, 448)
+  Saved cropped data: 448×407
+  Disc coverage: 46.0%
+  Cup coverage: 11.6%
+
+[95/400] Processing 0934...
+  Disc bounding box: (299, 830, 369, 421)
+  Saved cropped data: 421×369
+  Disc coverage: 43.7%
+  Cup coverage: 13.2%
+
+[96/400] Processing 0935...
+  Disc bounding box: (265, 807, 380, 406)
+  Saved cropped data: 406×380
+  Disc coverage: 43.8%
+  Cup coverage: 9.0%
+
+[97/400] Processing 0936...
+  Disc bounding box: (241, 822, 358, 416)
+  Saved cropped data: 416×358
+  Disc coverage: 43.3%
+  Cup coverage: 8.9%
+
+[98/400] Processing 0937...
+  Disc bounding box: (251, 775, 364, 397)
+  Saved cropped data: 397×364
+  Disc coverage: 42.9%
+  Cup coverage: 9.3%
+
+[99/400] Processing 0940...
+  Disc bounding box: (71, 703, 387, 427)
+  Saved cropped data: 427×387
+  Disc coverage: 44.1%
+  Cup coverage: 9.0%
+
+[100/400] Processing 0941...
+  Disc bounding box: (154, 639, 400, 403)
+  Saved cropped data: 403×400
+  Disc coverage: 44.5%
+  Cup coverage: 9.6%
+
+[101/400] Processing 0942...
+  Disc bounding box: (291, 667, 398, 434)
+  Saved cropped data: 434×398
+  Disc coverage: 46.2%
+  Cup coverage: 5.6%
+
+[102/400] Processing 0943...
+  Disc bounding box: (0, 692, 395, 444)
+  Saved cropped data: 444×395
+  Disc coverage: 49.7%
+  Cup coverage: 9.6%
+
+[103/400] Processing 0944...
+  Disc bounding box: (77, 635, 431, 459)
+  Saved cropped data: 459×431
+  Disc coverage: 46.5%
+  Cup coverage: 10.1%
+
+[104/400] Processing 0945...
+  Disc bounding box: (343, 807, 355, 376)
+  Saved cropped data: 376×355
+  Disc coverage: 41.9%
+  Cup coverage: 8.3%
+
+[105/400] Processing 0946...
+  Disc bounding box: (281, 772, 322, 378)
+  Saved cropped data: 378×322
+  Disc coverage: 40.1%
+  Cup coverage: 7.9%
+
+[106/400] Processing 0947...
+  Disc bounding box: (90, 671, 373, 401)
+  Saved cropped data: 401×373
+  Disc coverage: 43.6%
+  Cup coverage: 7.6%
+
+[107/400] Processing 0948...
+  Disc bounding box: (18, 655, 392, 439)
+  Saved cropped data: 439×392
+  Disc coverage: 45.7%
+  Cup coverage: 10.6%
+
+[108/400] Processing 0949...
+  Disc bounding box: (106, 756, 384, 415)
+  Saved cropped data: 415×384
+  Disc coverage: 44.1%
+  Cup coverage: 10.2%
+
+[109/400] Processing 0951...
+  Disc bounding box: (0, 669, 381, 470)
+  Saved cropped data: 470×381
+  Disc coverage: 50.5%
+  Cup coverage: 14.1%
+
+[110/400] Processing 0952...
+  Disc bounding box: (0, 763, 412, 461)
+  Saved cropped data: 461×412
+  Disc coverage: 46.7%
+  Cup coverage: 14.7%
+
+[111/400] Processing 0953...
+  Disc bounding box: (229, 719, 415, 432)
+  Saved cropped data: 432×415
+  Disc coverage: 46.1%
+  Cup coverage: 10.8%
+
+[112/400] Processing 0954...
+  Disc bounding box: (197, 587, 414, 427)
+  Saved cropped data: 427×414
+  Disc coverage: 46.4%
+  Cup coverage: 12.8%
+
+[113/400] Processing 0955...
+  Disc bounding box: (107, 749, 390, 415)
+  Saved cropped data: 415×390
+  Disc coverage: 45.1%
+  Cup coverage: 9.8%
+
+[114/400] Processing 0957...
+  Disc bounding box: (329, 731, 362, 388)
+  Saved cropped data: 388×362
+  Disc coverage: 42.6%
+  Cup coverage: 8.5%
+
+[115/400] Processing 0958...
+  Disc bounding box: (403, 787, 358, 408)
+  Saved cropped data: 408×358
+  Disc coverage: 42.9%
+  Cup coverage: 8.5%
+
+[116/400] Processing 0959...
+  Disc bounding box: (195, 712, 400, 439)
+  Saved cropped data: 439×400
+  Disc coverage: 45.7%
+  Cup coverage: 2.5%
+
+[117/400] Processing 0960...
+  Disc bounding box: (128, 748, 391, 422)
+  Saved cropped data: 422×391
+  Disc coverage: 44.1%
+  Cup coverage: 6.8%
+
+[118/400] Processing 0961...
+  Disc bounding box: (38, 763, 368, 387)
+  Saved cropped data: 387×368
+  Disc coverage: 42.3%
+  Cup coverage: 8.0%
+
+[119/400] Processing 0962...
+  Disc bounding box: (141, 846, 398, 411)
+  Saved cropped data: 411×398
+  Disc coverage: 44.8%
+  Cup coverage: 9.4%
+
+[120/400] Processing 0963...
+  Disc bounding box: (3, 765, 393, 406)
+  Saved cropped data: 406×393
+  Disc coverage: 44.7%
+  Cup coverage: 9.6%
+
+[121/400] Processing 0964...
+  Disc bounding box: (319, 762, 364, 381)
+  Saved cropped data: 381×364
+  Disc coverage: 42.8%
+  Cup coverage: 13.8%
+
+[122/400] Processing 0965...
+  Disc bounding box: (347, 735, 355, 388)
+  Saved cropped data: 388×355
+  Disc coverage: 42.6%
+  Cup coverage: 12.6%
+
+[123/400] Processing 0966...
+  Disc bounding box: (269, 737, 355, 389)
+  Saved cropped data: 389×355
+  Disc coverage: 42.1%
+  Cup coverage: 10.2%
+
+[124/400] Processing 0967...
+  Disc bounding box: (351, 771, 360, 376)
+  Saved cropped data: 376×360
+  Disc coverage: 42.2%
+  Cup coverage: 10.8%
+
+[125/400] Processing 0969...
+  Disc bounding box: (274, 650, 379, 397)
+  Saved cropped data: 397×379
+  Disc coverage: 43.7%
+  Cup coverage: 11.3%
+
+[126/400] Processing 0970...
+  Disc bounding box: (0, 771, 373, 404)
+  Saved cropped data: 404×373
+  Disc coverage: 44.6%
+  Cup coverage: 9.4%
+
+[127/400] Processing 0971...
+  Disc bounding box: (199, 727, 444, 480)
+  Saved cropped data: 480×444
+  Disc coverage: 48.2%
+  Cup coverage: 12.0%
+
+[128/400] Processing 0972...
+  Disc bounding box: (282, 738, 435, 469)
+  Saved cropped data: 469×435
+  Disc coverage: 48.1%
+  Cup coverage: 9.2%
+
+[129/400] Processing 0973...
+  Disc bounding box: (408, 918, 392, 397)
+  Saved cropped data: 397×392
+  Disc coverage: 43.7%
+  Cup coverage: 9.9%
+
+[130/400] Processing 0975...
+  Disc bounding box: (317, 777, 348, 405)
+  Saved cropped data: 405×348
+  Disc coverage: 42.5%
+  Cup coverage: 11.8%
+
+[131/400] Processing 0976...
+  Disc bounding box: (207, 752, 416, 423)
+  Saved cropped data: 423×416
+  Disc coverage: 46.1%
+  Cup coverage: 9.8%
+
+[132/400] Processing 0977...
+  Disc bounding box: (99, 721, 386, 438)
+  Saved cropped data: 438×386
+  Disc coverage: 45.1%
+  Cup coverage: 10.5%
+
+[133/400] Processing 0978...
+  Disc bounding box: (150, 802, 364, 431)
+  Saved cropped data: 431×364
+  Disc coverage: 43.8%
+  Cup coverage: 13.7%
+
+[134/400] Processing 0979...
+  Disc bounding box: (217, 739, 356, 441)
+  Saved cropped data: 441×356
+  Disc coverage: 44.6%
+  Cup coverage: 10.3%
+
+[135/400] Processing 0980...
+  Disc bounding box: (204, 775, 406, 464)
+  Saved cropped data: 464×406
+  Disc coverage: 46.7%
+  Cup coverage: 13.3%
+
+[136/400] Processing 0981...
+  Disc bounding box: (230, 749, 395, 455)
+  Saved cropped data: 455×395
+  Disc coverage: 46.2%
+  Cup coverage: 9.4%
+
+[137/400] Processing 0982...
+  Disc bounding box: (243, 851, 378, 402)
+  Saved cropped data: 402×378
+  Disc coverage: 43.5%
+  Cup coverage: 11.4%
+
+[138/400] Processing 0983...
+  Disc bounding box: (258, 733, 386, 414)
+  Saved cropped data: 414×386
+  Disc coverage: 44.6%
+  Cup coverage: 19.7%
+
+[139/400] Processing 0984...
+  Disc bounding box: (74, 752, 331, 396)
+  Saved cropped data: 396×331
+  Disc coverage: 40.6%
+  Cup coverage: 7.5%
+
+[140/400] Processing 0985...
+  Disc bounding box: (189, 674, 378, 391)
+  Saved cropped data: 391×378
+  Disc coverage: 43.3%
+  Cup coverage: 6.2%
+
+[141/400] Processing 0986...
+  Disc bounding box: (217, 895, 383, 420)
+  Saved cropped data: 420×383
+  Disc coverage: 44.6%
+  Cup coverage: 6.9%
+
+[142/400] Processing 0987...
+  Disc bounding box: (160, 643, 408, 496)
+  Saved cropped data: 496×408
+  Disc coverage: 47.5%
+  Cup coverage: 10.8%
+
+[143/400] Processing 0988...
+  Disc bounding box: (353, 563, 395, 451)
+  Saved cropped data: 451×395
+  Disc coverage: 46.4%
+  Cup coverage: 8.9%
+
+[144/400] Processing 0989...
+  Disc bounding box: (295, 612, 403, 438)
+  Saved cropped data: 438×403
+  Disc coverage: 45.5%
+  Cup coverage: 9.0%
+
+[145/400] Processing 0990...
+  Disc bounding box: (295, 733, 404, 424)
+  Saved cropped data: 424×404
+  Disc coverage: 45.3%
+  Cup coverage: 8.0%
+
+[146/400] Processing 0991...
+  Disc bounding box: (161, 683, 355, 412)
+  Saved cropped data: 412×355
+  Disc coverage: 43.3%
+  Cup coverage: 9.6%
+
+[147/400] Processing 0992...
+  Disc bounding box: (0, 661, 368, 408)
+  Saved cropped data: 408×368
+  Disc coverage: 46.7%
+  Cup coverage: 8.7%
+
+[148/400] Processing 0993...
+  Disc bounding box: (28, 711, 383, 404)
+  Saved cropped data: 404×383
+  Disc coverage: 44.1%
+  Cup coverage: 10.4%
+
+[149/400] Processing 0994...
+  Disc bounding box: (92, 842, 362, 420)
+  Saved cropped data: 420×362
+  Disc coverage: 43.9%
+  Cup coverage: 15.0%
+
+[150/400] Processing 0995...
+  Disc bounding box: (231, 783, 368, 400)
+  Saved cropped data: 400×368
+  Disc coverage: 43.2%
+  Cup coverage: 16.7%
+
+[151/400] Processing 0996...
+  Disc bounding box: (264, 730, 380, 413)
+  Saved cropped data: 413×380
+  Disc coverage: 44.0%
+  Cup coverage: 8.0%
+
+[152/400] Processing 0997...
+  Disc bounding box: (323, 835, 389, 412)
+  Saved cropped data: 412×389
+  Disc coverage: 44.6%
+  Cup coverage: 6.3%
+
+[153/400] Processing 0998...
+  Disc bounding box: (0, 687, 381, 476)
+  Saved cropped data: 476×381
+  Disc coverage: 45.2%
+  Cup coverage: 12.1%
+
+[154/400] Processing 0999...
+  Disc bounding box: (180, 684, 325, 382)
+  Saved cropped data: 382×325
+  Disc coverage: 40.2%
+  Cup coverage: 7.9%
+
+[155/400] Processing 1000...
+  Disc bounding box: (93, 724, 342, 388)
+  Saved cropped data: 388×342
+  Disc coverage: 41.3%
+  Cup coverage: 8.7%
+
+[156/400] Processing 1001...
+  Disc bounding box: (279, 780, 337, 383)
+  Saved cropped data: 383×337
+  Disc coverage: 41.3%
+  Cup coverage: 6.3%
+
+[157/400] Processing 1002...
+  Disc bounding box: (27, 734, 381, 400)
+  Saved cropped data: 400×381
+  Disc coverage: 43.5%
+  Cup coverage: 10.4%
+
+[158/400] Processing 1003...
+  Disc bounding box: (125, 802, 351, 417)
+  Saved cropped data: 417×351
+  Disc coverage: 42.8%
+  Cup coverage: 7.3%
+
+[159/400] Processing 1004...
+  Disc bounding box: (207, 791, 328, 376)
+  Saved cropped data: 376×328
+  Disc coverage: 40.0%
+  Cup coverage: 8.5%
+
+[160/400] Processing 1006...
+  Disc bounding box: (40, 603, 423, 430)
+  Saved cropped data: 430×423
+  Disc coverage: 46.3%
+  Cup coverage: 7.7%
+
+[161/400] Processing 1007...
+  Disc bounding box: (58, 711, 422, 440)
+  Saved cropped data: 440×422
+  Disc coverage: 46.3%
+  Cup coverage: 8.9%
+
+[162/400] Processing 1009...
+  Disc bounding box: (112, 708, 412, 435)
+  Saved cropped data: 435×412
+  Disc coverage: 46.5%
+  Cup coverage: 9.2%
+
+[163/400] Processing 1010...
+  Disc bounding box: (0, 774, 408, 441)
+  Saved cropped data: 441×408
+  Disc coverage: 47.5%
+  Cup coverage: 11.6%
+
+[164/400] Processing 1011...
+  Disc bounding box: (319, 887, 373, 394)
+  Saved cropped data: 394×373
+  Disc coverage: 43.5%
+  Cup coverage: 9.5%
+
+[165/400] Processing 1012...
+  Disc bounding box: (333, 859, 370, 407)
+  Saved cropped data: 407×370
+  Disc coverage: 43.2%
+  Cup coverage: 9.5%
+
+[166/400] Processing 1013...
+  Disc bounding box: (62, 629, 394, 431)
+  Saved cropped data: 431×394
+  Disc coverage: 45.2%
+  Cup coverage: 20.9%
+
+[167/400] Processing 1014...
+  Disc bounding box: (140, 844, 356, 358)
+  Saved cropped data: 358×356
+  Disc coverage: 40.4%
+  Cup coverage: 9.5%
+
+[168/400] Processing 1015...
+  Disc bounding box: (134, 663, 378, 396)
+  Saved cropped data: 396×378
+  Disc coverage: 43.8%
+  Cup coverage: 11.1%
+
+[169/400] Processing 1016...
+  Disc bounding box: (103, 728, 403, 404)
+  Saved cropped data: 404×403
+  Disc coverage: 44.6%
+  Cup coverage: 10.3%
+
+[170/400] Processing 1017...
+  Disc bounding box: (166, 749, 294, 420)
+  Saved cropped data: 420×294
+  Disc coverage: 38.8%
+  Cup coverage: 5.6%
+
+[171/400] Processing 1018...
+  Disc bounding box: (191, 767, 311, 392)
+  Saved cropped data: 392×311
+  Disc coverage: 40.0%
+  Cup coverage: 8.2%
+
+[172/400] Processing 1019...
+  Disc bounding box: (169, 884, 346, 436)
+  Saved cropped data: 436×346
+  Disc coverage: 43.1%
+  Cup coverage: 12.4%
+
+[173/400] Processing 1020...
+  Disc bounding box: (5, 672, 474, 483)
+  Saved cropped data: 483×474
+  Disc coverage: 49.3%
+  Cup coverage: 15.6%
+
+[174/400] Processing 1021...
+  Disc bounding box: (46, 711, 452, 452)
+  Saved cropped data: 452×452
+  Disc coverage: 47.8%
+  Cup coverage: 16.8%
+
+[175/400] Processing 1023...
+  Disc bounding box: (304, 807, 409, 412)
+  Saved cropped data: 412×409
+  Disc coverage: 45.1%
+  Cup coverage: 9.3%
+
+[176/400] Processing 1024...
+  Disc bounding box: (0, 503, 366, 408)
+  Saved cropped data: 408×366
+  Disc coverage: 43.6%
+  Cup coverage: 12.6%
+
+[177/400] Processing 1025...
+  Disc bounding box: (193, 741, 378, 407)
+  Saved cropped data: 407×378
+  Disc coverage: 43.7%
+  Cup coverage: 10.6%
+
+[178/400] Processing 1026...
+  Disc bounding box: (231, 716, 383, 428)
+  Saved cropped data: 428×383
+  Disc coverage: 44.6%
+  Cup coverage: 11.1%
+
+[179/400] Processing 1027...
+  Disc bounding box: (49, 731, 392, 412)
+  Saved cropped data: 412×392
+  Disc coverage: 45.0%
+  Cup coverage: 8.9%
+
+[180/400] Processing 1028...
+  Disc bounding box: (79, 611, 416, 453)
+  Saved cropped data: 453×416
+  Disc coverage: 46.8%
+  Cup coverage: 7.8%
+
+[181/400] Processing 1030...
+  Disc bounding box: (106, 716, 366, 394)
+  Saved cropped data: 394×366
+  Disc coverage: 43.0%
+  Cup coverage: 12.0%
+
+[182/400] Processing 1031...
+  Disc bounding box: (96, 766, 364, 411)
+  Saved cropped data: 411×364
+  Disc coverage: 43.2%
+  Cup coverage: 9.8%
+
+[183/400] Processing 1032...
+  Disc bounding box: (222, 760, 374, 379)
+  Saved cropped data: 379×374
+  Disc coverage: 42.5%
+  Cup coverage: 6.5%
+
+[184/400] Processing 1033...
+  Disc bounding box: (77, 752, 367, 394)
+  Saved cropped data: 394×367
+  Disc coverage: 42.8%
+  Cup coverage: 10.1%
+
+[185/400] Processing 1036...
+  Disc bounding box: (141, 739, 332, 341)
+  Saved cropped data: 341×332
+  Disc coverage: 39.8%
+  Cup coverage: 9.3%
+
+[186/400] Processing 1037...
+  Disc bounding box: (252, 739, 301, 295)
+  Saved cropped data: 295×301
+  Disc coverage: 34.8%
+  Cup coverage: 7.0%
+
+[187/400] Processing 1038...
+  Disc bounding box: (135, 792, 356, 394)
+  Saved cropped data: 394×356
+  Disc coverage: 42.2%
+  Cup coverage: 12.3%
+
+[188/400] Processing 1039...
+  Disc bounding box: (68, 810, 370, 378)
+  Saved cropped data: 378×370
+  Disc coverage: 42.3%
+  Cup coverage: 13.9%
+
+[189/400] Processing 1040...
+  Disc bounding box: (152, 698, 423, 446)
+  Saved cropped data: 446×423
+  Disc coverage: 46.7%
+  Cup coverage: 30.1%
+
+[190/400] Processing 1041...
+  Disc bounding box: (179, 629, 434, 478)
+  Saved cropped data: 478×434
+  Disc coverage: 47.5%
+  Cup coverage: 11.0%
+
+[191/400] Processing 1042...
+  Disc bounding box: (119, 719, 380, 402)
+  Saved cropped data: 402×380
+  Disc coverage: 43.5%
+  Cup coverage: 20.5%
+
+[192/400] Processing 1043...
+  Disc bounding box: (0, 666, 369, 412)
+  Saved cropped data: 412×369
+  Disc coverage: 43.2%
+  Cup coverage: 21.1%
+
+[193/400] Processing 1044...
+  Disc bounding box: (110, 804, 408, 423)
+  Saved cropped data: 423×408
+  Disc coverage: 45.6%
+  Cup coverage: 7.2%
+
+[194/400] Processing 1045...
+  Disc bounding box: (150, 790, 379, 379)
+  Saved cropped data: 379×379
+  Disc coverage: 42.6%
+  Cup coverage: 7.4%
+
+[195/400] Processing 1046...
+  Disc bounding box: (108, 738, 427, 468)
+  Saved cropped data: 468×427
+  Disc coverage: 47.0%
+  Cup coverage: 9.4%
+
+[196/400] Processing 1047...
+  Disc bounding box: (38, 813, 400, 443)
+  Saved cropped data: 443×400
+  Disc coverage: 45.8%
+  Cup coverage: 7.6%
+
+[197/400] Processing 1048...
+  Disc bounding box: (125, 789, 397, 393)
+  Saved cropped data: 393×397
+  Disc coverage: 44.0%
+  Cup coverage: 7.7%
+
+[198/400] Processing 1049...
+  Disc bounding box: (90, 759, 374, 400)
+  Saved cropped data: 400×374
+  Disc coverage: 43.5%
+  Cup coverage: 11.0%
+
+[199/400] Processing 1051...
+  Disc bounding box: (203, 670, 395, 400)
+  Saved cropped data: 400×395
+  Disc coverage: 44.5%
+  Cup coverage: 5.2%
+
+[200/400] Processing 1052...
+  Disc bounding box: (211, 715, 401, 423)
+  Saved cropped data: 423×401
+  Disc coverage: 44.8%
+  Cup coverage: 8.1%
+
+[201/400] Processing 1053...
+  Disc bounding box: (252, 721, 420, 424)
+  Saved cropped data: 424×420
+  Disc coverage: 45.8%
+  Cup coverage: 9.4%
+
+[202/400] Processing 1054...
+  Disc bounding box: (318, 767, 394, 395)
+  Saved cropped data: 395×394
+  Disc coverage: 44.1%
+  Cup coverage: 12.2%
+
+[203/400] Processing 1055...
+  Disc bounding box: (168, 782, 400, 405)
+  Saved cropped data: 405×400
+  Disc coverage: 44.7%
+  Cup coverage: 7.2%
+
+[204/400] Processing 1056...
+  Disc bounding box: (232, 743, 389, 402)
+  Saved cropped data: 402×389
+  Disc coverage: 44.0%
+  Cup coverage: 6.2%
+
+[205/400] Processing 1057...
+  Disc bounding box: (55, 643, 424, 451)
+  Saved cropped data: 451×424
+  Disc coverage: 46.9%
+  Cup coverage: 8.7%
+
+[206/400] Processing 1058...
+  Disc bounding box: (193, 759, 379, 381)
+  Saved cropped data: 381×379
+  Disc coverage: 43.1%
+  Cup coverage: 6.3%
+
+[207/400] Processing 1059...
+  Disc bounding box: (182, 778, 397, 388)
+  Saved cropped data: 388×397
+  Disc coverage: 43.7%
+  Cup coverage: 6.2%
+
+[208/400] Processing 1060...
+  Disc bounding box: (108, 816, 346, 405)
+  Saved cropped data: 405×346
+  Disc coverage: 42.3%
+  Cup coverage: 7.6%
+
+[209/400] Processing 1061...
+  Disc bounding box: (0, 822, 385, 418)
+  Saved cropped data: 418×385
+  Disc coverage: 45.2%
+  Cup coverage: 5.7%
+
+[210/400] Processing 1062...
+  Disc bounding box: (29, 731, 414, 453)
+  Saved cropped data: 453×414
+  Disc coverage: 46.9%
+  Cup coverage: 7.2%
+
+[211/400] Processing 1063...
+  Disc bounding box: (101, 728, 392, 399)
+  Saved cropped data: 399×392
+  Disc coverage: 43.9%
+  Cup coverage: 7.0%
+
+[212/400] Processing 1064...
+  Disc bounding box: (138, 743, 387, 395)
+  Saved cropped data: 395×387
+  Disc coverage: 43.9%
+  Cup coverage: 10.1%
+
+[213/400] Processing 1065...
+  Disc bounding box: (0, 774, 340, 434)
+  Saved cropped data: 434×340
+  Disc coverage: 45.3%
+  Cup coverage: 10.1%
+
+[214/400] Processing 1066...
+  Disc bounding box: (16, 706, 360, 438)
+  Saved cropped data: 438×360
+  Disc coverage: 43.8%
+  Cup coverage: 10.9%
+
+[215/400] Processing 1067...
+  Disc bounding box: (50, 699, 440, 444)
+  Saved cropped data: 444×440
+  Disc coverage: 47.1%
+  Cup coverage: 9.7%
+
+[216/400] Processing 1068...
+  Disc bounding box: (83, 673, 444, 454)
+  Saved cropped data: 454×444
+  Disc coverage: 47.3%
+  Cup coverage: 9.3%
+
+[217/400] Processing 1069...
+  Disc bounding box: (0, 638, 383, 426)
+  Saved cropped data: 426×383
+  Disc coverage: 45.0%
+  Cup coverage: 10.1%
+
+[218/400] Processing 1070...
+  Disc bounding box: (43, 754, 384, 415)
+  Saved cropped data: 415×384
+  Disc coverage: 44.0%
+  Cup coverage: 9.3%
+
+[219/400] Processing 1071...
+  Disc bounding box: (20, 571, 388, 448)
+  Saved cropped data: 448×388
+  Disc coverage: 46.2%
+  Cup coverage: 8.5%
+
+[220/400] Processing 1072...
+  Disc bounding box: (109, 663, 382, 431)
+  Saved cropped data: 431×382
+  Disc coverage: 44.6%
+  Cup coverage: 10.9%
+
+[221/400] Processing 1073...
+  Disc bounding box: (61, 820, 384, 402)
+  Saved cropped data: 402×384
+  Disc coverage: 43.9%
+  Cup coverage: 10.6%
+
+[222/400] Processing 1074...
+  Disc bounding box: (109, 715, 409, 411)
+  Saved cropped data: 411×409
+  Disc coverage: 45.2%
+  Cup coverage: 9.6%
+
+[223/400] Processing 1075...
+  Disc bounding box: (110, 743, 426, 427)
+  Saved cropped data: 427×426
+  Disc coverage: 46.6%
+  Cup coverage: 10.2%
+
+[224/400] Processing 1076...
+  Disc bounding box: (20, 860, 387, 417)
+  Saved cropped data: 417×387
+  Disc coverage: 44.8%
+  Cup coverage: 10.2%
+
+[225/400] Processing 1077...
+  Disc bounding box: (92, 754, 398, 436)
+  Saved cropped data: 436×398
+  Disc coverage: 45.5%
+  Cup coverage: 10.1%
+
+[226/400] Processing 1078...
+  Disc bounding box: (157, 695, 415, 454)
+  Saved cropped data: 454×415
+  Disc coverage: 47.1%
+  Cup coverage: 9.6%
+
+[227/400] Processing 1079...
+  Disc bounding box: (264, 713, 435, 450)
+  Saved cropped data: 450×435
+  Disc coverage: 47.3%
+  Cup coverage: 8.7%
+
+[228/400] Processing 1081...
+  Disc bounding box: (114, 722, 412, 431)
+  Saved cropped data: 431×412
+  Disc coverage: 46.0%
+  Cup coverage: 9.6%
+
+[229/400] Processing 1082...
+  Disc bounding box: (128, 743, 408, 436)
+  Saved cropped data: 436×408
+  Disc coverage: 45.8%
+  Cup coverage: 6.3%
+
+[230/400] Processing 1083...
+  Disc bounding box: (219, 731, 472, 431)
+  Saved cropped data: 431×472
+  Disc coverage: 47.2%
+  Cup coverage: 10.3%
+
+[231/400] Processing 1084...
+  Disc bounding box: (183, 798, 417, 452)
+  Saved cropped data: 452×417
+  Disc coverage: 46.5%
+  Cup coverage: 13.6%
+
+[232/400] Processing 1085...
+  Disc bounding box: (184, 743, 406, 452)
+  Saved cropped data: 452×406
+  Disc coverage: 46.2%
+  Cup coverage: 14.1%
+
+[233/400] Processing 1086...
+  Disc bounding box: (148, 743, 388, 416)
+  Saved cropped data: 416×388
+  Disc coverage: 45.4%
+  Cup coverage: 9.8%
+
+[234/400] Processing 1087...
+  Disc bounding box: (129, 825, 394, 447)
+  Saved cropped data: 447×394
+  Disc coverage: 45.9%
+  Cup coverage: 9.2%
+
+[235/400] Processing 1088...
+  Disc bounding box: (0, 896, 356, 423)
+  Saved cropped data: 423×356
+  Disc coverage: 44.1%
+  Cup coverage: 32.8%
+
+[236/400] Processing 1089...
+  Disc bounding box: (45, 650, 380, 424)
+  Saved cropped data: 424×380
+  Disc coverage: 44.2%
+  Cup coverage: 14.6%
+
+[237/400] Processing 1090...
+  Disc bounding box: (50, 784, 345, 391)
+  Saved cropped data: 391×345
+  Disc coverage: 41.7%
+  Cup coverage: 13.5%
+
+[238/400] Processing 1091...
+  Disc bounding box: (318, 788, 394, 398)
+  Saved cropped data: 398×394
+  Disc coverage: 44.4%
+  Cup coverage: 13.2%
+
+[239/400] Processing 1092...
+  Disc bounding box: (66, 669, 413, 420)
+  Saved cropped data: 420×413
+  Disc coverage: 45.3%
+  Cup coverage: 11.6%
+
+[240/400] Processing 1093...
+  Disc bounding box: (79, 767, 412, 447)
+  Saved cropped data: 447×412
+  Disc coverage: 46.4%
+  Cup coverage: 13.3%
+
+[241/400] Processing 1094...
+  Disc bounding box: (144, 805, 375, 402)
+  Saved cropped data: 402×375
+  Disc coverage: 43.3%
+  Cup coverage: 10.6%
+
+[242/400] Processing 1096...
+  Disc bounding box: (207, 591, 418, 423)
+  Saved cropped data: 423×418
+  Disc coverage: 46.0%
+  Cup coverage: 16.2%
+
+[243/400] Processing 1097...
+  Disc bounding box: (50, 747, 397, 407)
+  Saved cropped data: 407×397
+  Disc coverage: 44.3%
+  Cup coverage: 13.4%
+
+[244/400] Processing 1098...
+  Disc bounding box: (103, 823, 367, 402)
+  Saved cropped data: 402×367
+  Disc coverage: 43.1%
+  Cup coverage: 13.4%
+
+[245/400] Processing 1099...
+  Disc bounding box: (204, 743, 351, 389)
+  Saved cropped data: 389×351
+  Disc coverage: 42.7%
+  Cup coverage: 11.1%
+
+[246/400] Processing 1100...
+  Disc bounding box: (140, 688, 339, 405)
+  Saved cropped data: 405×339
+  Disc coverage: 41.0%
+  Cup coverage: 11.2%
+
+[247/400] Processing 1101...
+  Disc bounding box: (0, 735, 372, 413)
+  Saved cropped data: 413×372
+  Disc coverage: 43.5%
+  Cup coverage: 10.8%
+
+[248/400] Processing 1102...
+  Disc bounding box: (5, 706, 436, 468)
+  Saved cropped data: 468×436
+  Disc coverage: 48.1%
+  Cup coverage: 21.0%
+
+[249/400] Processing 1103...
+  Disc bounding box: (91, 691, 422, 452)
+  Saved cropped data: 452×422
+  Disc coverage: 46.8%
+  Cup coverage: 15.6%
+
+[250/400] Processing 1104...
+  Disc bounding box: (0, 655, 378, 429)
+  Saved cropped data: 429×378
+  Disc coverage: 49.2%
+  Cup coverage: 8.4%
+
+[251/400] Processing 1107...
+  Disc bounding box: (126, 734, 410, 477)
+  Saved cropped data: 477×410
+  Disc coverage: 47.1%
+  Cup coverage: 11.7%
+
+[252/400] Processing 1108...
+  Disc bounding box: (66, 731, 408, 458)
+  Saved cropped data: 458×408
+  Disc coverage: 47.0%
+  Cup coverage: 14.6%
+
+[253/400] Processing 1110...
+  Disc bounding box: (131, 726, 410, 424)
+  Saved cropped data: 424×410
+  Disc coverage: 45.4%
+  Cup coverage: 10.1%
+
+[254/400] Processing 1111...
+  Disc bounding box: (99, 710, 361, 382)
+  Saved cropped data: 382×361
+  Disc coverage: 42.0%
+  Cup coverage: 6.7%
+
+[255/400] Processing 1112...
+  Disc bounding box: (51, 670, 417, 472)
+  Saved cropped data: 472×417
+  Disc coverage: 46.7%
+  Cup coverage: 14.2%
+
+[256/400] Processing 1113...
+  Disc bounding box: (253, 767, 330, 370)
+  Saved cropped data: 370×330
+  Disc coverage: 40.2%
+  Cup coverage: 4.9%
+
+[257/400] Processing 1114...
+  Disc bounding box: (142, 781, 344, 384)
+  Saved cropped data: 384×344
+  Disc coverage: 41.6%
+  Cup coverage: 12.3%
+
+[258/400] Processing 1115...
+  Disc bounding box: (82, 780, 395, 419)
+  Saved cropped data: 419×395
+  Disc coverage: 45.0%
+  Cup coverage: 10.3%
+
+[259/400] Processing 1116...
+  Disc bounding box: (133, 766, 384, 405)
+  Saved cropped data: 405×384
+  Disc coverage: 44.2%
+  Cup coverage: 13.6%
+
+[260/400] Processing 1117...
+  Disc bounding box: (225, 619, 420, 439)
+  Saved cropped data: 439×420
+  Disc coverage: 46.1%
+  Cup coverage: 11.0%
+
+[261/400] Processing 1118...
+  Disc bounding box: (133, 759, 386, 421)
+  Saved cropped data: 421×386
+  Disc coverage: 44.4%
+  Cup coverage: 19.4%
+
+[262/400] Processing 1119...
+  Disc bounding box: (168, 776, 358, 353)
+  Saved cropped data: 353×358
+  Disc coverage: 40.7%
+  Cup coverage: 13.8%
+
+[263/400] Processing 1120...
+  Disc bounding box: (1, 705, 370, 426)
+  Saved cropped data: 426×370
+  Disc coverage: 44.2%
+  Cup coverage: 9.8%
+
+[264/400] Processing 1121...
+  Disc bounding box: (77, 735, 394, 448)
+  Saved cropped data: 448×394
+  Disc coverage: 45.8%
+  Cup coverage: 12.4%
+
+[265/400] Processing 1122...
+  Disc bounding box: (42, 680, 451, 437)
+  Saved cropped data: 437×451
+  Disc coverage: 47.6%
+  Cup coverage: 21.2%
+
+[266/400] Processing 1125...
+  Disc bounding box: (13, 774, 381, 445)
+  Saved cropped data: 445×381
+  Disc coverage: 45.7%
+  Cup coverage: 8.2%
+
+[267/400] Processing 1126...
+  Disc bounding box: (0, 660, 400, 460)
+  Saved cropped data: 460×400
+  Disc coverage: 46.7%
+  Cup coverage: 14.8%
+
+[268/400] Processing 1127...
+  Disc bounding box: (24, 697, 411, 471)
+  Saved cropped data: 471×411
+  Disc coverage: 47.1%
+  Cup coverage: 20.4%
+
+[269/400] Processing 1128...
+  Disc bounding box: (7, 755, 419, 449)
+  Saved cropped data: 449×419
+  Disc coverage: 46.6%
+  Cup coverage: 10.2%
+
+[270/400] Processing 1129...
+  Disc bounding box: (50, 661, 408, 435)
+  Saved cropped data: 435×408
+  Disc coverage: 45.7%
+  Cup coverage: 10.3%
+
+[271/400] Processing 1130...
+  Disc bounding box: (104, 679, 359, 427)
+  Saved cropped data: 427×359
+  Disc coverage: 43.6%
+  Cup coverage: 12.9%
+
+[272/400] Processing 1131...
+  Disc bounding box: (20, 716, 428, 454)
+  Saved cropped data: 454×428
+  Disc coverage: 47.3%
+  Cup coverage: 13.8%
+
+[273/400] Processing 1132...
+  Disc bounding box: (86, 655, 409, 440)
+  Saved cropped data: 440×409
+  Disc coverage: 46.4%
+  Cup coverage: 9.7%
+
+[274/400] Processing 1133...
+  Disc bounding box: (177, 807, 360, 376)
+  Saved cropped data: 376×360
+  Disc coverage: 41.7%
+  Cup coverage: 13.9%
+
+[275/400] Processing 1134...
+  Disc bounding box: (143, 803, 424, 479)
+  Saved cropped data: 479×424
+  Disc coverage: 47.5%
+  Cup coverage: 10.3%
+
+[276/400] Processing 1135...
+  Disc bounding box: (379, 826, 433, 465)
+  Saved cropped data: 465×433
+  Disc coverage: 47.9%
+  Cup coverage: 10.6%
+
+[277/400] Processing 1136...
+  Disc bounding box: (34, 651, 408, 445)
+  Saved cropped data: 445×408
+  Disc coverage: 45.6%
+  Cup coverage: 11.8%
+
+[278/400] Processing 1137...
+  Disc bounding box: (303, 727, 388, 419)
+  Saved cropped data: 419×388
+  Disc coverage: 44.4%
+  Cup coverage: 18.3%
+
+[279/400] Processing 1138...
+  Disc bounding box: (304, 775, 365, 400)
+  Saved cropped data: 400×365
+  Disc coverage: 43.0%
+  Cup coverage: 6.2%
+
+[280/400] Processing 1139...
+  Disc bounding box: (187, 751, 359, 400)
+  Saved cropped data: 400×359
+  Disc coverage: 42.1%
+  Cup coverage: 13.7%
+
+[281/400] Processing 1140...
+  Disc bounding box: (18, 579, 431, 447)
+  Saved cropped data: 447×431
+  Disc coverage: 47.2%
+  Cup coverage: 12.1%
+
+[282/400] Processing 1141...
+  Disc bounding box: (124, 667, 428, 443)
+  Saved cropped data: 443×428
+  Disc coverage: 46.9%
+  Cup coverage: 12.7%
+
+[283/400] Processing 1142...
+  Disc bounding box: (230, 653, 466, 461)
+  Saved cropped data: 461×466
+  Disc coverage: 48.1%
+  Cup coverage: 19.5%
+
+[284/400] Processing 1143...
+  Disc bounding box: (207, 641, 499, 490)
+  Saved cropped data: 490×499
+  Disc coverage: 50.1%
+  Cup coverage: 16.4%
+
+[285/400] Processing 1144...
+  Disc bounding box: (303, 770, 416, 414)
+  Saved cropped data: 414×416
+  Disc coverage: 45.8%
+  Cup coverage: 6.4%
+
+[286/400] Processing 1145...
+  Disc bounding box: (331, 623, 389, 424)
+  Saved cropped data: 424×389
+  Disc coverage: 45.0%
+  Cup coverage: 8.7%
+
+[287/400] Processing 1146...
+  Disc bounding box: (0, 858, 366, 405)
+  Saved cropped data: 405×366
+  Disc coverage: 46.9%
+  Cup coverage: 11.0%
+
+[288/400] Processing 1147...
+  Disc bounding box: (132, 737, 383, 402)
+  Saved cropped data: 402×383
+  Disc coverage: 43.7%
+  Cup coverage: 9.1%
+
+[289/400] Processing 1148...
+  Disc bounding box: (196, 715, 415, 449)
+  Saved cropped data: 449×415
+  Disc coverage: 46.0%
+  Cup coverage: 11.6%
+
+[290/400] Processing 1149...
+  Disc bounding box: (295, 583, 406, 443)
+  Saved cropped data: 443×406
+  Disc coverage: 45.9%
+  Cup coverage: 12.9%
+
+[291/400] Processing 1150...
+  Disc bounding box: (186, 695, 380, 415)
+  Saved cropped data: 415×380
+  Disc coverage: 43.9%
+  Cup coverage: 9.3%
+
+[292/400] Processing 1151...
+  Disc bounding box: (0, 644, 323, 385)
+  Saved cropped data: 385×323
+  Disc coverage: 38.9%
+  Cup coverage: 13.8%
+
+[293/400] Processing 1152...
+  Disc bounding box: (152, 655, 368, 390)
+  Saved cropped data: 390×368
+  Disc coverage: 41.9%
+  Cup coverage: 10.6%
+
+[294/400] Processing 1153...
+  Disc bounding box: (0, 725, 355, 464)
+  Saved cropped data: 464×355
+  Disc coverage: 51.9%
+  Cup coverage: 15.1%
+
+[295/400] Processing 1154...
+  Disc bounding box: (251, 679, 400, 448)
+  Saved cropped data: 448×400
+  Disc coverage: 46.2%
+  Cup coverage: 14.0%
+
+[296/400] Processing 1155...
+  Disc bounding box: (0, 697, 410, 449)
+  Saved cropped data: 449×410
+  Disc coverage: 46.8%
+  Cup coverage: 9.9%
+
+[297/400] Processing 1156...
+  Disc bounding box: (118, 595, 427, 476)
+  Saved cropped data: 476×427
+  Disc coverage: 47.6%
+  Cup coverage: 9.8%
+
+[298/400] Processing 1157...
+  Disc bounding box: (89, 735, 386, 407)
+  Saved cropped data: 407×386
+  Disc coverage: 44.4%
+  Cup coverage: 12.4%
+
+[299/400] Processing 1158...
+  Disc bounding box: (0, 719, 391, 421)
+  Saved cropped data: 421×391
+  Disc coverage: 45.3%
+  Cup coverage: 13.3%
+
+[300/400] Processing 1159...
+  Disc bounding box: (0, 655, 433, 476)
+  Saved cropped data: 476×433
+  Disc coverage: 48.2%
+  Cup coverage: 19.9%
+
+[301/400] Processing 1160...
+  Disc bounding box: (83, 823, 389, 404)
+  Saved cropped data: 404×389
+  Disc coverage: 44.1%
+  Cup coverage: 15.2%
+
+[302/400] Processing 1161...
+  Disc bounding box: (85, 716, 400, 394)
+  Saved cropped data: 394×400
+  Disc coverage: 45.0%
+  Cup coverage: 8.6%
+
+[303/400] Processing 1162...
+  Disc bounding box: (0, 844, 399, 420)
+  Saved cropped data: 420×399
+  Disc coverage: 45.7%
+  Cup coverage: 12.0%
+
+[304/400] Processing 1163...
+  Disc bounding box: (187, 823, 388, 432)
+  Saved cropped data: 432×388
+  Disc coverage: 44.7%
+  Cup coverage: 8.6%
+
+[305/400] Processing 1164...
+  Disc bounding box: (225, 625, 392, 437)
+  Saved cropped data: 437×392
+  Disc coverage: 45.2%
+  Cup coverage: 15.9%
+
+[306/400] Processing 1166...
+  Disc bounding box: (137, 575, 411, 438)
+  Saved cropped data: 438×411
+  Disc coverage: 46.3%
+  Cup coverage: 16.5%
+
+[307/400] Processing 1167...
+  Disc bounding box: (92, 812, 373, 414)
+  Saved cropped data: 414×373
+  Disc coverage: 43.1%
+  Cup coverage: 13.0%
+
+[308/400] Processing 1168...
+  Disc bounding box: (123, 726, 384, 432)
+  Saved cropped data: 432×384
+  Disc coverage: 45.1%
+  Cup coverage: 14.0%
+
+[309/400] Processing 1169...
+  Disc bounding box: (333, 707, 440, 463)
+  Saved cropped data: 463×440
+  Disc coverage: 48.4%
+  Cup coverage: 17.9%
+
+[310/400] Processing 1170...
+  Disc bounding box: (488, 684, 462, 449)
+  Saved cropped data: 449×462
+  Disc coverage: 48.1%
+  Cup coverage: 14.6%
+
+[311/400] Processing 1171...
+  Disc bounding box: (146, 814, 400, 408)
+  Saved cropped data: 408×400
+  Disc coverage: 44.5%
+  Cup coverage: 14.1%
+
+[312/400] Processing 1172...
+  Disc bounding box: (198, 789, 425, 433)
+  Saved cropped data: 433×425
+  Disc coverage: 46.0%
+  Cup coverage: 16.1%
+
+[313/400] Processing 1173...
+  Disc bounding box: (288, 719, 368, 396)
+  Saved cropped data: 396×368
+  Disc coverage: 43.2%
+  Cup coverage: 5.9%
+
+[314/400] Processing 1174...
+  Disc bounding box: (324, 679, 363, 407)
+  Saved cropped data: 407×363
+  Disc coverage: 42.8%
+  Cup coverage: 7.8%
+
+[315/400] Processing 1175...
+  Disc bounding box: (295, 771, 359, 395)
+  Saved cropped data: 395×359
+  Disc coverage: 42.7%
+  Cup coverage: 9.4%
+
+[316/400] Processing 1178...
+  Disc bounding box: (120, 770, 413, 407)
+  Saved cropped data: 407×413
+  Disc coverage: 44.9%
+  Cup coverage: 10.5%
+
+[317/400] Processing 1179...
+  Disc bounding box: (254, 705, 410, 437)
+  Saved cropped data: 437×410
+  Disc coverage: 47.1%
+  Cup coverage: 11.5%
+
+[318/400] Processing 1180...
+  Disc bounding box: (92, 706, 401, 437)
+  Saved cropped data: 437×401
+  Disc coverage: 44.9%
+  Cup coverage: 8.0%
+
+[319/400] Processing 1181...
+  Disc bounding box: (0, 675, 342, 417)
+  Saved cropped data: 417×342
+  Disc coverage: 51.4%
+  Cup coverage: 13.2%
+
+[320/400] Processing 1182...
+  Disc bounding box: (34, 637, 395, 427)
+  Saved cropped data: 427×395
+  Disc coverage: 45.7%
+  Cup coverage: 11.7%
+
+[321/400] Processing 1183...
+  Disc bounding box: (213, 686, 334, 339)
+  Saved cropped data: 339×334
+  Disc coverage: 38.9%
+  Cup coverage: 9.9%
+
+[322/400] Processing 1184...
+  Disc bounding box: (114, 682, 407, 440)
+  Saved cropped data: 440×407
+  Disc coverage: 46.7%
+  Cup coverage: 9.2%
+
+[323/400] Processing 1185...
+  Disc bounding box: (76, 703, 400, 428)
+  Saved cropped data: 428×400
+  Disc coverage: 45.9%
+  Cup coverage: 7.2%
+
+[324/400] Processing 1186...
+  Disc bounding box: (18, 704, 383, 448)
+  Saved cropped data: 448×383
+  Disc coverage: 45.1%
+  Cup coverage: 8.8%
+
+[325/400] Processing 1187...
+  Disc bounding box: (13, 924, 403, 431)
+  Saved cropped data: 431×403
+  Disc coverage: 45.4%
+  Cup coverage: 22.1%
+
+[326/400] Processing 1189...
+  Disc bounding box: (134, 738, 411, 425)
+  Saved cropped data: 425×411
+  Disc coverage: 45.8%
+  Cup coverage: 9.6%
+
+[327/400] Processing 1190...
+  Disc bounding box: (322, 663, 391, 431)
+  Saved cropped data: 431×391
+  Disc coverage: 45.4%
+  Cup coverage: 13.1%
+
+[328/400] Processing 1191...
+  Disc bounding box: (0, 656, 392, 471)
+  Saved cropped data: 471×392
+  Disc coverage: 46.4%
+  Cup coverage: 9.9%
+
+[329/400] Processing 1192...
+  Disc bounding box: (0, 746, 378, 472)
+  Saved cropped data: 472×378
+  Disc coverage: 47.1%
+  Cup coverage: 9.0%
+
+[330/400] Processing 1193...
+  Disc bounding box: (0, 779, 370, 453)
+  Saved cropped data: 453×370
+  Disc coverage: 50.4%
+  Cup coverage: 12.9%
+
+[331/400] Processing 1195...
+  Disc bounding box: (0, 679, 354, 466)
+  Saved cropped data: 466×354
+  Disc coverage: 50.4%
+  Cup coverage: 11.8%
+
+[332/400] Processing 1196...
+  Disc bounding box: (62, 681, 384, 451)
+  Saved cropped data: 451×384
+  Disc coverage: 45.1%
+  Cup coverage: 14.9%
+
+[333/400] Processing 1197...
+  Disc bounding box: (0, 819, 387, 428)
+  Saved cropped data: 428×387
+  Disc coverage: 44.7%
+  Cup coverage: 9.0%
+
+[334/400] Processing 1198...
+  Disc bounding box: (57, 767, 396, 412)
+  Saved cropped data: 412×396
+  Disc coverage: 44.4%
+  Cup coverage: 9.6%
+
+[335/400] Processing 1199...
+  Disc bounding box: (84, 724, 385, 415)
+  Saved cropped data: 415×385
+  Disc coverage: 44.5%
+  Cup coverage: 10.4%
+
+[336/400] Processing 1200...
+  Disc bounding box: (77, 800, 376, 400)
+  Saved cropped data: 400×376
+  Disc coverage: 43.2%
+  Cup coverage: 11.3%
+
+[337/400] Processing 1202...
+  Disc bounding box: (49, 725, 406, 430)
+  Saved cropped data: 430×406
+  Disc coverage: 45.6%
+  Cup coverage: 12.2%
+
+[338/400] Processing 1203...
+  Disc bounding box: (170, 823, 367, 400)
+  Saved cropped data: 400×367
+  Disc coverage: 42.8%
+  Cup coverage: 9.6%
+
+[339/400] Processing 1204...
+  Disc bounding box: (188, 777, 355, 382)
+  Saved cropped data: 382×355
+  Disc coverage: 41.9%
+  Cup coverage: 9.2%
+
+[340/400] Processing 1205...
+  Disc bounding box: (231, 835, 431, 460)
+  Saved cropped data: 460×431
+  Disc coverage: 47.5%
+  Cup coverage: 27.4%
+
+[341/400] Processing 1206...
+  Disc bounding box: (252, 827, 420, 432)
+  Saved cropped data: 432×420
+  Disc coverage: 45.9%
+  Cup coverage: 28.3%
+
+[342/400] Processing 1207...
+  Disc bounding box: (0, 687, 395, 436)
+  Saved cropped data: 436×395
+  Disc coverage: 45.5%
+  Cup coverage: 14.0%
+
+[343/400] Processing 1208...
+  Disc bounding box: (93, 735, 381, 416)
+  Saved cropped data: 416×381
+  Disc coverage: 43.8%
+  Cup coverage: 14.7%
+
+[344/400] Processing 1209...
+  Disc bounding box: (69, 736, 389, 421)
+  Saved cropped data: 421×389
+  Disc coverage: 44.7%
+  Cup coverage: 13.5%
+
+[345/400] Processing 1210...
+  Disc bounding box: (96, 821, 369, 382)
+  Saved cropped data: 382×369
+  Disc coverage: 42.4%
+  Cup coverage: 11.9%
+
+[346/400] Processing 1211...
+  Disc bounding box: (202, 775, 362, 389)
+  Saved cropped data: 389×362
+  Disc coverage: 42.2%
+  Cup coverage: 26.4%
+
+[347/400] Processing 1212...
+  Disc bounding box: (217, 831, 374, 392)
+  Saved cropped data: 392×374
+  Disc coverage: 42.7%
+  Cup coverage: 15.4%
+
+[348/400] Processing 1213...
+  Disc bounding box: (89, 751, 395, 414)
+  Saved cropped data: 414×395
+  Disc coverage: 44.5%
+  Cup coverage: 8.6%
+
+[349/400] Processing 1214...
+  Disc bounding box: (163, 588, 414, 471)
+  Saved cropped data: 471×414
+  Disc coverage: 47.6%
+  Cup coverage: 10.9%
+
+[350/400] Processing 1215...
+  Disc bounding box: (124, 623, 432, 471)
+  Saved cropped data: 471×432
+  Disc coverage: 47.4%
+  Cup coverage: 11.0%
+
+[351/400] Processing 1216...
+  Disc bounding box: (61, 739, 345, 388)
+  Saved cropped data: 388×345
+  Disc coverage: 41.5%
+  Cup coverage: 7.4%
+
+[352/400] Processing 1217...
+  Disc bounding box: (105, 814, 332, 393)
+  Saved cropped data: 393×332
+  Disc coverage: 41.1%
+  Cup coverage: 12.2%
+
+[353/400] Processing 1218...
+  Disc bounding box: (34, 769, 394, 425)
+  Saved cropped data: 425×394
+  Disc coverage: 45.0%
+  Cup coverage: 9.6%
+
+[354/400] Processing 1219...
+  Disc bounding box: (2, 743, 409, 457)
+  Saved cropped data: 457×409
+  Disc coverage: 46.7%
+  Cup coverage: 18.0%
+
+[355/400] Processing 1220...
+  Disc bounding box: (82, 743, 372, 428)
+  Saved cropped data: 428×372
+  Disc coverage: 44.4%
+  Cup coverage: 23.1%
+
+[356/400] Processing 1221...
+  Disc bounding box: (73, 800, 382, 391)
+  Saved cropped data: 391×382
+  Disc coverage: 43.1%
+  Cup coverage: 28.7%
+
+[357/400] Processing 1222...
+  Disc bounding box: (66, 797, 378, 429)
+  Saved cropped data: 429×378
+  Disc coverage: 44.6%
+  Cup coverage: 11.6%
+
+[358/400] Processing 1223...
+  Disc bounding box: (165, 818, 420, 416)
+  Saved cropped data: 416×420
+  Disc coverage: 45.5%
+  Cup coverage: 15.1%
+
+[359/400] Processing 1224...
+  Disc bounding box: (141, 779, 414, 409)
+  Saved cropped data: 409×414
+  Disc coverage: 45.1%
+  Cup coverage: 17.4%
+
+[360/400] Processing 1225...
+  Disc bounding box: (30, 712, 438, 472)
+  Saved cropped data: 472×438
+  Disc coverage: 48.2%
+  Cup coverage: 35.5%
+
+[361/400] Processing 1226...
+  Disc bounding box: (111, 787, 351, 372)
+  Saved cropped data: 372×351
+  Disc coverage: 41.2%
+  Cup coverage: 11.9%
+
+[362/400] Processing 1227...
+  Disc bounding box: (126, 760, 326, 392)
+  Saved cropped data: 392×326
+  Disc coverage: 40.7%
+  Cup coverage: 11.5%
+
+[363/400] Processing 1228...
+  Disc bounding box: (0, 818, 403, 448)
+  Saved cropped data: 448×403
+  Disc coverage: 45.8%
+  Cup coverage: 13.3%
+
+[364/400] Processing 1231...
+  Disc bounding box: (203, 783, 406, 448)
+  Saved cropped data: 448×406
+  Disc coverage: 46.2%
+  Cup coverage: 9.1%
+
+[365/400] Processing 1232...
+  Disc bounding box: (178, 807, 408, 444)
+  Saved cropped data: 444×408
+  Disc coverage: 46.3%
+  Cup coverage: 11.0%
+
+[366/400] Processing 1233...
+  Disc bounding box: (227, 809, 370, 417)
+  Saved cropped data: 417×370
+  Disc coverage: 43.5%
+  Cup coverage: 8.2%
+
+[367/400] Processing 1234...
+  Disc bounding box: (261, 864, 331, 399)
+  Saved cropped data: 399×331
+  Disc coverage: 41.1%
+  Cup coverage: 14.2%
+
+[368/400] Processing 1236...
+  Disc bounding box: (6, 713, 367, 423)
+  Saved cropped data: 423×367
+  Disc coverage: 43.8%
+  Cup coverage: 13.9%
+
+[369/400] Processing 1237...
+  Disc bounding box: (71, 695, 370, 379)
+  Saved cropped data: 379×370
+  Disc coverage: 42.6%
+  Cup coverage: 11.2%
+
+[370/400] Processing 1238...
+  Disc bounding box: (166, 703, 373, 468)
+  Saved cropped data: 468×373
+  Disc coverage: 44.8%
+  Cup coverage: 10.6%
+
+[371/400] Processing 1239...
+  Disc bounding box: (17, 690, 365, 435)
+  Saved cropped data: 435×365
+  Disc coverage: 43.8%
+  Cup coverage: 9.5%
+
+[372/400] Processing 1240...
+  Disc bounding box: (240, 700, 482, 444)
+  Saved cropped data: 444×482
+  Disc coverage: 48.7%
+  Cup coverage: 12.1%
+
+[373/400] Processing 1241...
+  Disc bounding box: (105, 747, 403, 421)
+  Saved cropped data: 421×403
+  Disc coverage: 45.5%
+  Cup coverage: 9.2%
+
+[374/400] Processing 1242...
+  Disc bounding box: (155, 724, 436, 394)
+  Saved cropped data: 394×436
+  Disc coverage: 45.4%
+  Cup coverage: 11.9%
+
+[375/400] Processing 1243...
+  Disc bounding box: (356, 868, 392, 414)
+  Saved cropped data: 414×392
+  Disc coverage: 44.2%
+  Cup coverage: 6.9%
+
+[376/400] Processing 1244...
+  Disc bounding box: (84, 795, 362, 395)
+  Saved cropped data: 395×362
+  Disc coverage: 43.0%
+  Cup coverage: 14.6%
+
+[377/400] Processing 1245...
+  Disc bounding box: (166, 691, 365, 391)
+  Saved cropped data: 391×365
+  Disc coverage: 42.6%
+  Cup coverage: 10.2%
+
+[378/400] Processing 1246...
+  Disc bounding box: (125, 719, 383, 396)
+  Saved cropped data: 396×383
+  Disc coverage: 43.4%
+  Cup coverage: 8.4%
+
+[379/400] Processing 1249...
+  Disc bounding box: (215, 691, 355, 401)
+  Saved cropped data: 401×355
+  Disc coverage: 42.2%
+  Cup coverage: 9.7%
+
+[380/400] Processing 1250...
+  Disc bounding box: (94, 754, 376, 409)
+  Saved cropped data: 409×376
+  Disc coverage: 43.8%
+  Cup coverage: 14.1%
+
+[381/400] Processing 1251...
+  Disc bounding box: (138, 776, 388, 427)
+  Saved cropped data: 427×388
+  Disc coverage: 45.0%
+  Cup coverage: 29.7%
+
+[382/400] Processing 1252...
+  Disc bounding box: (155, 756, 430, 385)
+  Saved cropped data: 385×430
+  Disc coverage: 44.5%
+  Cup coverage: 8.6%
+
+[383/400] Processing 1253...
+  Disc bounding box: (156, 890, 352, 443)
+  Saved cropped data: 443×352
+  Disc coverage: 43.9%
+  Cup coverage: 7.4%
+
+[384/400] Processing 1254...
+  Disc bounding box: (207, 739, 398, 435)
+  Saved cropped data: 435×398
+  Disc coverage: 45.2%
+  Cup coverage: 25.9%
+
+[385/400] Processing 1255...
+  Disc bounding box: (155, 695, 436, 436)
+  Saved cropped data: 436×436
+  Disc coverage: 46.6%
+  Cup coverage: 17.1%
+
+[386/400] Processing 1256...
+  Disc bounding box: (0, 711, 441, 470)
+  Saved cropped data: 470×441
+  Disc coverage: 48.0%
+  Cup coverage: 10.4%
+
+[387/400] Processing 1257...
+  Disc bounding box: (0, 717, 404, 441)
+  Saved cropped data: 441×404
+  Disc coverage: 45.9%
+  Cup coverage: 9.5%
+
+[388/400] Processing 1258...
+  Disc bounding box: (18, 723, 428, 444)
+  Saved cropped data: 444×428
+  Disc coverage: 47.2%
+  Cup coverage: 10.2%
+
+[389/400] Processing 1261...
+  Disc bounding box: (146, 753, 393, 447)
+  Saved cropped data: 447×393
+  Disc coverage: 45.9%
+  Cup coverage: 12.4%
+
+[390/400] Processing 1262...
+  Disc bounding box: (228, 751, 387, 438)
+  Saved cropped data: 438×387
+  Disc coverage: 45.1%
+  Cup coverage: 10.3%
+
+[391/400] Processing 1263...
+  Disc bounding box: (123, 667, 407, 435)
+  Saved cropped data: 435×407
+  Disc coverage: 45.6%
+  Cup coverage: 26.5%
+
+[392/400] Processing 1264...
+  Disc bounding box: (149, 625, 401, 501)
+  Saved cropped data: 501×401
+  Disc coverage: 48.4%
+  Cup coverage: 9.4%
+
+[393/400] Processing 1266...
+  Disc bounding box: (147, 774, 405, 456)
+  Saved cropped data: 456×405
+  Disc coverage: 46.4%
+  Cup coverage: 13.5%
+
+[394/400] Processing 1267...
+  Disc bounding box: (141, 677, 427, 473)
+  Saved cropped data: 473×427
+  Disc coverage: 47.7%
+  Cup coverage: 11.7%
+
+[395/400] Processing 1268...
+  Disc bounding box: (87, 735, 346, 416)
+  Saved cropped data: 416×346
+  Disc coverage: 42.9%
+  Cup coverage: 10.2%
+
+[396/400] Processing 1269...
+  Disc bounding box: (211, 743, 380, 413)
+  Saved cropped data: 413×380
+  Disc coverage: 44.1%
+  Cup coverage: 9.1%
+
+[397/400] Processing 1271...
+  Disc bounding box: (282, 787, 308, 392)
+  Saved cropped data: 392×308
+  Disc coverage: 39.9%
+  Cup coverage: 16.6%
+
+[398/400] Processing 1272...
+  Disc bounding box: (249, 871, 360, 404)
+  Saved cropped data: 404×360
+  Disc coverage: 42.8%
+  Cup coverage: 7.7%
+
+[399/400] Processing 1274...
+  Disc bounding box: (100, 794, 404, 412)
+  Saved cropped data: 412×404
+  Disc coverage: 44.7%
+  Cup coverage: 13.4%
+
+[400/400] Processing 1275...
+  Disc bounding box: (179, 688, 400, 401)
+  Saved cropped data: 401×400
+  Disc coverage: 44.2%
+  Cup coverage: 29.0%
+
+
+============================================================
+Summary: 400/400 successful
+============================================================
+=====================

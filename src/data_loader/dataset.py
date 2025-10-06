@@ -5,6 +5,7 @@ import os
 from typing import Tuple, Optional, Callable
 import pandas as pd
 import numpy as np
+import cv2
 from PIL import Image
 import torch
 from torch.utils.data import Dataset
@@ -23,6 +24,7 @@ class RetinaDataset(Dataset):
         transform: Optional transform to apply to images
         target_size: Tuple of (height, width) to resize images and masks
         use_cropped: Whether to use cropped images (default True for ROI-based approach)
+        cropped_masks_dir: Directory containing generated cropped masks (if use_cropped=True)
     """
 
     def __init__(
@@ -31,7 +33,8 @@ class RetinaDataset(Dataset):
         csv_file: str,
         transform: Optional[Callable] = None,
         target_size: Tuple[int, int] = (512, 512),
-        use_cropped: bool = True
+        use_cropped: bool = True,
+        cropped_masks_dir: str = 'datasets/REFUGE_cropped_masks'
     ):
         self.root_dir = root_dir
         self.df = pd.read_csv(csv_file)
@@ -43,6 +46,7 @@ class RetinaDataset(Dataset):
         self.transform = transform
         self.target_size = target_size
         self.use_cropped = use_cropped
+        self.cropped_masks_dir = cropped_masks_dir
 
         # Default transforms if none provided
         if self.transform is None:
@@ -73,21 +77,25 @@ class RetinaDataset(Dataset):
         row = self.df.iloc[idx]
 
         # Extract folder ID from the training folder structure
-        # Images are in Training-400/XXXX/XXXX_cropped.jpg format
         folder_name = self._extract_folder_name(row)
 
-        # Construct paths
+        # Construct paths based on whether we're using cropped versions
         if self.use_cropped:
-            img_path = os.path.join(self.root_dir, 'Training-400',
-                                    folder_name, f'{folder_name}_cropped.jpg')
+            # Use the generated cropped masks from REFUGE_cropped_masks
+            img_path = os.path.join(self.cropped_masks_dir, folder_name, 
+                                    f'{folder_name}_cropped.jpg')
+            disc_mask_path = os.path.join(self.cropped_masks_dir, folder_name,
+                                          f'{folder_name}_disc_cropped.bmp')
+            cup_mask_path = os.path.join(self.cropped_masks_dir, folder_name,
+                                         f'{folder_name}_cup_cropped.bmp')
         else:
+            # Use full resolution images and masks
             img_path = os.path.join(self.root_dir, 'Training-400',
                                     folder_name, f'{folder_name}.jpg')
-
-        disc_mask_path = os.path.join(self.root_dir, 'Training-400',
-                                      folder_name, f'{folder_name}_disc.bmp')
-        cup_mask_path = os.path.join(self.root_dir, 'Training-400',
-                                     folder_name, f'{folder_name}_cup.bmp')
+            disc_mask_path = os.path.join(self.root_dir, 'Training-400',
+                                          folder_name, f'{folder_name}_disc.bmp')
+            cup_mask_path = os.path.join(self.root_dir, 'Training-400',
+                                         folder_name, f'{folder_name}_cup.bmp')
 
         # Load image
         image = Image.open(img_path).convert('RGB')
@@ -102,8 +110,8 @@ class RetinaDataset(Dataset):
         cup_mask = self.mask_transform(cup_mask)
 
         # Binarize masks (threshold at 0.5 after normalization)
-        disc_mask = (disc_mask > 0.5).float()
-        cup_mask = (cup_mask > 0.5).float()
+        disc_mask = (disc_mask < 0.75).float()  # BMP: 128=disc foreground
+        cup_mask = (cup_mask < 0.5).float()  # BMP: 0=cup foreground
 
         # Combine disc and cup masks into a single tensor (2 channels)
         mask = torch.cat([disc_mask, cup_mask], dim=0)
@@ -143,13 +151,15 @@ class RetinaDatasetValidation(Dataset):
         csv_file: str,
         transform: Optional[Callable] = None,
         target_size: Tuple[int, int] = (512, 512),
-        use_cropped: bool = True
+        use_cropped: bool = True,
+        cropped_masks_dir: str = 'datasets/REFUGE_cropped_masks_val'
     ):
         self.root_dir = root_dir
         self.df = pd.read_csv(csv_file)
         self.transform = transform
         self.target_size = target_size
         self.use_cropped = use_cropped
+        self.cropped_masks_dir = cropped_masks_dir
 
         if self.transform is None:
             self.transform = transforms.Compose([
@@ -172,18 +182,21 @@ class RetinaDatasetValidation(Dataset):
         row = self.df.iloc[idx]
         folder_name = self._extract_folder_name(row)
 
-        # Use Validation-400 folder
+        # Use cropped masks if available, otherwise fall back to Validation-400
         if self.use_cropped:
-            img_path = os.path.join(self.root_dir, 'Validation-400',
-                                    folder_name, f'{folder_name}_cropped.jpg')
+            img_path = os.path.join(self.cropped_masks_dir, folder_name,
+                                    f'{folder_name}_cropped.jpg')
+            disc_mask_path = os.path.join(self.cropped_masks_dir, folder_name,
+                                          f'{folder_name}_disc_cropped.bmp')
+            cup_mask_path = os.path.join(self.cropped_masks_dir, folder_name,
+                                         f'{folder_name}_cup_cropped.bmp')
         else:
             img_path = os.path.join(self.root_dir, 'Validation-400',
                                     folder_name, f'{folder_name}.jpg')
-
-        disc_mask_path = os.path.join(self.root_dir, 'Validation-400',
-                                      folder_name, f'{folder_name}_disc.bmp')
-        cup_mask_path = os.path.join(self.root_dir, 'Validation-400',
-                                     folder_name, f'{folder_name}_cup.bmp')
+            disc_mask_path = os.path.join(self.root_dir, 'Validation-400',
+                                          folder_name, f'{folder_name}_disc.bmp')
+            cup_mask_path = os.path.join(self.root_dir, 'Validation-400',
+                                         folder_name, f'{folder_name}_cup.bmp')
 
         image = Image.open(img_path).convert('RGB')
         disc_mask = Image.open(disc_mask_path).convert('L')
@@ -193,8 +206,8 @@ class RetinaDatasetValidation(Dataset):
         disc_mask = self.mask_transform(disc_mask)
         cup_mask = self.mask_transform(cup_mask)
 
-        disc_mask = (disc_mask > 0.5).float()
-        cup_mask = (cup_mask > 0.5).float()
+        disc_mask = (disc_mask < 0.75).float()  # BMP: 128=disc foreground
+        cup_mask = (cup_mask < 0.5).float()  # BMP: 0=cup foreground
 
         mask = torch.cat([disc_mask, cup_mask], dim=0)
 
@@ -209,6 +222,110 @@ class RetinaDatasetValidation(Dataset):
             if part.isdigit():
                 return part
         # Fallback: use the second-to-last part
+        return parts[-2]
+
+    def get_label(self, idx: int) -> int:
+        return self.df.iloc[idx]['label']
+
+
+class RetinaDatasetTest(Dataset):
+    """
+    Test dataset for REFUGE with support for cropped masks.
+    Similar to RetinaDatasetValidation but for Test-400 folder.
+    """
+
+    def __init__(
+        self,
+        csv_file: str,
+        root_dir: str,
+        transform: Optional[Callable] = None,
+        target_size: Tuple[int, int] = (512, 512),
+        use_cropped: bool = True,
+        cropped_masks_dir: str = 'datasets/REFUGE_cropped_masks_test'
+    ):
+        self.root_dir = root_dir
+        self.df = pd.read_csv(csv_file)
+        self.transform = transform
+        self.target_size = target_size
+        self.use_cropped = use_cropped
+        self.cropped_masks_dir = cropped_masks_dir
+
+        # Filter out rows with NaN in multimaskName
+        self.df = self.df[self.df['multimaskName'].notna()
+                          ].reset_index(drop=True)
+
+        # Image transforms
+        if self.transform is None:
+            self.transform = transforms.Compose([
+                transforms.Resize(target_size),
+                transforms.ToTensor(),
+                transforms.Normalize(
+                    mean=[0.485, 0.456, 0.406],
+                    std=[0.229, 0.224, 0.225]
+                )
+            ])
+
+        # Mask transform
+        self.mask_transform = transforms.Compose([
+            transforms.Resize(target_size, interpolation=Image.NEAREST),
+            transforms.ToTensor()
+        ])
+
+    def __len__(self) -> int:
+        return len(self.df)
+
+    def __getitem__(self, idx: int) -> Tuple[torch.Tensor, torch.Tensor]:
+        row = self.df.iloc[idx]
+        folder_name = self._extract_folder_name(row)
+
+        # Use cropped masks if available, otherwise fall back to Test-400
+        if self.use_cropped:
+            img_path = os.path.join(self.cropped_masks_dir, folder_name,
+                                    f'{folder_name}_cropped.jpg')
+            disc_mask_path = os.path.join(self.cropped_masks_dir, folder_name,
+                                          f'{folder_name}_disc_cropped.bmp')
+            cup_mask_path = os.path.join(self.cropped_masks_dir, folder_name,
+                                         f'{folder_name}_cup_cropped.bmp')
+        else:
+            img_path = os.path.join(self.root_dir, 'Test-400',
+                                    folder_name, f'{folder_name}.jpg')
+            disc_mask_path = os.path.join(self.root_dir, 'Test-400',
+                                          folder_name, f'{folder_name}_disc.bmp')
+            cup_mask_path = os.path.join(self.root_dir, 'Test-400',
+                                         folder_name, f'{folder_name}_cup.bmp')
+
+        # Load image
+        image = Image.open(img_path).convert('RGB')
+
+        # Load masks
+        disc_mask = cv2.imread(disc_mask_path, cv2.IMREAD_GRAYSCALE)
+        cup_mask = cv2.imread(cup_mask_path, cv2.IMREAD_GRAYSCALE)
+
+        # Threshold masks: disc (128), cup (0), background (255)
+        disc_mask = (disc_mask < 200).astype(np.uint8) * 255
+        cup_mask = (cup_mask < 128).astype(np.uint8) * 255
+
+        # Convert to PIL
+        disc_mask = Image.fromarray(disc_mask)
+        cup_mask = Image.fromarray(cup_mask)
+
+        # Apply transforms
+        image = self.transform(image)
+        disc_mask = self.mask_transform(disc_mask)
+        cup_mask = self.mask_transform(cup_mask)
+
+        # Stack masks: [disc, cup]
+        mask = torch.cat([disc_mask, cup_mask], dim=0)
+
+        return image, mask
+
+    def _extract_folder_name(self, row: pd.Series) -> str:
+        """Extract folder name from multimaskName path."""
+        multimask_path = row['multimaskName']
+        parts = multimask_path.split('/')
+        for part in parts:
+            if part.isdigit():
+                return part
         return parts[-2]
 
     def get_label(self, idx: int) -> int:
@@ -321,8 +438,8 @@ class EnhancedRetinaDataset(Dataset):
         cup_mask = self.mask_transform(cup_mask)
 
         # Binarize masks
-        disc_mask = (disc_mask > 0.5).float()
-        cup_mask = (cup_mask > 0.5).float()
+        disc_mask = (disc_mask < 0.75).float()  # BMP: 128=disc foreground
+        cup_mask = (cup_mask < 0.5).float()  # BMP: 0=cup foreground
 
         # Combine masks
         mask = torch.cat([disc_mask, cup_mask], dim=0)
@@ -417,8 +534,8 @@ class EnhancedRetinaDatasetValidation(Dataset):
         disc_mask = self.mask_transform(disc_mask)
         cup_mask = self.mask_transform(cup_mask)
 
-        disc_mask = (disc_mask > 0.5).float()
-        cup_mask = (cup_mask > 0.5).float()
+        disc_mask = (disc_mask < 0.75).float()  # BMP: 128=disc foreground
+        cup_mask = (cup_mask < 0.5).float()  # BMP: 0=cup foreground
 
         mask = torch.cat([disc_mask, cup_mask], dim=0)
 

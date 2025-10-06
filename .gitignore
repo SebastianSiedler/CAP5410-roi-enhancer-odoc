@@ -2,3 +2,5 @@
 **/datasets/REFUGE/**
 **/*.pyc
 **/__pycache__/
+**/*.pkl
+**/*.pth
