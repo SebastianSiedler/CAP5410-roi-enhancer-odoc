@@ -1,0 +1,19 @@
+{
+    "data_dir": "datasets/REFUGE",
+    "train_csv": "datasets/REFUGE/REFUGETrain.csv",
+    "val_csv": "datasets/REFUGE/REFUGE1Val.csv",
+    "base_features": 64,
+    "bilinear": false,
+    "epochs": 5,
+    "batch_size": 4,
+    "lr": 0.0001,
+    "weight_decay": 1e-05,
+    "target_size": 512,
+    "lambda_dice": 0.5,
+    "lambda_bce": 0.5,
+    "save_dir": "experiments/baseline_unet",
+    "save_freq": 10,
+    "resume": null,
+    "device": "mps",
+    "num_workers": 4
+}

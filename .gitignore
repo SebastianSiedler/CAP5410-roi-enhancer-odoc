@@ -1,2 +1,4 @@
 **/*.DS_Store
 **/datasets/REFUGE/**
+**/*.pyc
+**/__pycache__/
