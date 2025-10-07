@@ -34,7 +34,9 @@ class RetinaDataset(Dataset):
         transform: Optional[Callable] = None,
         target_size: Tuple[int, int] = (512, 512),
         use_cropped: bool = True,
-        cropped_masks_dir: str = 'datasets/REFUGE_cropped_masks'
+        cropped_masks_dir: str = 'datasets/REFUGE_cropped_masks',
+        training: bool = False,
+        augment: bool = True
     ):
         self.root_dir = root_dir
         self.df = pd.read_csv(csv_file)
@@ -47,6 +49,15 @@ class RetinaDataset(Dataset):
         self.target_size = target_size
         self.use_cropped = use_cropped
         self.cropped_masks_dir = cropped_masks_dir
+        self.training = training
+        self.augment = augment
+        
+        # Initialize augmentation if training
+        if self.training and self.augment:
+            from .training_augmentation import TrainingAugmentation
+            self.augmentor = TrainingAugmentation(training=True, p=0.5)
+        else:
+            self.augmentor = None
 
         # Default transforms if none provided
         if self.transform is None:
@@ -97,21 +108,23 @@ class RetinaDataset(Dataset):
             cup_mask_path = os.path.join(self.root_dir, 'Training-400',
                                          folder_name, f'{folder_name}_cup.bmp')
 
-        # Load image
+                # Load as PIL Image
         image = Image.open(img_path).convert('RGB')
+        mask_disc = Image.open(disc_mask_path).convert('L')
+        mask_cup = Image.open(cup_mask_path).convert('L')
 
-        # Load masks
-        disc_mask = Image.open(disc_mask_path).convert('L')  # Grayscale
-        cup_mask = Image.open(cup_mask_path).convert('L')
+        # Apply augmentation if training
+        if self.augmentor is not None:
+            image, mask_disc, mask_cup = self.augmentor(image, mask_disc, mask_cup)
 
         # Apply transforms
         image = self.transform(image)
-        disc_mask = self.mask_transform(disc_mask)
-        cup_mask = self.mask_transform(cup_mask)
+        mask_disc_tensor = self.mask_transform(mask_disc)
+        mask_cup_tensor = self.mask_transform(mask_cup)
 
         # Binarize masks (threshold at 0.5 after normalization)
-        disc_mask = (disc_mask < 0.75).float()  # BMP: 128=disc foreground
-        cup_mask = (cup_mask < 0.5).float()  # BMP: 0=cup foreground
+        disc_mask = (mask_disc_tensor < 0.75).float()  # BMP: 128=disc foreground
+        cup_mask = (mask_cup_tensor < 0.5).float()  # BMP: 0=cup foreground
 
         # Combine disc and cup masks into a single tensor (2 channels)
         mask = torch.cat([disc_mask, cup_mask], dim=0)

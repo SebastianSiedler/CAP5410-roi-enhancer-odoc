@@ -4,6 +4,7 @@ Trains U-Net on REFUGE dataset for optic disc/cup segmentation
 """
 from utils.metrics import batch_metrics, MetricsTracker
 from utils.loss_functions import CombinedSegmentationLoss
+from utils.improved_losses import ImprovedCombinedLoss
 from models.unet import UNet
 from data_loader.dataset import RetinaDataset, RetinaDatasetValidation
 import os
@@ -113,7 +114,9 @@ def create_dataloaders(args):
         root_dir=args.data_dir,
         csv_file=args.train_csv,
         target_size=(args.target_size, args.target_size),
-        use_cropped=True
+        use_cropped=True,
+        training=True,      # Enable training mode for augmentation
+        augment=True        # Enable augmentation
     )
 
     train_loader = DataLoader(
@@ -262,10 +265,10 @@ def main():
     num_params = sum(p.numel() for p in model.parameters())
     print(f"Model parameters: {num_params:,}")
 
-    # Create loss function
-    criterion = CombinedSegmentationLoss(
-        lambda_dice=args.lambda_dice,
-        lambda_bce=args.lambda_bce
+    # Create loss function - Use ImprovedCombinedLoss for better cup segmentation
+    criterion = ImprovedCombinedLoss(
+        cup_weight=2.0,      # Emphasize cup (2x weight)
+        use_focal=True       # Use focal loss for hard examples
     )
 
     # Create optimizer
