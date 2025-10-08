@@ -15,6 +15,7 @@ import torchvision.transforms as transforms
 
 from src.models.unet import UNet
 from src.utils.metrics import calculate_cdr
+from src.data_loader.clahe_preprocessing import CLAHEPreprocessor
 
 
 def load_model(checkpoint_path, device='cuda'):
@@ -68,13 +69,15 @@ def load_model(checkpoint_path, device='cuda'):
     return model, config
 
 
-def preprocess_image(image_path, target_size=(512, 512)):
+def preprocess_image(image_path, target_size=(512, 512), use_clahe=True, clahe_mode='LAB'):
     """
     Load and preprocess image for inference
     
     Args:
         image_path: Path to input image
         target_size: Target size for resizing
+        use_clahe: Whether to apply CLAHE preprocessing
+        clahe_mode: CLAHE mode ('LAB', 'RGB', 'HSV')
     
     Returns:
         tensor: Preprocessed image tensor (1, 3, H, W)
@@ -85,6 +88,18 @@ def preprocess_image(image_path, target_size=(512, 512)):
     
     # Store original for visualization
     original = image.copy()
+    
+    # Apply CLAHE if requested
+    if use_clahe:
+        clahe_preprocessor = CLAHEPreprocessor(
+            clip_limit=2.0,
+            tile_grid_size=(8, 8),
+            apply_to=clahe_mode
+        )
+        # Convert PIL to numpy for CLAHE
+        image_np = np.array(image)
+        enhanced_np = clahe_preprocessor(image_np)
+        image = Image.fromarray(enhanced_np)
     
     # Preprocessing pipeline (same as training)
     transform = transforms.Compose([
@@ -226,6 +241,13 @@ def main():
                        help='Device to use (cuda/cpu)')
     parser.add_argument('--threshold', type=float, default=0.5,
                        help='Threshold for binary segmentation')
+    parser.add_argument('--use_clahe', action='store_true', default=True,
+                       help='Apply CLAHE preprocessing (default: True)')
+    parser.add_argument('--no_clahe', action='store_false', dest='use_clahe',
+                       help='Disable CLAHE preprocessing')
+    parser.add_argument('--clahe_mode', type=str, default='LAB',
+                       choices=['LAB', 'RGB', 'HSV'],
+                       help='CLAHE mode (default: LAB)')
     
     args = parser.parse_args()
     
@@ -242,7 +264,10 @@ def main():
     
     # Load and preprocess image
     print(f"\nProcessing image: {args.image}")
-    image_tensor, original_image = preprocess_image(args.image)
+    print(f"  CLAHE: {'Enabled' if args.use_clahe else 'Disabled'}")
+    if args.use_clahe:
+        print(f"  CLAHE mode: {args.clahe_mode}")
+    image_tensor, original_image = preprocess_image(args.image, use_clahe=args.use_clahe, clahe_mode=args.clahe_mode)
     
     # Make prediction
     print("Running inference...")

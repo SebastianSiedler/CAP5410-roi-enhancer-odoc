@@ -37,7 +37,8 @@ class RetinaDataset(Dataset):
         cropped_masks_dir: str = 'datasets/REFUGE_cropped_masks',
         use_clahe: bool = False,
         clahe_clip_limit: float = 2.0,
-        clahe_mode: str = 'LAB'
+        clahe_mode: str = 'LAB',
+        augmentation: Optional[Callable] = None
     ):
         self.root_dir = root_dir
         self.df = pd.read_csv(csv_file)
@@ -51,6 +52,7 @@ class RetinaDataset(Dataset):
         self.use_cropped = use_cropped
         self.cropped_masks_dir = cropped_masks_dir
         self.use_clahe = use_clahe
+        self.augmentation = augmentation  # NEW: Store augmentation callable
         
         # Initialize CLAHE preprocessor if enabled
         if self.use_clahe:
@@ -134,6 +136,10 @@ class RetinaDataset(Dataset):
 
         # Combine disc and cup masks into a single tensor (2 channels)
         mask = torch.cat([disc_mask, cup_mask], dim=0)
+
+        # Apply augmentation if provided (after transforms, synchronized for image and mask)
+        if self.augmentation is not None:
+            image, mask = self.augmentation(image, mask)
 
         return image, mask
 
@@ -283,7 +289,8 @@ class RetinaDatasetTest(Dataset):
         cropped_masks_dir: str = 'datasets/REFUGE_cropped_masks_test',
         use_clahe: bool = False,
         clahe_clip_limit: float = 2.0,
-        clahe_mode: str = 'LAB'
+        clahe_mode: str = 'LAB',
+        augmentation: Optional[Callable] = None
     ):
         self.root_dir = root_dir
         self.df = pd.read_csv(csv_file)
@@ -292,6 +299,7 @@ class RetinaDatasetTest(Dataset):
         self.use_cropped = use_cropped
         self.cropped_masks_dir = cropped_masks_dir
         self.use_clahe = use_clahe
+        self.augmentation = augmentation  # NEW: Store augmentation (typically None for test)
         
         # Initialize CLAHE preprocessor if enabled
         if self.use_clahe:
@@ -388,6 +396,11 @@ class RetinaDatasetTest(Dataset):
 
     def get_label(self, idx: int) -> int:
         return self.df.iloc[idx]['label']
+    
+    def get_image_name(self, idx: int) -> str:
+        """Get the image name/ID for display purposes."""
+        row = self.df.iloc[idx]
+        return self._extract_folder_name(row)
 
 
 class EnhancedRetinaDataset(Dataset):

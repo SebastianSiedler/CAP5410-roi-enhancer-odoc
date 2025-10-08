@@ -378,7 +378,11 @@ def main():
 
     # Print model info
     num_params = sum(p.numel() for p in model.parameters())
+    num_trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print(f"Model parameters: {num_params:,}")
+    if num_trainable != num_params:
+        print(f"Trainable parameters: {num_trainable:,}")
+
 
     # Create loss function
     criterion = CombinedSegmentationLoss(
