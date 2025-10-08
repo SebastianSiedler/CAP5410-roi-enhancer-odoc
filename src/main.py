@@ -1,10 +1,10 @@
 """
-Main training script for baseline U-Net segmentation
-Trains U-Net on REFUGE dataset for optic disc/cup segmentation
+Main training script for EE-TransUNet segmentation
+Trains EE-TransUNet on REFUGE dataset for optic disc/cup segmentation
 """
 from utils.metrics import batch_metrics, MetricsTracker
 from utils.loss_functions import CombinedSegmentationLoss
-from models.unet import UNet
+from models.ee_transunet import VisionTransformer, CONFIGS
 from data_loader.dataset import RetinaDataset, RetinaDatasetValidation
 import os
 import sys
@@ -15,6 +15,7 @@ from datetime import datetime
 
 import torch
 import torch.nn as nn
+import numpy as np
 from torch.utils.data import DataLoader
 from torch.optim import Adam, lr_scheduler
 from tqdm import tqdm
@@ -29,7 +30,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 def get_args():
     """Parse command line arguments"""
     parser = argparse.ArgumentParser(
-        description='Train baseline U-Net for OD/OC segmentation')
+        description='Train EE-TransUNet for OD/OC segmentation')
 
     # Data parameters
     parser.add_argument('--data_dir', type=str,
@@ -43,31 +44,26 @@ def get_args():
                         help='Path to validation CSV file')
 
     # Model parameters
-    parser.add_argument('--base_features', type=int, default=64,
-                        help='Base number of features in U-Net')
-    parser.add_argument('--bilinear', action='store_true',
-                        help='Use bilinear upsampling instead of transposed conv')
+    parser.add_argument('--model_name', type=str, default='ViT-Tiny',
+                        choices=['ViT-Tiny', 'ViT-B_16', 'ViT-B_32', 'ViT-L_16', 'ViT-L_32', 
+                                'R50-ViT-B_16', 'R50-ViT-L_16', 'testing'],
+                        help='EE-TransUNet model variant')
+    parser.add_argument('--n_skip', type=int, default=3,
+                        help='Number of skip connections')
+    parser.add_argument('--vit_patches_size', type=int, default=16,
+                        help='Vision Transformer patch size')
 
     # Training parameters
-    parser.add_argument('--epochs', type=int, default=100,
+    parser.add_argument('--epochs', type=int, default=150,
                         help='Number of training epochs')
     parser.add_argument('--batch_size', type=int, default=8,
                         help='Batch size for training')
-    parser.add_argument('--lr', type=float, default=1e-4,
-                        help='Learning rate')
-    parser.add_argument('--weight_decay', type=float, default=1e-5,
+    parser.add_argument('--lr', type=float, default=0.01,
+                        help='Learning rate (EE-TransUNet default: 0.01)')
+    parser.add_argument('--weight_decay', type=float, default=1e-4,
                         help='Weight decay for optimizer')
-    parser.add_argument('--target_size', type=int, default=512,
-                        help='Target image size (square)')
-
-    # Preprocessing parameters
-    parser.add_argument('--use_clahe', action='store_true',
-                        help='Enable CLAHE preprocessing for contrast enhancement')
-    parser.add_argument('--clahe_clip_limit', type=float, default=2.0,
-                        help='CLAHE clip limit (1.0-4.0, higher = more contrast)')
-    parser.add_argument('--clahe_mode', type=str, default='LAB',
-                        choices=['LAB', 'HSV', 'RGB', 'GREEN'],
-                        help='CLAHE color space (LAB recommended for fundus)')
+    parser.add_argument('--img_size', type=int, default=512,
+                        help='Input image size (square)')
 
     # Loss parameters
     parser.add_argument('--lambda_dice', type=float, default=0.5,
@@ -77,12 +73,14 @@ def get_args():
 
     # Checkpoint parameters
     parser.add_argument('--save_dir', type=str,
-                        default='experiments/baseline_unet',
+                        default='experiments/ee_transunet',
                         help='Directory to save checkpoints and logs')
     parser.add_argument('--save_freq', type=int, default=10,
                         help='Save checkpoint every N epochs')
     parser.add_argument('--resume', type=str, default=None,
                         help='Path to checkpoint to resume training')
+    parser.add_argument('--pretrained_path', type=str, default=None,
+                        help='Path to pretrained weights (ImageNet21k)')
 
     # Hardware
     parser.add_argument('--device', type=str, default='cuda',
@@ -120,15 +118,13 @@ def create_dataloaders(args):
     """Create training and validation dataloaders"""
     print("Creating dataloaders...")
 
-    # Training dataset
+    # Training dataset (no CLAHE - EE-TransUNet doesn't use it in original repo)
     train_dataset = RetinaDataset(
         root_dir=args.data_dir,
         csv_file=args.train_csv,
-        target_size=(args.target_size, args.target_size),
-        use_cropped=True,
-        use_clahe=args.use_clahe,
-        clahe_clip_limit=args.clahe_clip_limit,
-        clahe_mode=args.clahe_mode
+        target_size=(args.img_size, args.img_size),
+        use_cropped=True,  # Use cropped datasets as in original code
+        use_clahe=False,  # EE-TransUNet doesn't use CLAHE preprocessing
     )
 
     train_loader = DataLoader(
@@ -143,11 +139,9 @@ def create_dataloaders(args):
     val_dataset = RetinaDatasetValidation(
         root_dir=args.data_dir,
         csv_file=args.val_csv,
-        target_size=(args.target_size, args.target_size),
-        use_cropped=True,
-        use_clahe=args.use_clahe,
-        clahe_clip_limit=args.clahe_clip_limit,
-        clahe_mode=args.clahe_mode
+        target_size=(args.img_size, args.img_size),
+        use_cropped=True,  # Use cropped datasets as in original code
+        use_clahe=False,
     )
 
     val_loader = DataLoader(
@@ -365,13 +359,22 @@ def main():
     train_loader, val_loader = create_dataloaders(args)
 
     # Create model
-    print("Creating model...")
-    model = UNet(
-        n_channels=3,
-        n_classes=2,
-        bilinear=args.bilinear,
-        base_features=args.base_features
-    ).to(device)
+    print(f"Creating {args.model_name} model...")
+    config = CONFIGS[args.model_name]
+    config.n_classes = 2  # Optic disc and cup
+    config.n_skip = args.n_skip
+    
+    # Update config with image size
+    if args.pretrained_path:
+        config.pretrained_path = args.pretrained_path
+    
+    model = VisionTransformer(config, img_size=args.img_size, num_classes=2).to(device)
+    
+    # Load pretrained weights if available
+    if args.pretrained_path and os.path.exists(args.pretrained_path):
+        print(f"Loading pretrained weights from {args.pretrained_path}")
+        model.load_from(np.load(args.pretrained_path))
+        print("Pretrained weights loaded successfully!")
 
     # Print model info
     num_params = sum(p.numel() for p in model.parameters())

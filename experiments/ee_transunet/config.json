@@ -1,0 +1,21 @@
+{
+    "data_dir": "datasets/REFUGE",
+    "train_csv": "datasets/REFUGE/REFUGETrain.csv",
+    "val_csv": "datasets/REFUGE/REFUGE1Val.csv",
+    "model_name": "ViT-Tiny",
+    "n_skip": 3,
+    "vit_patches_size": 16,
+    "epochs": 50,
+    "batch_size": 4,
+    "lr": 0.01,
+    "weight_decay": 0.0001,
+    "img_size": 224,
+    "lambda_dice": 0.5,
+    "lambda_bce": 0.5,
+    "save_dir": "experiments/ee_transunet",
+    "save_freq": 10,
+    "resume": null,
+    "pretrained_path": null,
+    "device": "cuda",
+    "num_workers": 4
+}
