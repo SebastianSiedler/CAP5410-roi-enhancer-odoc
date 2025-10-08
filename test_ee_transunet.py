@@ -105,7 +105,7 @@ def create_test_dataloader(data_dir, test_csv, img_size, batch_size=1):
     
     print(f"Test samples: {len(test_dataset)}")
     
-    return test_loader
+    return test_loader, test_dataset  # ← Return dataset too for image names
 
 
 def evaluate_model(model, test_loader, device):
@@ -189,7 +189,29 @@ def evaluate_model(model, test_loader, device):
     return results
 
 
-def create_visualizations(model, test_loader, device, output_dir, num_samples=10):
+def create_overlay(img_np, disc_mask, cup_mask, alpha=0.4):
+    """Create overlay with green disc and orange cup"""
+    overlay = img_np.copy()
+    
+    # Create color masks
+    green_mask = np.zeros_like(img_np)
+    green_mask[disc_mask > 0.5] = [0, 1, 0]  # Green for disc
+    
+    orange_mask = np.zeros_like(img_np)
+    orange_mask[cup_mask > 0.5] = [1, 0.5, 0]  # Orange for cup
+    
+    # Combine masks (cup overwrites disc where they overlap)
+    combined_mask = green_mask.copy()
+    combined_mask[cup_mask > 0.5] = orange_mask[cup_mask > 0.5]
+    
+    # Blend with original image
+    overlay = img_np * (1 - alpha) + combined_mask * alpha
+    overlay = np.clip(overlay, 0, 1)
+    
+    return overlay
+
+
+def create_visualizations(model, test_loader, test_dataset, device, output_dir, num_samples=10):
     """Create visualization images"""
     print(f"\nCreating visualizations for {num_samples} samples...")
     
@@ -216,6 +238,28 @@ def create_visualizations(model, test_loader, device, output_dir, num_samples=10
             for i in range(images.size(0)):
                 if samples_saved >= num_samples:
                     break
+                
+                # Get sample index and image name
+                sample_idx = batch_idx * test_loader.batch_size + i
+                row = test_dataset.df.iloc[sample_idx]
+                
+                # Extract image name from the row (just the filename without path/extension)
+                if 'ImgName' in row:
+                    img_path = row['ImgName']
+                elif 'imgName' in row:
+                    img_path = row['imgName']
+                else:
+                    # Try to extract from other columns
+                    img_path = str(sample_idx).zfill(4)
+                
+                # Extract just the filename without path and extension
+                import os
+                img_name = os.path.splitext(os.path.basename(img_path))[0]
+                
+                # Extract the test number from the filename (e.g., T0227 -> 227)
+                import re
+                test_number_match = re.search(r'T(\d+)', img_name)
+                test_number = int(test_number_match.group(1)) if test_number_match else sample_idx + 1
                 
                 # Get sample data
                 img = images[i].cpu()
@@ -244,47 +288,57 @@ def create_visualizations(model, test_loader, device, output_dir, num_samples=10
                     cup_dice = cup_dice.item()
                 avg_dice = (disc_dice + cup_dice) / 2.0
                 
-                # Create visualization
-                fig, axes = plt.subplots(2, 3, figsize=(15, 10))
+                # Create overlays
+                gt_overlay = create_overlay(img_np, true_disc, true_cup)
+                pred_overlay = create_overlay(img_np, pred_disc, pred_cup)
                 
-                # Row 1: Predictions
+                # Create visualization (2 rows x 4 columns)
+                fig, axes = plt.subplots(2, 4, figsize=(20, 10))
+                
+                # Row 1: Ground Truth
                 axes[0, 0].imshow(img_np)
-                axes[0, 0].set_title('Input Image')
+                axes[0, 0].set_title('Original Image', fontsize=12, fontweight='bold')
                 axes[0, 0].axis('off')
                 
-                axes[0, 1].imshow(pred_disc, cmap='gray')
-                axes[0, 1].set_title(f'Predicted Disc')
+                axes[0, 1].imshow(true_disc, cmap='gray')
+                axes[0, 1].set_title('GT Disc', fontsize=12, fontweight='bold')
                 axes[0, 1].axis('off')
                 
-                axes[0, 2].imshow(pred_cup, cmap='gray')
-                axes[0, 2].set_title(f'Predicted Cup')
+                axes[0, 2].imshow(true_cup, cmap='gray')
+                axes[0, 2].set_title('GT Cup', fontsize=12, fontweight='bold')
                 axes[0, 2].axis('off')
                 
-                # Row 2: Ground truth
+                axes[0, 3].imshow(gt_overlay)
+                axes[0, 3].set_title(f'GT Overlay (CDR={true_cdr:.3f})', fontsize=12, fontweight='bold')
+                axes[0, 3].axis('off')
+                
+                # Row 2: Predictions
                 axes[1, 0].imshow(img_np)
-                axes[1, 0].set_title('Input Image')
+                axes[1, 0].set_title('Original Image', fontsize=12, fontweight='bold')
                 axes[1, 0].axis('off')
                 
-                axes[1, 1].imshow(true_disc, cmap='gray')
-                axes[1, 1].set_title(f'Ground Truth Disc')
+                axes[1, 1].imshow(pred_disc, cmap='gray')
+                axes[1, 1].set_title(f'Pred Disc (Dice={disc_dice:.3f})', fontsize=12, fontweight='bold')
                 axes[1, 1].axis('off')
                 
-                axes[1, 2].imshow(true_cup, cmap='gray')
-                axes[1, 2].set_title(f'Ground Truth Cup')
+                axes[1, 2].imshow(pred_cup, cmap='gray')
+                axes[1, 2].set_title(f'Pred Cup (Dice={cup_dice:.3f})', fontsize=12, fontweight='bold')
                 axes[1, 2].axis('off')
                 
-                # Add overall title with metrics
+                axes[1, 3].imshow(pred_overlay)
+                axes[1, 3].set_title(f'Pred Overlay (CDR={pred_cdr:.3f})', fontsize=12, fontweight='bold')
+                axes[1, 3].axis('off')
+                
+                # Add overall title with metrics and image name
                 fig.suptitle(
-                    f'Sample {batch_idx * test_loader.batch_size + i:04d} | '
-                    f'Dice: {avg_dice:.4f} (Disc: {disc_dice:.4f}, Cup: {cup_dice:.4f}) | '
-                    f'CDR: Pred={pred_cdr:.3f}, True={true_cdr:.3f}, MAE={abs(pred_cdr-true_cdr):.3f}',
-                    fontsize=14, fontweight='bold'
+                    f'Test Sample {test_number} - Avg Dice: {avg_dice:.3f} | Image: {img_name}',
+                    fontsize=16, fontweight='bold', y=0.98
                 )
                 
-                plt.tight_layout()
+                plt.tight_layout(rect=[0, 0, 1, 0.96])
                 
                 # Save figure
-                save_path = vis_dir / f'test_sample_{batch_idx * test_loader.batch_size + i:04d}.png'
+                save_path = vis_dir / f'test_sample_{sample_idx:04d}.png'
                 plt.savefig(save_path, dpi=150, bbox_inches='tight')
                 plt.close()
                 
@@ -344,7 +398,7 @@ def main():
     model = load_model(args.checkpoint, args.model_name, args.img_size, args.device)
     
     # Create test dataloader
-    test_loader = create_test_dataloader(
+    test_loader, test_dataset = create_test_dataloader(
         args.data_dir,
         args.test_csv,
         args.img_size,
@@ -365,10 +419,13 @@ def main():
         create_visualizations(
             model,
             test_loader,
+            test_dataset,  # ← Pass dataset for image names
             args.device,
             args.output_dir,
             num_samples=args.num_visualizations
         )
+    
+    print(f"\n✅ Testing complete! Results saved to: {args.output_dir}")
     
     print(f"\n✅ Testing complete! Results saved to: {args.output_dir}")
 
