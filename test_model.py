@@ -18,6 +18,7 @@ from tqdm import tqdm
 sys.path.append(str(Path(__file__).parent / 'src'))
 
 from models.unet import UNet
+from models.resnet_unet import ResNetUNet
 from data_loader.dataset import RetinaDatasetTest
 from utils.metrics import batch_metrics, MetricsTracker
 
@@ -68,18 +69,32 @@ def load_model(checkpoint_path, device):
     
     # Get model configuration from checkpoint
     args = checkpoint.get('args', {})
-    base_features = args.get('base_features', 64)
-    bilinear = args.get('bilinear', False)
     
-    print(f"Model config: base_features={base_features}, bilinear={bilinear}")
+    # Determine model type
+    model_type = args.get('model', 'unet')
     
-    # Create model
-    model = UNet(
-        n_channels=3,
-        n_classes=2,
-        bilinear=bilinear,
-        base_features=base_features
-    ).to(device)
+    if model_type == 'resnet_unet':
+        # ResNet-UNet model
+        backbone = args.get('backbone', 'resnet34')
+        print(f"Model type: ResNet-UNet (backbone={backbone})")
+        
+        model = ResNetUNet(
+            n_classes=2,
+            backbone=backbone,
+            pretrained=False  # Don't need pretrained for testing
+        ).to(device)
+    else:
+        # Standard U-Net model
+        base_features = args.get('base_features', 64)
+        bilinear = args.get('bilinear', False)
+        print(f"Model type: U-Net (base_features={base_features}, bilinear={bilinear})")
+        
+        model = UNet(
+            n_channels=3,
+            n_classes=2,
+            bilinear=bilinear,
+            base_features=base_features
+        ).to(device)
     
     # Load weights
     model.load_state_dict(checkpoint['model_state_dict'])

@@ -1,10 +1,11 @@
 """
-Main training script for baseline U-Net segmentation
-Trains U-Net on REFUGE dataset for optic disc/cup segmentation
+Main training script for U-Net and ResNet-UNet segmentation
+Trains U-Net or ResNet-UNet on REFUGE dataset for optic disc/cup segmentation
 """
 from utils.metrics import batch_metrics, MetricsTracker
 from utils.loss_functions import CombinedSegmentationLoss
 from models.unet import UNet
+from models.resnet_unet import ResNetUNet
 from data_loader.dataset import RetinaDataset, RetinaDatasetValidation
 import os
 import sys
@@ -29,7 +30,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 def get_args():
     """Parse command line arguments"""
     parser = argparse.ArgumentParser(
-        description='Train baseline U-Net for OD/OC segmentation')
+        description='Train U-Net or ResNet-UNet for OD/OC segmentation')
 
     # Data parameters
     parser.add_argument('--data_dir', type=str,
@@ -43,10 +44,22 @@ def get_args():
                         help='Path to validation CSV file')
 
     # Model parameters
+    parser.add_argument('--model', type=str, default='unet',
+                        choices=['unet', 'resnet_unet'],
+                        help='Model architecture to use')
+    parser.add_argument('--backbone', type=str, default='resnet34',
+                        choices=['resnet18', 'resnet34', 'resnet50'],
+                        help='ResNet backbone (only for resnet_unet)')
+    parser.add_argument('--pretrained', action='store_true',
+                        help='Use ImageNet pretrained weights (only for resnet_unet)')
+    parser.add_argument('--freeze_encoder', action='store_true',
+                        help='Freeze encoder weights initially (only for resnet_unet)')
+    parser.add_argument('--unfreeze_epoch', type=int, default=10,
+                        help='Epoch to unfreeze encoder (only for resnet_unet)')
     parser.add_argument('--base_features', type=int, default=64,
-                        help='Base number of features in U-Net')
+                        help='Base number of features in U-Net (only for unet)')
     parser.add_argument('--bilinear', action='store_true',
-                        help='Use bilinear upsampling instead of transposed conv')
+                        help='Use bilinear upsampling instead of transposed conv (only for unet)')
 
     # Training parameters
     parser.add_argument('--epochs', type=int, default=100,
@@ -365,17 +378,33 @@ def main():
     train_loader, val_loader = create_dataloaders(args)
 
     # Create model
-    print("Creating model...")
-    model = UNet(
-        n_channels=3,
-        n_classes=2,
-        bilinear=args.bilinear,
-        base_features=args.base_features
-    ).to(device)
+    print(f"Creating model: {args.model}...")
+    if args.model == 'resnet_unet':
+        model = ResNetUNet(
+            n_classes=2,
+            backbone=args.backbone,
+            pretrained=args.pretrained
+        ).to(device)
+        
+        # Optionally freeze encoder initially
+        if args.freeze_encoder:
+            model.freeze_encoder()
+            print(f"Encoder frozen. Will unfreeze at epoch {args.unfreeze_epoch}")
+    else:  # unet
+        model = UNet(
+            n_channels=3,
+            n_classes=2,
+            bilinear=args.bilinear,
+            base_features=args.base_features
+        ).to(device)
 
     # Print model info
     num_params = sum(p.numel() for p in model.parameters())
+    num_trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print(f"Model parameters: {num_params:,}")
+    if num_trainable != num_params:
+        print(f"Trainable parameters: {num_trainable:,}")
+
 
     # Create loss function
     criterion = CombinedSegmentationLoss(
@@ -424,6 +453,20 @@ def main():
     print(f"\nStarting training for {args.epochs} epochs...")
 
     for epoch in range(start_epoch, args.epochs):
+        # Unfreeze encoder if using ResNet-UNet
+        if (args.model == 'resnet_unet' and args.freeze_encoder and 
+            epoch == args.unfreeze_epoch):
+            print(f"\n{'='*60}")
+            print(f"Unfreezing encoder at epoch {epoch}")
+            print('='*60)
+            model.unfreeze_encoder()
+            # Update optimizer to include encoder parameters
+            optimizer = Adam(
+                model.parameters(),
+                lr=args.lr,
+                weight_decay=args.weight_decay
+            )
+        
         # Train
         train_metrics = train_epoch(
             model, train_loader, criterion, optimizer, device, epoch)
