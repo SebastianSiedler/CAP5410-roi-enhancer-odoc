@@ -1,0 +1,24 @@
+{
+    "model": "resnet34_unet",
+    "encoder": "resnet34",
+    "pretrained": true,
+    "data_dir": "../../datasets/REFUGE",
+    "train_csv": "../../datasets/REFUGE/REFUGETrain.csv",
+    "val_csv": "../../datasets/REFUGE/REFUGE1Val.csv",
+    "test_csv": "../../datasets/REFUGE/REFUGE1Test.csv",
+    "use_cropped": true,
+    "use_clahe": true,
+    "clahe_clip_limit": 2.0,
+    "clahe_tile_size": [
+        8,
+        8
+    ],
+    "clahe_mode": "LAB",
+    "epochs": 50,
+    "freeze_encoder_epochs": 10,
+    "batch_size": 8,
+    "learning_rate": 0.0001,
+    "weight_decay": 0.0001,
+    "num_workers": 4,
+    "output_dir": "./results"
+}
