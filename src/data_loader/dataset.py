@@ -396,6 +396,11 @@ class RetinaDatasetTest(Dataset):
 
     def get_label(self, idx: int) -> int:
         return self.df.iloc[idx]['label']
+    
+    def get_image_name(self, idx: int) -> str:
+        """Get the image name/ID for display purposes."""
+        row = self.df.iloc[idx]
+        return self._extract_folder_name(row)
 
 
 class EnhancedRetinaDataset(Dataset):

@@ -327,6 +327,12 @@ def visualize_predictions(test_dataset, predictions, masks, output_path,
         image, mask_gt = test_dataset[idx]
         pred = predictions[idx]
         
+        # Get the actual image name/ID from the dataset
+        if hasattr(test_dataset, 'get_image_name'):
+            image_name = test_dataset.get_image_name(idx)
+        else:
+            image_name = str(idx)
+        
         # Denormalize image
         img_np = image.numpy().transpose(1, 2, 0)
         img_np = img_np * np.array([0.229, 0.224, 0.225]) + np.array([0.485, 0.456, 0.406])
@@ -351,7 +357,7 @@ def visualize_predictions(test_dataset, predictions, masks, output_path,
         
         # Plot
         axes[i, 0].imshow(img_np)
-        axes[i, 0].set_title(f'Sample {idx}\nOverall Dice: {overall_dice:.3f}')
+        axes[i, 0].set_title(f'Sample {image_name}\nOverall Dice: {overall_dice:.3f}')
         axes[i, 0].axis('off')
         
         axes[i, 1].imshow(disc_gt, cmap='gray')
