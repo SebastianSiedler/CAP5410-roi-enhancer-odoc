@@ -18,6 +18,9 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from torch.optim import Adam, lr_scheduler
 from tqdm import tqdm
+import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('Agg')  # Use non-interactive backend for server environments
 
 # Add parent directory to path
 sys.path.append(str(Path(__file__).parent.parent))
@@ -56,6 +59,15 @@ def get_args():
                         help='Weight decay for optimizer')
     parser.add_argument('--target_size', type=int, default=512,
                         help='Target image size (square)')
+
+    # Preprocessing parameters
+    parser.add_argument('--use_clahe', action='store_true',
+                        help='Enable CLAHE preprocessing for contrast enhancement')
+    parser.add_argument('--clahe_clip_limit', type=float, default=2.0,
+                        help='CLAHE clip limit (1.0-4.0, higher = more contrast)')
+    parser.add_argument('--clahe_mode', type=str, default='LAB',
+                        choices=['LAB', 'HSV', 'RGB', 'GREEN'],
+                        help='CLAHE color space (LAB recommended for fundus)')
 
     # Loss parameters
     parser.add_argument('--lambda_dice', type=float, default=0.5,
@@ -113,7 +125,10 @@ def create_dataloaders(args):
         root_dir=args.data_dir,
         csv_file=args.train_csv,
         target_size=(args.target_size, args.target_size),
-        use_cropped=True
+        use_cropped=True,
+        use_clahe=args.use_clahe,
+        clahe_clip_limit=args.clahe_clip_limit,
+        clahe_mode=args.clahe_mode
     )
 
     train_loader = DataLoader(
@@ -129,7 +144,10 @@ def create_dataloaders(args):
         root_dir=args.data_dir,
         csv_file=args.val_csv,
         target_size=(args.target_size, args.target_size),
-        use_cropped=True
+        use_cropped=True,
+        use_clahe=args.use_clahe,
+        clahe_clip_limit=args.clahe_clip_limit,
+        clahe_mode=args.clahe_mode
     )
 
     val_loader = DataLoader(
@@ -173,9 +191,10 @@ def train_epoch(model, dataloader, criterion, optimizer, device, epoch):
             metrics_tracker.update(metrics)
 
         # Update progress bar
+        current_metrics = metrics_tracker.get_average()
         pbar.set_postfix({
-            'loss': f"{loss.item():.4f}",
-            'dice': f"{metrics['dice_mean']:.4f}"
+            'loss': f"{current_metrics['loss']:.4f}",
+            'dice': f"{current_metrics['dice_mean']:.4f}"
         })
 
     return metrics_tracker.get_average()
@@ -203,9 +222,10 @@ def validate(model, dataloader, criterion, device, epoch):
             metrics_tracker.update(metrics)
 
             # Update progress bar
+            current_metrics = metrics_tracker.get_average()
             pbar.set_postfix({
-                'loss': f"{loss.item():.4f}",
-                'dice': f"{metrics['dice_mean']:.4f}"
+                'loss': f"{current_metrics['loss']:.4f}",
+                'dice': f"{current_metrics['dice_mean']:.4f}"
             })
 
     return metrics_tracker.get_average()
@@ -225,6 +245,101 @@ def save_checkpoint(model, optimizer, scheduler, epoch, metrics, args, filename=
     filepath = os.path.join(args.save_dir, filename)
     torch.save(checkpoint, filepath)
     print(f"Saved checkpoint: {filepath}")
+
+
+def plot_training_curves(history, save_dir):
+    """
+    Generate and save training curves showing loss and metrics over epochs
+    
+    Args:
+        history: Dictionary containing training history with keys:
+                'train_loss', 'val_loss', 'train_dice', 'val_dice', 'val_cdr_mae'
+        save_dir: Directory to save the plots
+    """
+    epochs = range(1, len(history['train_loss']) + 1)
+    
+    # Create figure with subplots
+    fig, axes = plt.subplots(2, 2, figsize=(15, 10))
+    fig.suptitle('Training Progress', fontsize=16, fontweight='bold')
+    
+    # Plot 1: Loss curves
+    ax1 = axes[0, 0]
+    ax1.plot(epochs, history['train_loss'], 'b-', label='Train Loss', linewidth=2)
+    ax1.plot(epochs, history['val_loss'], 'r-', label='Val Loss', linewidth=2)
+    ax1.set_xlabel('Epoch', fontsize=12)
+    ax1.set_ylabel('Loss', fontsize=12)
+    ax1.set_title('Training and Validation Loss', fontsize=14, fontweight='bold')
+    ax1.legend(fontsize=10)
+    ax1.grid(True, alpha=0.3)
+    
+    # Plot 2: Dice coefficient
+    ax2 = axes[0, 1]
+    ax2.plot(epochs, history['train_dice'], 'b-', label='Train Dice', linewidth=2)
+    ax2.plot(epochs, history['val_dice'], 'r-', label='Val Dice', linewidth=2)
+    ax2.set_xlabel('Epoch', fontsize=12)
+    ax2.set_ylabel('Dice Coefficient', fontsize=12)
+    ax2.set_title('Dice Coefficient (Mean)', fontsize=14, fontweight='bold')
+    ax2.legend(fontsize=10)
+    ax2.grid(True, alpha=0.3)
+    ax2.set_ylim([0, 1])
+    
+    # Plot 3: CDR MAE
+    ax3 = axes[1, 0]
+    ax3.plot(epochs, history['val_cdr_mae'], 'g-', label='Val CDR MAE', linewidth=2)
+    ax3.set_xlabel('Epoch', fontsize=12)
+    ax3.set_ylabel('CDR MAE', fontsize=12)
+    ax3.set_title('Cup-to-Disc Ratio Mean Absolute Error', fontsize=14, fontweight='bold')
+    ax3.legend(fontsize=10)
+    ax3.grid(True, alpha=0.3)
+    
+    # Plot 4: Summary statistics
+    ax4 = axes[1, 1]
+    ax4.axis('off')
+    
+    # Calculate summary statistics
+    best_val_dice = max(history['val_dice'])
+    best_val_dice_epoch = history['val_dice'].index(best_val_dice) + 1
+    final_val_dice = history['val_dice'][-1]
+    final_val_loss = history['val_loss'][-1]
+    final_cdr_mae = history['val_cdr_mae'][-1]
+    
+    summary_text = f"""
+    Training Summary
+    {'=' * 40}
+    
+    Total Epochs: {len(epochs)}
+    
+    Best Validation Dice: {best_val_dice:.4f}
+    Best Dice at Epoch: {best_val_dice_epoch}
+    
+    Final Validation Metrics:
+      - Dice: {final_val_dice:.4f}
+      - Loss: {final_val_loss:.4f}
+      - CDR MAE: {final_cdr_mae:.4f}
+    
+    Improvement:
+      - Dice: {history['val_dice'][0]:.4f} → {final_val_dice:.4f}
+      - Loss: {history['val_loss'][0]:.4f} → {final_val_loss:.4f}
+    """
+    
+    ax4.text(0.1, 0.5, summary_text, fontsize=11, family='monospace',
+             verticalalignment='center', transform=ax4.transAxes)
+    
+    # Adjust layout and save
+    plt.tight_layout()
+    
+    # Save plot
+    plot_path = os.path.join(save_dir, 'training_curves.png')
+    plt.savefig(plot_path, dpi=300, bbox_inches='tight')
+    print(f"\nTraining curves saved to: {plot_path}")
+    
+    plt.close()
+    
+    # Also save history as JSON for later analysis
+    history_path = os.path.join(save_dir, 'training_history.json')
+    with open(history_path, 'w') as f:
+        json.dump(history, f, indent=4)
+    print(f"Training history saved to: {history_path}")
 
 
 def load_checkpoint(model, optimizer, scheduler, checkpoint_path):
@@ -295,6 +410,15 @@ def main():
 
     # Training log
     log_file = os.path.join(args.save_dir, 'training_log.txt')
+    
+    # Initialize history tracking for plotting
+    history = {
+        'train_loss': [],
+        'train_dice': [],
+        'val_loss': [],
+        'val_dice': [],
+        'val_cdr_mae': []
+    }
 
     # Training loop
     print(f"\nStarting training for {args.epochs} epochs...")
@@ -309,6 +433,13 @@ def main():
 
         # Update learning rate
         scheduler.step(val_metrics['dice_mean'])
+        
+        # Track metrics for plotting
+        history['train_loss'].append(train_metrics['loss'])
+        history['train_dice'].append(train_metrics['dice_mean'])
+        history['val_loss'].append(val_metrics['loss'])
+        history['val_dice'].append(val_metrics['dice_mean'])
+        history['val_cdr_mae'].append(val_metrics['cdr_mae'])
 
         # Print epoch summary
         print(f"\nEpoch {epoch} Summary:")
@@ -339,6 +470,10 @@ def main():
 
     print("\nTraining completed!")
     print(f"Best validation Dice: {best_dice:.4f}")
+    
+    # Generate and save training plots
+    print("\nGenerating training curves...")
+    plot_training_curves(history, args.save_dir)
 
 
 if __name__ == '__main__':

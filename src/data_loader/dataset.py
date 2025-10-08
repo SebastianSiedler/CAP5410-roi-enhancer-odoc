@@ -34,7 +34,10 @@ class RetinaDataset(Dataset):
         transform: Optional[Callable] = None,
         target_size: Tuple[int, int] = (512, 512),
         use_cropped: bool = True,
-        cropped_masks_dir: str = 'datasets/REFUGE_cropped_masks'
+        cropped_masks_dir: str = 'datasets/REFUGE_cropped_masks',
+        use_clahe: bool = False,
+        clahe_clip_limit: float = 2.0,
+        clahe_mode: str = 'LAB'
     ):
         self.root_dir = root_dir
         self.df = pd.read_csv(csv_file)
@@ -47,6 +50,18 @@ class RetinaDataset(Dataset):
         self.target_size = target_size
         self.use_cropped = use_cropped
         self.cropped_masks_dir = cropped_masks_dir
+        self.use_clahe = use_clahe
+        
+        # Initialize CLAHE preprocessor if enabled
+        if self.use_clahe:
+            from .clahe_preprocessing import CLAHEPreprocessor
+            self.clahe_preprocessor = CLAHEPreprocessor(
+                clip_limit=clahe_clip_limit,
+                tile_grid_size=(8, 8),
+                apply_to=clahe_mode
+            )
+        else:
+            self.clahe_preprocessor = None
 
         # Default transforms if none provided
         if self.transform is None:
@@ -99,6 +114,10 @@ class RetinaDataset(Dataset):
 
         # Load image
         image = Image.open(img_path).convert('RGB')
+        
+        # Apply CLAHE preprocessing if enabled
+        if self.clahe_preprocessor is not None:
+            image = self.clahe_preprocessor(image)
 
         # Load masks
         disc_mask = Image.open(disc_mask_path).convert('L')  # Grayscale
@@ -152,7 +171,10 @@ class RetinaDatasetValidation(Dataset):
         transform: Optional[Callable] = None,
         target_size: Tuple[int, int] = (512, 512),
         use_cropped: bool = True,
-        cropped_masks_dir: str = 'datasets/REFUGE_cropped_masks_val'
+        cropped_masks_dir: str = 'datasets/REFUGE_cropped_masks_val',
+        use_clahe: bool = False,
+        clahe_clip_limit: float = 2.0,
+        clahe_mode: str = 'LAB'
     ):
         self.root_dir = root_dir
         self.df = pd.read_csv(csv_file)
@@ -160,6 +182,18 @@ class RetinaDatasetValidation(Dataset):
         self.target_size = target_size
         self.use_cropped = use_cropped
         self.cropped_masks_dir = cropped_masks_dir
+        self.use_clahe = use_clahe
+        
+        # Initialize CLAHE preprocessor if enabled
+        if self.use_clahe:
+            from .clahe_preprocessing import CLAHEPreprocessor
+            self.clahe_preprocessor = CLAHEPreprocessor(
+                clip_limit=clahe_clip_limit,
+                tile_grid_size=(8, 8),
+                apply_to=clahe_mode
+            )
+        else:
+            self.clahe_preprocessor = None
 
         if self.transform is None:
             self.transform = transforms.Compose([
@@ -199,6 +233,11 @@ class RetinaDatasetValidation(Dataset):
                                          folder_name, f'{folder_name}_cup.bmp')
 
         image = Image.open(img_path).convert('RGB')
+        
+        # Apply CLAHE preprocessing if enabled
+        if self.clahe_preprocessor is not None:
+            image = self.clahe_preprocessor(image)
+        
         disc_mask = Image.open(disc_mask_path).convert('L')
         cup_mask = Image.open(cup_mask_path).convert('L')
 
@@ -241,7 +280,10 @@ class RetinaDatasetTest(Dataset):
         transform: Optional[Callable] = None,
         target_size: Tuple[int, int] = (512, 512),
         use_cropped: bool = True,
-        cropped_masks_dir: str = 'datasets/REFUGE_cropped_masks_test'
+        cropped_masks_dir: str = 'datasets/REFUGE_cropped_masks_test',
+        use_clahe: bool = False,
+        clahe_clip_limit: float = 2.0,
+        clahe_mode: str = 'LAB'
     ):
         self.root_dir = root_dir
         self.df = pd.read_csv(csv_file)
@@ -249,6 +291,18 @@ class RetinaDatasetTest(Dataset):
         self.target_size = target_size
         self.use_cropped = use_cropped
         self.cropped_masks_dir = cropped_masks_dir
+        self.use_clahe = use_clahe
+        
+        # Initialize CLAHE preprocessor if enabled
+        if self.use_clahe:
+            from .clahe_preprocessing import CLAHEPreprocessor
+            self.clahe_preprocessor = CLAHEPreprocessor(
+                clip_limit=clahe_clip_limit,
+                tile_grid_size=(8, 8),
+                apply_to=clahe_mode
+            )
+        else:
+            self.clahe_preprocessor = None
 
         # Filter out rows with NaN in multimaskName
         self.df = self.df[self.df['multimaskName'].notna()
@@ -296,6 +350,10 @@ class RetinaDatasetTest(Dataset):
 
         # Load image
         image = Image.open(img_path).convert('RGB')
+        
+        # Apply CLAHE preprocessing if enabled
+        if self.clahe_preprocessor is not None:
+            image = self.clahe_preprocessor(image)
 
         # Load masks
         disc_mask = cv2.imread(disc_mask_path, cv2.IMREAD_GRAYSCALE)

@@ -47,6 +47,15 @@ def get_args():
     parser.add_argument('--num_vis_samples', type=int, default=10,
                         help='Number of samples to visualize')
     
+    # CLAHE preprocessing parameters
+    parser.add_argument('--use_clahe', action='store_true',
+                        help='Enable CLAHE preprocessing (must match training)')
+    parser.add_argument('--clahe_clip_limit', type=float, default=2.0,
+                        help='CLAHE clip limit')
+    parser.add_argument('--clahe_mode', type=str, default='LAB',
+                        choices=['LAB', 'HSV', 'RGB', 'GREEN'],
+                        help='CLAHE color space')
+    
     return parser.parse_args()
 
 
@@ -354,7 +363,10 @@ def main():
     test_dataset = RetinaDatasetTest(
         csv_file=args.test_csv,
         root_dir=args.data_dir,
-        use_cropped=True
+        use_cropped=True,
+        use_clahe=args.use_clahe,
+        clahe_clip_limit=args.clahe_clip_limit,
+        clahe_mode=args.clahe_mode
     )
     
     test_loader = DataLoader(

@@ -1,0 +1,22 @@
+{
+    "data_dir": "datasets/REFUGE",
+    "train_csv": "datasets/REFUGE/REFUGETrain.csv",
+    "val_csv": "datasets/REFUGE/REFUGE1Val.csv",
+    "base_features": 32,
+    "bilinear": false,
+    "epochs": 200,
+    "batch_size": 8,
+    "lr": 0.0001,
+    "weight_decay": 0.0001,
+    "target_size": 512,
+    "use_clahe": true,
+    "clahe_clip_limit": 2.0,
+    "clahe_mode": "LAB",
+    "lambda_dice": 0.5,
+    "lambda_bce": 0.5,
+    "save_dir": "experiments/small_unet_clahe",
+    "save_freq": 10,
+    "resume": null,
+    "device": "cuda",
+    "num_workers": 4
+}
