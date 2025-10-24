@@ -138,14 +138,16 @@ class GlaucomaDataset(Dataset):
         """
         Load REFUGE dataset samples.
         Ignores train/val/test folder structure and treats all as one pool.
+        REFUGE does NOT have img/ subdirectory - images are directly in Images_Cropped.
         """
         samples = []
         refuge_dir = self.root_dir / 'REFUGE'
 
         # Combine all splits from REFUGE
         for subset in ['train', 'val', 'test']:
-            images_dir = refuge_dir / subset / 'Images_Cropped' / 'img'
-            masks_dir = refuge_dir / subset / 'Masks_Cropped' / 'img'
+            # REFUGE: No img/ subdirectory, images are directly in Images_Cropped
+            images_dir = refuge_dir / subset / 'Images_Cropped'
+            masks_dir = refuge_dir / subset / 'Masks_Cropped'
 
             if not images_dir.exists():
                 continue
