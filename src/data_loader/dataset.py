@@ -109,9 +109,9 @@ class GlaucomaDataset(Dataset):
         samples = []
         origa_dir = self.root_dir / 'ORIGA'
 
-        # ORIGA images are in Images_Cropped/img subdirectory (same as G1020)
-        images_dir = origa_dir / 'Images_Cropped' / 'img'
-        masks_dir = origa_dir / 'Masks_Cropped' / 'img'
+        # ORIGA images are in Images_Cropped subdirectory
+        images_dir = origa_dir / 'Images_Cropped'
+        masks_dir = origa_dir / 'Masks_Cropped'
 
         if not images_dir.exists():
             print(
