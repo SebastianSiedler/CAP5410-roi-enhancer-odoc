@@ -3,3 +3,5 @@
 
 !/datasets/glaucoma-datasets/README.md
 !/datasets/README.md
+
+**/__pycache__/
