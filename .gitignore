@@ -1,2 +1,5 @@
 **/*.DS_Store
-**/datasets/REFUGE/**
+/datasets/**
+
+!/datasets/glaucoma-datasets/README.md
+!/datasets/README.md
