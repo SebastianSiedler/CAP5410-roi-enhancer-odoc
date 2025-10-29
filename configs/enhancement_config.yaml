@@ -1,0 +1,28 @@
+# Configuration for Task-Aware Enhancement Model Training
+
+# Data settings
+data_root: "/home/robolab/dev/steffen/CAP5410-roi-enhancer-odoc"
+batch_size: 8
+num_workers: 4
+
+# Model architecture
+enhancement_channels: 64  # Base channels for enhancement model
+n_residual_blocks: 6      # Number of residual blocks in bottleneck
+segmentation_checkpoint: null  # Path to pre-trained segmentation model (optional)
+freeze_segmentation: true      # Freeze segmentation model during training
+
+# Training hyperparameters
+epochs: 100
+lr: 0.0002
+lambda_dice: 1.0          # Weight for task-aware Dice loss
+lambda_perceptual: 0.1    # Weight for perceptual/quality loss
+patience: 15              # Early stopping patience
+
+# Logging and saving
+save_dir: "experiments/enhancement"
+exp_name: "task_aware_enhancement_v1"
+log_interval: 10          # Log every N batches
+save_interval: 5          # Save checkpoint every N epochs
+
+# Device
+device: "cuda"  # or "cpu"

@@ -1,5 +1,6 @@
 **/*.DS_Store
 /datasets/**
+/experiments/**
 
 !/datasets/glaucoma-datasets/README.md
 !/datasets/README.md

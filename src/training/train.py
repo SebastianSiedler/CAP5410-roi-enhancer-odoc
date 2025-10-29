@@ -2,9 +2,9 @@
 Training and evaluation functions for UNet segmentation.
 """
 
-from data_loader.transforms import get_training_transforms, get_validation_transforms
-from data_loader.dataset import get_dataloaders
-from models.unet import UNet
+from src.data_loader.transforms import get_training_transforms, get_validation_transforms
+from src.data_loader.dataset import get_dataloaders
+from src.models.unet import UNet
 import os
 import sys
 from pathlib import Path
