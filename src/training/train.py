@@ -57,11 +57,19 @@ class DiceLoss(nn.Module):
 class CombinedLoss(nn.Module):
     """Combined Cross Entropy + Dice Loss"""
 
-    def __init__(self, ce_weight=0.5, dice_weight=0.5):
+    def __init__(self, ce_weight=0.5, dice_weight=0.5, class_weights=None, device=None):
         super().__init__()
         self.ce_weight = ce_weight
         self.dice_weight = dice_weight
-        self.ce = nn.CrossEntropyLoss()
+
+        # Support class weights for imbalanced datasets
+        if class_weights is not None:
+            if device is not None:
+                class_weights = class_weights.to(device)
+            self.ce = nn.CrossEntropyLoss(weight=class_weights)
+        else:
+            self.ce = nn.CrossEntropyLoss()
+
         self.dice = DiceLoss()
 
     def forward(self, pred, target):
@@ -231,7 +239,13 @@ def train_model(
     print(f"Model parameters: {sum(p.numel() for p in model.parameters()):,}")
 
     # Loss and optimizer
-    criterion = CombinedLoss(ce_weight=0.5, dice_weight=0.5)
+    class_weights = torch.tensor([
+        1.0,  # Background
+        1.0,  # Disc
+        2.0  # Cup (Cup is harder to segment -> higher weight)
+    ], device=device)
+    criterion = CombinedLoss(
+        ce_weight=0.5, dice_weight=0.5, class_weights=class_weights, device=device)
     optimizer = optim.AdamW(
         model.parameters(), lr=learning_rate, weight_decay=1e-4)
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(

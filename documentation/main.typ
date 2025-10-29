@@ -21,3 +21,9 @@ Wir nutzen Albumentations um die Bilder zu Runtime zu transformieren.
 Das heißt in jeder Epoche sieht beim training (nicht validation!) das Bild anders aus. 2000 trainingsbilder, 10 epochen. => 20000 verschiedene Bilder.
 
 #bibliography("works.bib", style: "ieee")
+
+
+
+- versucht um modell zu verbessern: 
+    - cup gewichtung auf 2.0 setzen
+    - mehr epochen (100 statt 50)
