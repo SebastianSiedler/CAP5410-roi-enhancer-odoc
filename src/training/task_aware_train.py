@@ -386,7 +386,7 @@ def train_enhancement_model(
     from models.unet import UNet
     from models.enhancement_unet import EnhancementUNet, EnhancementSegmentationPipeline
     from data_loader.dataset import GlaucomaDataset
-odel    
+    
     # Clear dataset cache to ensure filter_incomplete works correctly
     GlaucomaDataset._split_cache.clear()
     
