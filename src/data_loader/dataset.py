@@ -248,6 +248,8 @@ class GlaucomaDataset(Dataset):
             transformed = self.transform(image=np.array(image), mask=mask)
             image = transformed['image']
             mask = transformed['mask']
+            # Ensure mask is long type for CrossEntropyLoss
+            mask = mask.long()
         else:
             # Convert to tensors if no transform provided
             image = torch.from_numpy(np.array(image)).permute(
