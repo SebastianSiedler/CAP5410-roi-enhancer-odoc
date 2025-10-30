@@ -191,7 +191,8 @@ def train_model(
     num_workers=4,
     device=None,
     save_dir='checkpoints',
-    filter_incomplete=True
+    filter_incomplete=True,
+    use_clahe=False
 ):
     """
     Main training function.
@@ -207,6 +208,7 @@ def train_model(
         device: Device to train on (None = auto-detect)
         save_dir: Directory to save checkpoints
         filter_incomplete: Filter images without all 3 classes
+        use_clahe: Apply CLAHE for contrast enhancement
 
     Returns:
         model: Trained model
@@ -216,6 +218,8 @@ def train_model(
     if device is None:
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"Using device: {device}")
+    if use_clahe:
+        print("Using CLAHE for contrast enhancement")
 
     # Create save directory
     save_dir = Path(save_dir)
@@ -227,8 +231,10 @@ def train_model(
         root_dir=root_dir,
         batch_size=batch_size,
         num_workers=num_workers,
-        transform_train=get_training_transforms(image_size=image_size),
-        transform_val=get_validation_transforms(image_size=image_size),
+        transform_train=get_training_transforms(
+            image_size=image_size, use_clahe=use_clahe),
+        transform_val=get_validation_transforms(
+            image_size=image_size, use_clahe=use_clahe),
         filter_incomplete=filter_incomplete
     )
 
