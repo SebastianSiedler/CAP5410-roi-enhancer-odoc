@@ -96,19 +96,47 @@ class PerceptualLoss(nn.Module):
         return self.criterion(enhanced, original)
 
 
+class TotalVariationLoss(nn.Module):
+    """
+    Total Variation Loss to encourage spatial smoothness and reduce artifacts.
+    Penalizes large gradients in the enhanced image.
+    """
+    
+    def __init__(self):
+        super().__init__()
+    
+    def forward(self, images):
+        """
+        Args:
+            images: Enhanced images [B, C, H, W]
+            
+        Returns:
+            TV loss (scalar)
+        """
+        # Compute differences in horizontal and vertical directions
+        diff_h = torch.abs(images[:, :, 1:, :] - images[:, :, :-1, :])
+        diff_v = torch.abs(images[:, :, :, 1:] - images[:, :, :, :-1])
+        
+        # Sum of absolute differences
+        tv_loss = diff_h.mean() + diff_v.mean()
+        return tv_loss
+
+
 class TaskAwareLoss(nn.Module):
     """
     Combined loss function for task-aware enhancement training.
     
-    L_total = λ_dice * L_dice + λ_perceptual * L_perceptual
+    L_total = λ_dice * L_dice + λ_perceptual * L_perceptual + λ_tv * L_tv
     
     where:
     - L_dice: Dice loss on segmentation predictions (task-aware component)
     - L_perceptual: Perceptual loss to maintain image quality
+    - L_tv: Total Variation loss for spatial smoothness
     
     Args:
         lambda_dice: Weight for segmentation (task-aware) loss
         lambda_perceptual: Weight for perceptual (quality) loss
+        lambda_tv: Weight for total variation (smoothness) loss
         n_classes: Number of segmentation classes
         class_weights: Optional weights for each class in Dice loss
     """
@@ -116,16 +144,19 @@ class TaskAwareLoss(nn.Module):
     def __init__(
         self,
         lambda_dice=1.0,
-        lambda_perceptual=0.1,
+        lambda_perceptual=0.05,
+        lambda_tv=0.001,
         n_classes=3,
         class_weights=None
     ):
         super().__init__()
         self.lambda_dice = lambda_dice
         self.lambda_perceptual = lambda_perceptual
+        self.lambda_tv = lambda_tv
         
         self.dice_loss = DiceLoss(n_classes=n_classes, weight=class_weights)
         self.perceptual_loss = PerceptualLoss()
+        self.tv_loss = TotalVariationLoss()
     
     def forward(
         self, 
@@ -150,13 +181,17 @@ class TaskAwareLoss(nn.Module):
         # Task-aware loss: optimize for segmentation performance
         dice_loss = self.dice_loss(segmentation_logits, targets)
         
-        # Perceptual loss: maintain image quality
+        # Perceptual loss: maintain image quality (reduced weight)
         perceptual_loss = self.perceptual_loss(enhanced_images, original_images)
+        
+        # Total Variation loss: encourage spatial smoothness
+        tv_loss = self.tv_loss(enhanced_images)
         
         # Combine losses
         total_loss = (
             self.lambda_dice * dice_loss +
-            self.lambda_perceptual * perceptual_loss
+            self.lambda_perceptual * perceptual_loss +
+            self.lambda_tv * tv_loss
         )
         
         # Return loss components for logging
@@ -164,6 +199,7 @@ class TaskAwareLoss(nn.Module):
             'total': total_loss.item(),
             'dice': dice_loss.item(),
             'perceptual': perceptual_loss.item(),
+            'tv': tv_loss.item(),
         }
         
         return total_loss, loss_dict
@@ -341,6 +377,7 @@ def train_enhancement_model(
     save_dir='enhancement_checkpoints',
     lambda_dice=1.0,
     lambda_perceptual=0.1,
+    lambda_tv=0.001,
     patience=10,
     save_interval=5,
     use_tensorboard=True,
@@ -363,6 +400,7 @@ def train_enhancement_model(
         save_dir: Directory to save checkpoints
         lambda_dice: Weight for dice loss
         lambda_perceptual: Weight for perceptual loss
+        lambda_tv: Weight for total variation loss (NEW)
         patience: Early stopping patience
         save_interval: Save checkpoint every N epochs
         use_tensorboard: Whether to use TensorBoard logging
@@ -477,8 +515,12 @@ def train_enhancement_model(
     # Create pipeline
     pipeline = EnhancementSegmentationPipeline(enhancement_model, segmentation_model)
     
-    # Loss and optimizer
-    criterion = TaskAwareLoss(lambda_dice=lambda_dice, lambda_perceptual=lambda_perceptual)
+    # Loss and optimizer with Total Variation loss
+    criterion = TaskAwareLoss(
+        lambda_dice=lambda_dice, 
+        lambda_perceptual=lambda_perceptual,
+        lambda_tv=lambda_tv
+    )
     optimizer = optim.Adam(enhancement_model.parameters(), lr=learning_rate)
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(
         optimizer, mode='max', factor=0.5, patience=5
