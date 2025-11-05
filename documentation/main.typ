@@ -27,3 +27,5 @@ Das heißt in jeder Epoche sieht beim training (nicht validation!) das Bild ande
 - versucht um modell zu verbessern: 
     - cup gewichtung auf 2.0 setzen
     - mehr epochen (100 statt 50)
+
+- clahe zu verwenden hat anscheinend gar nichts gebracht (sogar 0.4% schlechter geworden)
