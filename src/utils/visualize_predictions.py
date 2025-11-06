@@ -7,6 +7,10 @@ Shows side-by-side comparison of:
 - Right: Predicted segmentation overlay
 """
 
+from data_loader.transforms import get_validation_transforms
+from data_loader.dataset import GlaucomaDataset
+from models.resnet_unet import ResNetUNet, ResNetUNetLite
+from models.unet import UNet
 import sys
 from pathlib import Path
 import numpy as np
@@ -19,37 +23,50 @@ from PIL import Image
 project_root = Path(__file__).parent.parent.parent
 sys.path.append(str(project_root / 'src'))
 
-from models.unet import UNet
-from data_loader.dataset import GlaucomaDataset
-from data_loader.transforms import get_validation_transforms
 
+def load_model(checkpoint_path: str, device: str = 'cuda', model_type: str = 'unet'):
+    """
+    Load trained model from checkpoint.
 
-def load_model(checkpoint_path: str, device: str = 'cuda'):
-    """Load trained model from checkpoint."""
-    checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=False)
-    
-    # Extract model parameters from checkpoint
-    model = UNet(
-        n_channels=3,
-        n_classes=3,
-        base_channels=checkpoint.get('base_channels', 64)
-    )
-    
+    Args:
+        checkpoint_path: Path to checkpoint file
+        device: Device to load model on
+        model_type: 'unet', 'resnet34', or 'resnet18'
+    """
+    checkpoint = torch.load(
+        checkpoint_path, map_location=device, weights_only=False)
+
+    # Determine model type from checkpoint or parameter
+    if 'model_type' in checkpoint:
+        model_type = checkpoint['model_type']
+
+    # Create model based on type
+    if model_type == 'resnet18':
+        model = ResNetUNetLite(n_channels=3, n_classes=3, pretrained=False)
+    elif model_type == 'resnet34':
+        model = ResNetUNet(n_channels=3, n_classes=3, pretrained=False)
+    else:  # Default to UNet
+        model = UNet(
+            n_channels=3,
+            n_classes=3,
+            base_channels=checkpoint.get('base_channels', 64)
+        )
+
     model.load_state_dict(checkpoint['model_state_dict'])
     model = model.to(device)
     model.eval()
-    
+
     return model
 
 
 def create_colored_mask(mask: np.ndarray, alpha: float = 0.5):
     """
     Create colored overlay for segmentation mask.
-    
+
     Args:
         mask: Segmentation mask (H, W) with values 0, 1, 2
         alpha: Transparency for overlay
-    
+
     Returns:
         RGBA colored mask
     """
@@ -59,52 +76,53 @@ def create_colored_mask(mask: np.ndarray, alpha: float = 0.5):
         1: [255, 0, 0, 255],     # Disc: red
         2: [0, 255, 0, 255]      # Cup: green
     }
-    
+
     h, w = mask.shape
     colored = np.zeros((h, w, 4), dtype=np.uint8)
-    
+
     for class_id, color in colors.items():
         colored[mask == class_id] = color
-    
+
     # Apply alpha to non-background pixels
     colored[:, :, 3] = np.where(mask > 0, int(alpha * 255), 0)
-    
+
     return colored
 
 
 def overlay_mask_on_image(image: np.ndarray, mask: np.ndarray, alpha: float = 0.5):
     """
     Overlay colored segmentation mask on image.
-    
+
     Args:
         image: RGB image (H, W, 3) in range [0, 255]
         mask: Segmentation mask (H, W) with values 0, 1, 2
         alpha: Transparency for overlay
-    
+
     Returns:
         Image with overlay (H, W, 3)
     """
     colored_mask = create_colored_mask(mask, alpha)
-    
+
     # Convert image to float for blending
     image_float = image.astype(float)
-    
+
     # Blend where mask is not background
     mask_alpha = colored_mask[:, :, 3:4] / 255.0
-    blended = image_float * (1 - mask_alpha) + colored_mask[:, :, :3] * mask_alpha
-    
+    blended = image_float * (1 - mask_alpha) + \
+        colored_mask[:, :, :3] * mask_alpha
+
     return blended.astype(np.uint8)
 
 
 def predict_on_image(model, image: np.ndarray, device: str = 'cuda'):
     """
     Run model prediction on a single image.
-    
+
     Args:
         model: Trained model
         image: Input image tensor (C, H, W)
         device: Device to run on
-    
+
     Returns:
         Predicted mask (H, W)
     """
@@ -112,7 +130,7 @@ def predict_on_image(model, image: np.ndarray, device: str = 'cuda'):
         image = image.unsqueeze(0).to(device)  # Add batch dimension
         output = model(image)
         pred_mask = torch.argmax(output, dim=1).squeeze(0).cpu().numpy()
-    
+
     return pred_mask
 
 
@@ -123,11 +141,12 @@ def visualize_predictions(
     save_path: str = None,
     device: str = 'cuda',
     image_size: int = 256,
-    seed: int = 42
+    seed: int = 42,
+    model_type: str = 'unet'
 ):
     """
     Visualize model predictions on test images.
-    
+
     Args:
         checkpoint_path: Path to model checkpoint
         root_dir: Project root directory
@@ -136,18 +155,19 @@ def visualize_predictions(
         device: Device to run on
         image_size: Image size used during training
         seed: Random seed for reproducible sample selection
+        model_type: 'unet', 'resnet34', or 'resnet18'
     """
     # Set device
     if device == 'cuda' and not torch.cuda.is_available():
         device = 'cpu'
         print("CUDA not available, using CPU")
-    
+
     print(f"Using device: {device}")
-    
+
     # Load model
     print(f"Loading model from {checkpoint_path}")
-    model = load_model(checkpoint_path, device)
-    
+    model = load_model(checkpoint_path, device, model_type)
+
     # Load test dataset
     print("Loading test dataset...")
     test_dataset = GlaucomaDataset(
@@ -157,77 +177,79 @@ def visualize_predictions(
         seed=seed,
         filter_incomplete=True
     )
-    
+
     print(f"Test dataset size: {len(test_dataset)}")
-    
+
     # Select random samples
     np.random.seed(seed)
-    indices = np.random.choice(len(test_dataset), size=min(num_samples, len(test_dataset)), replace=False)
-    
+    indices = np.random.choice(len(test_dataset), size=min(
+        num_samples, len(test_dataset)), replace=False)
+
     # Create figure
     fig, axes = plt.subplots(num_samples, 3, figsize=(15, 5 * num_samples))
     if num_samples == 1:
         axes = axes.reshape(1, -1)
-    
+
     # Process each sample
     for i, idx in enumerate(indices):
         # Get image and ground truth
         image_tensor, gt_mask = test_dataset[idx]
-        
+
         # Get original image (denormalize)
         # Reverse normalization
         mean = torch.tensor([0.485, 0.456, 0.406]).view(3, 1, 1)
         std = torch.tensor([0.229, 0.224, 0.225]).view(3, 1, 1)
         image_denorm = image_tensor * std + mean
         image_denorm = torch.clamp(image_denorm, 0, 1)
-        
+
         # Convert to numpy for visualization
-        image_np = (image_denorm.permute(1, 2, 0).numpy() * 255).astype(np.uint8)
+        image_np = (image_denorm.permute(
+            1, 2, 0).numpy() * 255).astype(np.uint8)
         gt_mask_np = gt_mask.numpy()
-        
+
         # Get prediction
         pred_mask = predict_on_image(model, image_tensor, device)
-        
+
         # Create overlays
         gt_overlay = overlay_mask_on_image(image_np, gt_mask_np, alpha=0.4)
         pred_overlay = overlay_mask_on_image(image_np, pred_mask, alpha=0.4)
-        
+
         # Plot
         axes[i, 0].imshow(image_np)
         axes[i, 0].set_title(f'Sample {idx}\nOriginal Image', fontsize=12)
         axes[i, 0].axis('off')
-        
+
         axes[i, 1].imshow(gt_overlay)
         axes[i, 1].set_title('Ground Truth', fontsize=12)
         axes[i, 1].axis('off')
-        
+
         axes[i, 2].imshow(pred_overlay)
         axes[i, 2].set_title('Prediction', fontsize=12)
         axes[i, 2].axis('off')
-        
+
         # Calculate IoU for this sample
         iou_disc = calculate_iou(gt_mask_np, pred_mask, class_id=1)
         iou_cup = calculate_iou(gt_mask_np, pred_mask, class_id=2)
-        
+
         print(f"Sample {idx}: IoU Disc={iou_disc:.3f}, IoU Cup={iou_cup:.3f}")
-    
+
     # Add legend
     legend_elements = [
         Patch(facecolor='red', alpha=0.4, label='Optic Disc'),
         Patch(facecolor='green', alpha=0.4, label='Optic Cup')
     ]
-    fig.legend(handles=legend_elements, loc='upper center', ncol=2, 
+    fig.legend(handles=legend_elements, loc='upper center', ncol=2,
                bbox_to_anchor=(0.5, 1.0), fontsize=12, frameon=True)
-    
+
     plt.tight_layout(rect=[0, 0, 1, 0.98])
-    
+
     # Save if requested
     if save_path:
         plt.savefig(save_path, dpi=150, bbox_inches='tight')
         print(f"\nVisualization saved to: {save_path}")
-    
+
     plt.show()
-    
+
     return fig
 
 
@@ -235,20 +257,20 @@ def calculate_iou(mask1: np.ndarray, mask2: np.ndarray, class_id: int):
     """Calculate IoU for a specific class."""
     mask1_class = (mask1 == class_id)
     mask2_class = (mask2 == class_id)
-    
+
     intersection = np.logical_and(mask1_class, mask2_class).sum()
     union = np.logical_or(mask1_class, mask2_class).sum()
-    
+
     if union == 0:
         return 0.0
-    
+
     return intersection / union
 
 
 def main():
     """Main function for standalone usage."""
     import argparse
-    
+
     parser = argparse.ArgumentParser(description='Visualize model predictions')
     parser.add_argument('--checkpoint', type=str, default='checkpoints/best_model.pth',
                         help='Path to model checkpoint')
@@ -264,13 +286,13 @@ def main():
                         help='Image size used during training')
     parser.add_argument('--seed', type=int, default=42,
                         help='Random seed')
-    
+
     args = parser.parse_args()
-    
+
     # Ensure save directory exists
     save_dir = Path(args.save_path).parent
     save_dir.mkdir(parents=True, exist_ok=True)
-    
+
     # Run visualization
     visualize_predictions(
         checkpoint_path=args.checkpoint,

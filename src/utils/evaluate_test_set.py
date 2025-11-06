@@ -11,6 +11,7 @@ Computes comprehensive metrics including:
 from data_loader.transforms import get_validation_transforms
 from data_loader.dataset import GlaucomaDataset
 from models.unet import UNet
+from models.resnet_unet import ResNetUNet, ResNetUNetLite
 import sys
 from pathlib import Path
 import numpy as np
@@ -23,16 +24,33 @@ project_root = Path(__file__).parent.parent.parent
 sys.path.append(str(project_root / 'src'))
 
 
-def load_model(checkpoint_path: str, device: str = 'cuda'):
-    """Load trained model from checkpoint."""
+def load_model(checkpoint_path: str, device: str = 'cuda', model_type: str = 'unet'):
+    """
+    Load trained model from checkpoint.
+
+    Args:
+        checkpoint_path: Path to checkpoint file
+        device: Device to load model on
+        model_type: 'unet', 'resnet34', or 'resnet18'
+    """
     checkpoint = torch.load(
         checkpoint_path, map_location=device, weights_only=False)
 
-    model = UNet(
-        n_channels=3,
-        n_classes=3,
-        base_channels=checkpoint.get('base_channels', 64)
-    )
+    # Determine model type from checkpoint or parameter
+    if 'model_type' in checkpoint:
+        model_type = checkpoint['model_type']
+
+    # Create model based on type
+    if model_type == 'resnet18':
+        model = ResNetUNetLite(n_channels=3, n_classes=3, pretrained=False)
+    elif model_type == 'resnet34':
+        model = ResNetUNet(n_channels=3, n_classes=3, pretrained=False)
+    else:  # Default to UNet
+        model = UNet(
+            n_channels=3,
+            n_classes=3,
+            base_channels=checkpoint.get('base_channels', 64)
+        )
 
     model.load_state_dict(checkpoint['model_state_dict'])
     model = model.to(device)
@@ -80,7 +98,8 @@ def evaluate_test_set(
     device: str = 'cuda',
     image_size: int = 256,
     seed: int = 42,
-    save_path: str = None
+    save_path: str = None,
+    model_type: str = 'unet'
 ):
     """
     Evaluate model on entire test dataset.
@@ -92,6 +111,7 @@ def evaluate_test_set(
         image_size: Image size used during training
         seed: Random seed
         save_path: Path to save results JSON (optional)
+        model_type: 'unet', 'resnet34', or 'resnet18'
 
     Returns:
         Dictionary with evaluation metrics
@@ -105,7 +125,7 @@ def evaluate_test_set(
 
     # Load model
     print(f"Loading model from {checkpoint_path}")
-    model = load_model(checkpoint_path, device)
+    model = load_model(checkpoint_path, device, model_type)
 
     # Load test dataset
     print("Loading test dataset...")
