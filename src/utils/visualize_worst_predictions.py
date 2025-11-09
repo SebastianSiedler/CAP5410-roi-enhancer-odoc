@@ -11,7 +11,7 @@ import sys
 from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.patches import Patch
+from matplotlib.patches import Patch, Rectangle
 import torch
 from PIL import Image
 from tqdm import tqdm
@@ -160,6 +160,11 @@ def find_worst_predictions(
 
     with torch.no_grad():
         for idx in tqdm(range(len(test_dataset)), desc="Evaluating"):
+            # Get sample metadata
+            sample_info = test_dataset.samples[idx]
+            dataset_name = sample_info['dataset']
+            image_filename = Path(sample_info['image_path']).name
+
             # Get sample
             image, gt_mask = test_dataset[idx]
 
@@ -191,6 +196,8 @@ def find_worst_predictions(
 
             sample_results.append({
                 'idx': idx,
+                'dataset': dataset_name,
+                'filename': image_filename,
                 'score': score,
                 'iou_disc': iou_disc,
                 'iou_cup': iou_cup,
@@ -259,7 +266,7 @@ def visualize_worst_predictions(
         # Plot
         axes[i, 0].imshow(image_np)
         axes[i, 0].set_title(
-            f'Sample {sample["idx"]}\nOriginal Image', fontsize=12)
+            f'{sample["dataset"]} | {sample["filename"]}', fontsize=12)
         axes[i, 0].axis('off')
 
         axes[i, 1].imshow(gt_overlay)
@@ -272,7 +279,7 @@ def visualize_worst_predictions(
         axes[i, 2].axis('off')
 
         print(
-            f"Sample {sample['idx']}: Disc IoU={sample['iou_disc']:.3f}, Cup IoU={sample['iou_cup']:.3f}")
+            f'{sample["dataset"]} | {sample["filename"]}: Disc IoU={sample["iou_disc"]:.3f}, Cup IoU={sample["iou_cup"]:.3f}')
 
     # Add legend
     legend_elements = [
