@@ -57,7 +57,7 @@ We obtained these three datasets from the "Glaucoma Fundus Imaging Datasets" Kag
 - 2: optic cup
 
 *Data Split:* \
-We used a 70/15/15 split for training, validation, and testing, respectively. After combining the datasets, we had a total of 2,870 images. We ensured that the splits were stratified to maintain the proportion of glaucoma and normal cases across all sets. Also some of the images had incomplete masks (234), e.g. missing optic cup or disc annotations. We filtered out these images to ensure the quality of our training data.
+We used a 70/15/15 split with random seed 42 for training, validation, and testing, respectively. After combining the datasets, we had a total of 2,870 images. We ensured that the splits were stratified to maintain the proportion of glaucoma and normal cases across all sets. Also some of the images had incomplete masks (234), e.g. missing optic cup or disc annotations. We filtered out these images to ensure the quality of our training data.
 
 This resulted in the following distribution:
 - Total images before filtering: 2870

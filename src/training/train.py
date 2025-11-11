@@ -218,6 +218,16 @@ def train_model(
     if device is None:
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"Using device: {device}")
+
+    # Set seeds for reproducible results
+    torch.manual_seed(42)
+    torch.cuda.manual_seed(42)
+    torch.cuda.manual_seed_all(42)  # for multi-GPU
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    np.random.seed(42)
+    print("Random seeds set for reproducible training")
+
     if use_clahe:
         print("Using CLAHE for contrast enhancement")
 

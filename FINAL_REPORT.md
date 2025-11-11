@@ -331,7 +331,7 @@ We report mIoU as the primary metric for fair comparison across approaches.
 **Precision**: FP32  
 **Batch Size**: 16 (GPU memory: ~10GB)  
 **Data Loading**: 4 workers with prefetching  
-**Reproducibility**: Fixed random seeds (42) for PyTorch, NumPy, and Python
+**Reproducibility**: Fixed random seeds (42) for PyTorch, NumPy, and CUDA operations. Seeds are set at the start of training to ensure deterministic weight initialization, data augmentation, and GPU operations across all experiments.
 
 ---
 
