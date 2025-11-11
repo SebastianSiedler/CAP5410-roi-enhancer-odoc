@@ -1,0 +1,7 @@
+Metric,Baseline Mean,Baseline Std,Enhanced Mean,Enhanced Std,Improvement,Improvement %
+Dice Overall,0.8820,0.0500,0.8097,0.0797,-0.0723,-8.20%
+Dice Disc,0.8942,0.0569,0.8021,0.0874,-0.0920,-10.29%
+Dice Cup,0.8698,0.0561,0.8172,0.0828,-0.0526,-6.05%
+IoU Background,0.8987,0.0362,0.6857,0.1405,-0.2131,-23.71%
+IoU Disc,0.8132,0.0898,0.6784,0.1207,-0.1348,-16.58%
+IoU Cup,0.7738,0.0838,0.6990,0.1164,-0.0748,-9.67%
