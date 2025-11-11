@@ -276,7 +276,7 @@ We report mIoU as the primary metric for fair comparison across approaches.
   "iou_cup": "IoU Cup",
   "miou": "mIoU",
   "parameters": "Parameters",
-  "delta_miou": "Δ mIoU",
+  "delta_miou": "#sym.Delta  mIoU",
 )
 
 // Approach display mapping
@@ -374,26 +374,26 @@ Key Observations:
   table(
     columns: (auto, auto, auto, auto),
     align: center,
-    table.header([*Approach*], [*ΔIoU BG*], [*ΔIoU Disc*], [*ΔIoU Cup*]),
+    table.header([*Approach*], [*#sym.Delta IoU BG*], [*#sym.Delta IoU Disc*], [* #sym.Delta IoU Cup*]),
     [CLAHE],
-    format_number(comparison_data.data.clahe.iou_bg - baseline_iou_bg, "Δ mIoU"),
-    format_number(comparison_data.data.clahe.iou_disc - baseline_iou_disc, "Δ mIoU"),
-    format_number(comparison_data.data.clahe.iou_cup - baseline_iou_cup, "Δ mIoU"),
+    format_number(comparison_data.data.clahe.iou_bg - baseline_iou_bg, "#sym.Delta  mIoU"),
+    format_number(comparison_data.data.clahe.iou_disc - baseline_iou_disc, "#sym.Delta  mIoU"),
+    format_number(comparison_data.data.clahe.iou_cup - baseline_iou_cup, "#sym.Delta  mIoU"),
 
     [#sym.plus Std Enhancer],
-    format_number(comparison_data.data.baseline_std_enhancer.iou_bg - baseline_iou_bg, "Δ mIoU"),
-    format_number(comparison_data.data.baseline_std_enhancer.iou_disc - baseline_iou_disc, "Δ mIoU"),
-    format_number(comparison_data.data.baseline_std_enhancer.iou_cup - baseline_iou_cup, "Δ mIoU"),
+    format_number(comparison_data.data.baseline_std_enhancer.iou_bg - baseline_iou_bg, "#sym.Delta  mIoU"),
+    format_number(comparison_data.data.baseline_std_enhancer.iou_disc - baseline_iou_disc, "#sym.Delta  mIoU"),
+    format_number(comparison_data.data.baseline_std_enhancer.iou_cup - baseline_iou_cup, "#sym.Delta  mIoU"),
 
     [#sym.plus Atrous Enhancer],
-    format_number(comparison_data.data.baseline_atrous_enhancer.iou_bg - baseline_iou_bg, "Δ mIoU"),
-    format_number(comparison_data.data.baseline_atrous_enhancer.iou_disc - baseline_iou_disc, "Δ mIoU"),
-    format_number(comparison_data.data.baseline_atrous_enhancer.iou_cup - baseline_iou_cup, "Δ mIoU"),
+    format_number(comparison_data.data.baseline_atrous_enhancer.iou_bg - baseline_iou_bg, "#sym.Delta  mIoU"),
+    format_number(comparison_data.data.baseline_atrous_enhancer.iou_disc - baseline_iou_disc, "#sym.Delta  mIoU"),
+    format_number(comparison_data.data.baseline_atrous_enhancer.iou_cup - baseline_iou_cup, "#sym.Delta  mIoU"),
 
     [ASPP-UNet],
-    format_number(comparison_data.data.aspp_unet.iou_bg - baseline_iou_bg, "Δ mIoU"),
-    format_number(comparison_data.data.aspp_unet.iou_disc - baseline_iou_disc, "Δ mIoU"),
-    format_number(comparison_data.data.aspp_unet.iou_cup - baseline_iou_cup, "Δ mIoU"),
+    format_number(comparison_data.data.aspp_unet.iou_bg - baseline_iou_bg, "#sym.Delta  mIoU"),
+    format_number(comparison_data.data.aspp_unet.iou_disc - baseline_iou_disc, "#sym.Delta  mIoU"),
+    format_number(comparison_data.data.aspp_unet.iou_cup - baseline_iou_cup, "#sym.Delta  mIoU"),
   ),
   caption: [Class-specific IoU improvements over baseline UNet. ASPP-UNet shows consistent improvements across all classes, with the largest gains in background segmentation.],
 ) <fig_class_specific>
@@ -401,7 +401,7 @@ Key Observations:
 *Analysis:*
 
 // evaluate in the end again. probably this could also be counted as error margin
-- *Cup Segmentation (most challenging):* ASPP-UNet achieves #calc.round(comparison_data.data.aspp_unet.iou_cup * 100, digits: 2)% IoU vs. #calc.round(baseline_iou_cup * 100, digits: 2)% baseline (+#format_number(comparison_data.data.aspp_unet.iou_cup - baseline_iou_cup, "Δ mIoU") points), demonstrating that multi-scale features help with the hardest class
+- *Cup Segmentation (most challenging):* ASPP-UNet achieves #calc.round(comparison_data.data.aspp_unet.iou_cup * 100, digits: 2)% IoU vs. #calc.round(baseline_iou_cup * 100, digits: 2)% baseline (+#format_number(comparison_data.data.aspp_unet.iou_cup - baseline_iou_cup, "#sym.Delta  mIoU") points), demonstrating that multi-scale features help with the hardest class
 
 - *Disc Segmentation:* All approaches achieve >#calc.round(calc.min(..approaches.map(a => comparison_data.data.at(a).iou_disc)) * 100, digits: 1)%, with ASPP-UNet reaching #calc.round(comparison_data.data.aspp_unet.iou_disc * 100, digits: 2)%
 
