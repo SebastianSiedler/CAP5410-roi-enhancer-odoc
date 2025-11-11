@@ -122,23 +122,87 @@ class TotalVariationLoss(nn.Module):
         return tv_loss
 
 
+class ShapePriorLoss(nn.Module):
+    """
+    Shape Prior Loss to enforce anatomically plausible segmentation shapes.
+    
+    Uses a pre-trained Shape Autoencoder to learn latent representations of
+    correct optic disc/cup shapes. Penalizes segmentation outputs that deviate
+    from the learned shape distribution.
+    
+    This prevents "fragmented" or "irregular" segmentation contours by forcing
+    the output to have latent codes similar to ground truth shapes.
+    
+    Args:
+        shape_autoencoder: Pre-trained ShapeAutoencoder model (or None to skip)
+        n_classes: Number of segmentation classes
+    """
+    
+    def __init__(self, shape_autoencoder=None, n_classes=3):
+        super().__init__()
+        self.shape_autoencoder = shape_autoencoder
+        self.n_classes = n_classes
+        
+        # Freeze autoencoder if provided
+        if self.shape_autoencoder is not None:
+            for param in self.shape_autoencoder.parameters():
+                param.requires_grad = False
+            self.shape_autoencoder.eval()
+    
+    def forward(self, pred_logits, target_masks):
+        """
+        Compute shape prior loss.
+        
+        Args:
+            pred_logits: Predicted segmentation logits [B, n_classes, H, W]
+            target_masks: Ground truth masks [B, H, W] with class indices
+            
+        Returns:
+            shape_loss: Distance between predicted and target shape codes
+        """
+        if self.shape_autoencoder is None:
+            return torch.tensor(0.0, device=pred_logits.device)
+        
+        # Convert predicted logits to one-hot probabilities
+        pred_probs = F.softmax(pred_logits, dim=1)
+        
+        # Convert target masks to one-hot
+        target_one_hot = F.one_hot(target_masks, num_classes=self.n_classes)
+        target_one_hot = target_one_hot.permute(0, 3, 1, 2).float()
+        
+        with torch.no_grad():
+            # Encode ground truth to get target latent codes
+            target_codes = self.shape_autoencoder.encode(target_one_hot)
+        
+        # Encode predictions to get predicted latent codes
+        pred_codes = self.shape_autoencoder.encode(pred_probs)
+        
+        # L2 distance in latent space (forces similar shapes)
+        shape_loss = F.mse_loss(pred_codes, target_codes)
+        
+        return shape_loss
+
+
 class TaskAwareLoss(nn.Module):
     """
     Combined loss function for task-aware enhancement training.
     
-    L_total = λ_dice * L_dice + λ_perceptual * L_perceptual + λ_tv * L_tv
+    L_total = λ_dice * L_dice + λ_perceptual * L_perceptual + λ_tv * L_tv + λ_shape * L_shape
     
     where:
     - L_dice: Dice loss on segmentation predictions (task-aware component)
     - L_perceptual: Perceptual loss to maintain image quality
     - L_tv: Total Variation loss for spatial smoothness
+    - L_shape: Shape Prior loss for anatomically plausible shapes (NEW)
     
     Args:
         lambda_dice: Weight for segmentation (task-aware) loss
         lambda_perceptual: Weight for perceptual (quality) loss
         lambda_tv: Weight for total variation (smoothness) loss
+        lambda_shape: Weight for shape prior (anatomical) loss
         n_classes: Number of segmentation classes
         class_weights: Optional weights for each class in Dice loss
+        shape_autoencoder: Pre-trained ShapeAutoencoder for shape regularization
     """
     
     def __init__(
@@ -146,17 +210,21 @@ class TaskAwareLoss(nn.Module):
         lambda_dice=1.0,
         lambda_perceptual=0.05,
         lambda_tv=0.001,
+        lambda_shape=0.1,
         n_classes=3,
-        class_weights=None
+        class_weights=None,
+        shape_autoencoder=None
     ):
         super().__init__()
         self.lambda_dice = lambda_dice
         self.lambda_perceptual = lambda_perceptual
         self.lambda_tv = lambda_tv
+        self.lambda_shape = lambda_shape
         
         self.dice_loss = DiceLoss(n_classes=n_classes, weight=class_weights)
         self.perceptual_loss = PerceptualLoss()
         self.tv_loss = TotalVariationLoss()
+        self.shape_loss = ShapePriorLoss(shape_autoencoder, n_classes)
     
     def forward(
         self, 
@@ -187,11 +255,15 @@ class TaskAwareLoss(nn.Module):
         # Total Variation loss: encourage spatial smoothness
         tv_loss = self.tv_loss(enhanced_images)
         
+        # Shape Prior loss: enforce anatomically plausible shapes
+        shape_loss = self.shape_loss(segmentation_logits, targets)
+        
         # Combine losses
         total_loss = (
             self.lambda_dice * dice_loss +
             self.lambda_perceptual * perceptual_loss +
-            self.lambda_tv * tv_loss
+            self.lambda_tv * tv_loss +
+            self.lambda_shape * shape_loss
         )
         
         # Return loss components for logging
@@ -200,6 +272,7 @@ class TaskAwareLoss(nn.Module):
             'dice': dice_loss.item(),
             'perceptual': perceptual_loss.item(),
             'tv': tv_loss.item(),
+            'shape': shape_loss.item(),
         }
         
         return total_loss, loss_dict
@@ -378,10 +451,12 @@ def train_enhancement_model(
     lambda_dice=1.0,
     lambda_perceptual=0.1,
     lambda_tv=0.001,
+    lambda_shape=0.1,
     patience=10,
     save_interval=5,
     use_tensorboard=True,
-    filter_incomplete=False
+    filter_incomplete=False,
+    shape_autoencoder_path=None
 ):
     """
     Main training function for enhancement model with frozen segmentation model.
@@ -400,11 +475,13 @@ def train_enhancement_model(
         save_dir: Directory to save checkpoints
         lambda_dice: Weight for dice loss
         lambda_perceptual: Weight for perceptual loss
-        lambda_tv: Weight for total variation loss (NEW)
+        lambda_tv: Weight for total variation loss
+        lambda_shape: Weight for shape prior loss (NEW)
         patience: Early stopping patience
         save_interval: Save checkpoint every N epochs
         use_tensorboard: Whether to use TensorBoard logging
         filter_incomplete: If True, filter out images without all 3 classes
+        shape_autoencoder_path: Path to pre-trained ShapeAutoencoder (optional)
         
     Returns:
         pipeline: Trained enhancement-segmentation pipeline
@@ -515,11 +592,27 @@ def train_enhancement_model(
     # Create pipeline
     pipeline = EnhancementSegmentationPipeline(enhancement_model, segmentation_model)
     
-    # Loss and optimizer with Total Variation loss
+    # Load Shape Autoencoder if provided
+    shape_autoencoder = None
+    if shape_autoencoder_path is not None:
+        print(f"\nLoading Simple Shape Autoencoder from: {shape_autoencoder_path}")
+        from src.models.simple_shape_autoencoder import SimpleShapeAutoencoder
+        shape_autoencoder = SimpleShapeAutoencoder(latent_dim=64)
+        shape_checkpoint = torch.load(shape_autoencoder_path, map_location=device, weights_only=False)
+        shape_autoencoder.load_state_dict(shape_checkpoint['model_state_dict'])
+        shape_autoencoder = shape_autoencoder.to(device)
+        shape_autoencoder.eval()
+        print("✓ Simple Shape Autoencoder loaded and frozen")
+    else:
+        print("\n⚠ No Shape Autoencoder provided - shape prior loss will be disabled")
+    
+    # Loss and optimizer with all loss components
     criterion = TaskAwareLoss(
         lambda_dice=lambda_dice, 
         lambda_perceptual=lambda_perceptual,
-        lambda_tv=lambda_tv
+        lambda_tv=lambda_tv,
+        lambda_shape=lambda_shape,
+        shape_autoencoder=shape_autoencoder
     )
     optimizer = optim.Adam(enhancement_model.parameters(), lr=learning_rate)
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(
@@ -561,17 +654,21 @@ def train_enhancement_model(
             epoch_losses.append(loss_dict['total'])
             epoch_dice.append(metrics_dict['dice_mean'])
             
+            # Show UNWEIGHTED Dice loss and Dice metric for clarity
             pbar.set_postfix({
-                'loss': f"{loss_dict['total']:.4f}",
-                'dice': f"{metrics_dict['dice_mean']:.4f}"
+                'total_loss': f"{loss_dict['total']:.4f}",
+                'dice_loss': f"{loss_dict['dice']:.4f}",
+                'dice_metric': f"{metrics_dict['dice_mean']:.4f}"
             })
             
             # Log to tensorboard
             if writer is not None:
                 step = (epoch - 1) * len(train_loader) + batch_idx
                 writer.add_scalar('train/loss_total', loss_dict['total'], step)
-                writer.add_scalar('train/loss_dice', loss_dict['dice'], step)
-                writer.add_scalar('train/loss_perceptual', loss_dict['perceptual'], step)
+                writer.add_scalar('train/loss_dice_unweighted', loss_dict['dice'], step)
+                writer.add_scalar('train/loss_perceptual_unweighted', loss_dict['perceptual'], step)
+                writer.add_scalar('train/loss_tv_unweighted', loss_dict['tv'], step)
+                writer.add_scalar('train/loss_shape_unweighted', loss_dict['shape'], step)
                 writer.add_scalar('train/dice_mean', metrics_dict['dice_mean'], step)
             
             # Clear GPU cache periodically
@@ -593,9 +690,11 @@ def train_enhancement_model(
             epoch_losses.append(loss_dict['total'])
             epoch_dice.append(metrics_dict['dice_mean'])
             
+            # Show UNWEIGHTED Dice loss and Dice metric for clarity
             pbar.set_postfix({
-                'loss': f"{loss_dict['total']:.4f}",
-                'dice': f"{metrics_dict['dice_mean']:.4f}"
+                'total_loss': f"{loss_dict['total']:.4f}",
+                'dice_loss': f"{loss_dict['dice']:.4f}",
+                'dice_metric': f"{metrics_dict['dice_mean']:.4f}"
             })
             
             # Visualize first batch
@@ -652,7 +751,7 @@ def train_enhancement_model(
         
         # Log to tensorboard
         if writer is not None:
-            writer.add_scalar('val/loss', val_loss, epoch)
+            writer.add_scalar('val/loss_total', val_loss, epoch)
             writer.add_scalar('val/dice_mean', val_dice, epoch)
         
         # Update learning rate
@@ -666,11 +765,13 @@ def train_enhancement_model(
         history['val_dice'].append(val_dice)
         history['lr'].append(current_lr)
         
-        # Print summary
+        # Print summary with CLEAR explanation
         print(f"\nEpoch {epoch} Summary:")
-        print(f"  Train Loss: {train_loss:.4f}, Dice: {train_dice:.4f}")
-        print(f"  Val   Loss: {val_loss:.4f}, Dice: {val_dice:.4f}")
+        print(f"  Train - Total Loss: {train_loss:.4f} | Dice Score (Metric): {train_dice:.4f}")
+        print(f"  Val   - Total Loss: {val_loss:.4f} | Dice Score (Metric): {val_dice:.4f}")
         print(f"  Learning Rate: {current_lr:.6f}")
+        print(f"  NOTE: Total Loss = {lambda_dice}*dice_loss + {lambda_perceptual}*perceptual + {lambda_tv}*tv + {lambda_shape}*shape")
+        print(f"        Total Loss > 1 is NORMAL due to weighted sum. Focus on Dice Score improvement!")
         
         # Save best model
         if val_dice > best_dice:
