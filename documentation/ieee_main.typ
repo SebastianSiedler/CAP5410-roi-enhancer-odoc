@@ -78,6 +78,7 @@ To improve generatlization and robustness of our model, we applied the following
 The implementation was done using the Albumentations library @src_2018arXiv180906839B in the file `transforms.py`. Validation and test sets use only normalization without augmenation.
 
 == Network Architectures
+// TODO: hier noch mal kurz dazuschreiben, wie wir überhaupt darauf gekommen sind. Also grundidee der enhancer mit unet vergleich clahe. weil aber in dem aktuellen paper das mit dem aspp so krass sein soll, haben wir geschaut, wie sich der enhancer dann verhält, wenn wir das mit atrous machen.
 We evaluate five distinct approaches: // TODO: add clahe
 
 + Standard UNet (Baseline) \
@@ -205,6 +206,7 @@ and $lambda = 0.001$ to prevent over-modification of images.
 
 
 == Training Strategy
+// TODO: for whole chapter. check all parameters again in the end
 *Standard UNet and ASPP-Unet (Single-Phase)*:
 - Optimizer: Adam (lr=1e-4, betas=(0.9, 0.999))
 - Batch size: 16
@@ -314,25 +316,28 @@ We report mIoU as the primary metric for fair comparison across approaches.
 }
 
 // TODO: Maybe spread this table across whole page width
-#figure(
-  table(
-    columns: (auto, auto, auto, auto, auto, auto, auto, auto),
-    align: center,
-    table.header(
-      [*Approach*],
-      ..metrics.map(m => [*#(header_map.at(m))*]),
+// TODO: Missing values for CLAHE
+#place(top + center, scope: "parent", float: true)[
+  #figure(
+    table(
+      columns: (auto, auto, auto, auto, auto, auto, auto, auto),
+      align: center,
+      table.header(
+        [*Approach*],
+        ..metrics.map(m => [*#(header_map.at(m))*]),
+      ),
+      ..for approach in approaches {
+        let row = ([*#(approach_display.at(approach))*],)
+        for metric in metrics {
+          let value = data.at(approach).at(metric)
+          row.push(format_number(value, metric))
+        }
+        row
+      },
     ),
-    ..for approach in approaches {
-      let row = ([*#(approach_display.at(approach))*],)
-      for metric in metrics {
-        let value = data.at(approach).at(metric)
-        row.push(format_number(value, metric))
-      }
-      row
-    },
-  ),
-  caption: [Quantitative comparison of all five approaches on the validation set. ASPP-UNet achieves the best performance with 85.09% mIoU while using 30.9% fewer parameters than the baseline. Learned enhancement approaches show marginal degradation, suggesting that preprocessing-based methods are less effective than architectural improvements for this task.], // Caption TODO:
-) <fig_quantitative_comparison>
+    caption: [Quantitative comparison of all five approaches on the validation set. ASPP-UNet achieves the best performance with 85.09% mIoU while using 30.9% fewer parameters than the baseline. Learned enhancement approaches show marginal degradation, suggesting that preprocessing-based methods are less effective than architectural improvements for this task.], // Caption TODO:
+  ) <fig_quantitative_comparison>
+]
 
 
 Key Observations:
@@ -395,7 +400,8 @@ Key Observations:
 
 *Analysis:*
 
-- *Cup Segmentation (most challenging):* ASPP-UNet achieves #calc.round(comparison_data.data.aspp_unet.iou_cup * 100, digits: 2)% IoU vs. #calc.round(baseline_iou_cup * 100, digits: 2)% baseline (#format_number(comparison_data.data.aspp_unet.iou_cup - baseline_iou_cup, "Δ mIoU")), demonstrating that multi-scale features help with the hardest class
+// evaluate in the end again. probably this could also be counted as error margin
+- *Cup Segmentation (most challenging):* ASPP-UNet achieves #calc.round(comparison_data.data.aspp_unet.iou_cup * 100, digits: 2)% IoU vs. #calc.round(baseline_iou_cup * 100, digits: 2)% baseline (+#format_number(comparison_data.data.aspp_unet.iou_cup - baseline_iou_cup, "Δ mIoU") points), demonstrating that multi-scale features help with the hardest class
 
 - *Disc Segmentation:* All approaches achieve >#calc.round(calc.min(..approaches.map(a => comparison_data.data.at(a).iou_disc)) * 100, digits: 1)%, with ASPP-UNet reaching #calc.round(comparison_data.data.aspp_unet.iou_disc * 100, digits: 2)%
 
@@ -413,3 +419,19 @@ Visual inspection of predictions reveals:
 = Conclusions and Future Work
 
 // TODO: irgendwie gibt es so ein satz von machinelearning so nach dem Motto "Keep it simple"
+
+
+
+// TODO: comparison with SOTA paper why our models are so much worse? Are they really worse? Or are they just calculating there metrics different. We are using IoU on cropped roi. Are they using Dice of Full image? -> roi smaller therefore hit rate way easier!
+
+// TODO: noch mal die anderen beiden dokumente (gdoc und notes.typ) durchschauen, ob da noch was verwertbares dabei ist
+
+// TODO: further research: ich glaube das trainings material an sich ist nicht perfekt. Vielleicht könnte man bei REFUGE unstimmigkeiten zwischen den verschiedenen leuten die labeln das mit in die Loss funktion mit rein packen.
+
+// TODO: Ich glaube auch, dass unser model probleme hat, wenn das schon sehr fortgeschritten ist. Also OC:OD gegen 1:1. vielleicht das auch irgendwie mit in die Loss funktion packen, dass hohe ratio stärker gewichtet wird
+
+// TODO: Auch das wir aufgrund der begrenzten hardware ressourcen das Ding nicht mit mehr auflösung trainieren konnte. Welche haben wir überhaupt jetzt benutzt? 256 oder 512?
+
+
+
+// TODO: großes problem würde ich wirklich sagen, die trainingsdaten. Ich bin selbst kein augenarzt, aber das ist schon teilweise wirklich sehr sehr schwer zu erkennen.
