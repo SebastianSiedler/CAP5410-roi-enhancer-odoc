@@ -245,7 +245,137 @@ We report mIoU as the primary metric for fair comparison across approaches.
 
 = Experimental Results
 
+== Quantitative Comparison
+
+@fig_quantitative_comparison presents comprehensive validation set results for all five approaches.
+
+// Load comparison data from JSON
+#let comparison_data = json("../results/comparison_simple.json")
+
+// Create table from the data
+#let approaches = comparison_data.approaches
+#let metrics = comparison_data.metrics
+#let data = comparison_data.data
+
+// Helper function to format numbers
+#let format_number(value, metric) = {
+  if value == none {
+    "---"
+  } else if type(value) == float {
+    if metric == "Δ mIoU" {
+      // Format as percentage with + sign for positive values
+      let percent = calc.round(value * 100, digits: 2)
+      if percent == 0 {
+        "---"
+      } else if percent > 0 {
+        "+" + str(percent) + "%"
+      } else {
+        str(percent) + "%"
+      }
+    } else if value >= 1.0 {
+      str(calc.round(value, digits: 0))
+    } else if value >= 0.1 {
+      str(calc.round(value, digits: 3))
+    } else {
+      str(calc.round(value, digits: 4))
+    }
+  } else {
+    str(value)
+  }
+}
+
+// TODO: Maybe spread this table across whole page width
+#figure(
+  table(
+    columns: (auto, auto, auto, auto, auto, auto, auto, auto),
+    align: center,
+    table.header(
+      [*Approach*],
+      ..metrics.map(m => [*#m*]),
+    ),
+    ..for approach in approaches {
+      let row = ([*#approach*],)
+      for metric in metrics {
+        let value = data.at(approach).at(metric)
+        row.push(format_number(value, metric))
+      }
+      row
+    },
+  ),
+  caption: [Quantitative comparison of all five approaches on the validation set. ASPP-UNet achieves the best performance with 85.09% mIoU while using 30.9% fewer parameters than the baseline. Learned enhancement approaches show marginal degradation, suggesting that preprocessing-based methods are less effective than architectural improvements for this task.], // Caption TODO:
+) <fig_quantitative_comparison>
+
+
+Key Observations:
++ *Best Performance:* ASPP-UNet achieves #calc.round(comparison_data.data.ASPP-UNet.mIoU * 100, digits: 2)% mIoU, improving upon baseline by #calc.round(comparison_data.data.ASPP-UNet.at("Δ mIoU") * 100, digits: 2) percentage points (relative improvement: #calc.round((comparison_data.data.ASPP-UNet.mIoU - comparison_data.data.at("Baseline UNet").mIoU) / comparison_data.data.at("Baseline UNet").mIoU * 100, digits: 2)%).
+
++ *Parameter Efficiency:* ASPP-UNet uses #calc.round((1 - comparison_data.data.ASPP-UNet.Parameters / comparison_data.data.at("Baseline UNet").Parameters) * 100, digits: 2)% fewer parameters (#calc.round(comparison_data.data.ASPP-UNet.Parameters / 1000000, digits: 2)M vs #calc.round(comparison_data.data.at("Baseline UNet").Parameters / 1000000, digits: 2)M) while outperforming all other approaches
+
++ *Enhancement Degradation:* Both standard and atrous enhancer approaches show slight performance drops compared to the baseline UNet
+  - Standard enhancer: #calc.round(comparison_data.data.at("Baseline + Std Enhancer").at("Δ mIoU") * 100, digits: 2)%
+  - Atrous enhancer: #calc.round(comparison_data.data.at("Baseline + Atrous Enhancer").at("Δ mIoU") * 100, digits: 2)%
+
+// TODO: why is clahe worse?
++ *CLAHE Preprocessing*: Surprisingly, CLAHE preprocessing leads to a minor decrease in performance compared to the baseline UNet. (#calc.round(comparison_data.data.CLAHE.at("Δ mIoU") * 100, digits: 2)% points)
+
+// TODO: we should check this. This could also be just margin of error
++ *Multi-Scale Enhancement*: Altrous enhancer performs worse than standard enhancer, contradicting the hypothesis that multi-scale preprocessing helps
+
++ *Class-Specific Analysis*:
+  - Background: ASPP-UNET shows largest improvement (+#calc.round((comparison_data.data.ASPP-UNet.at("IoU BG") - comparison_data.data.at("Baseline UNet").at("IoU BG")) * 100, digits: 2)% points)
+  - Disc: ASPP-Unet improves by +#calc.round((comparison_data.data.ASPP-UNet.at("IoU Disc") - comparison_data.data.at("Baseline UNet").at("IoU Disc")) * 100, digits: 2)% points
+  - ASPP-UNet improves by +#calc.round((comparison_data.data.ASPP-UNet.at("IoU Cup") - comparison_data.data.at("Baseline UNet").at("IoU Cup")) * 100, digits: 2)% points (most challenging class)
+
+== Training Convergence Analysis
+// TODO:
+
+
+== Per-Class Performance Analysis
+
+#let baseline_iou_bg = comparison_data.data.at("Baseline UNet").at("IoU BG")
+#let baseline_iou_disc = comparison_data.data.at("Baseline UNet").at("IoU Disc")
+#let baseline_iou_cup = comparison_data.data.at("Baseline UNet").at("IoU Cup")
+
+#figure(
+  table(
+    columns: (auto, auto, auto, auto),
+    align: center,
+    table.header([*Approach*], [*ΔIoU BG*], [*ΔIoU Disc*], [*ΔIoU Cup*]),
+    [CLAHE],
+    format_number(comparison_data.data.CLAHE.at("IoU BG") - baseline_iou_bg, "Δ mIoU"),
+    format_number(comparison_data.data.CLAHE.at("IoU Disc") - baseline_iou_disc, "Δ mIoU"),
+    format_number(comparison_data.data.CLAHE.at("IoU Cup") - baseline_iou_cup, "Δ mIoU"),
+
+    [#sym.plus Std Enhancer],
+    format_number(comparison_data.data.at("Baseline + Std Enhancer").at("IoU BG") - baseline_iou_bg, "Δ mIoU"),
+    format_number(comparison_data.data.at("Baseline + Std Enhancer").at("IoU Disc") - baseline_iou_disc, "Δ mIoU"),
+    format_number(comparison_data.data.at("Baseline + Std Enhancer").at("IoU Cup") - baseline_iou_cup, "Δ mIoU"),
+
+    [#sym.plus Atrous Enhancer],
+    format_number(comparison_data.data.at("Baseline + Atrous Enhancer").at("IoU BG") - baseline_iou_bg, "Δ mIoU"),
+    format_number(comparison_data.data.at("Baseline + Atrous Enhancer").at("IoU Disc") - baseline_iou_disc, "Δ mIoU"),
+    format_number(comparison_data.data.at("Baseline + Atrous Enhancer").at("IoU Cup") - baseline_iou_cup, "Δ mIoU"),
+
+    [ASPP-UNet],
+    format_number(comparison_data.data.ASPP-UNet.at("IoU BG") - baseline_iou_bg, "Δ mIoU"),
+    format_number(comparison_data.data.ASPP-UNet.at("IoU Disc") - baseline_iou_disc, "Δ mIoU"),
+    format_number(comparison_data.data.ASPP-UNet.at("IoU Cup") - baseline_iou_cup, "Δ mIoU"),
+  ),
+  caption: [Class-specific IoU improvements over baseline UNet. ASPP-UNet shows consistent improvements across all classes, with the largest gains in background segmentation.],
+) <fig_class_specific>
+
+*Analysis:*
+
+- *Cup Segmentation (most challenging):* ASPP-UNet achieves #calc.round(comparison_data.data.ASPP-UNet.at("IoU Cup") * 100, digits: 2)% IoU vs. #calc.round(baseline_iou_cup * 100, digits: 2)% baseline (#format_number(comparison_data.data.ASPP-UNet.at("IoU Cup") - baseline_iou_cup, "Δ mIoU")), demonstrating that multi-scale features help with the hardest class
+
+- *Disc Segmentation:* All approaches achieve >#calc.round(calc.min(..approaches.map(a => comparison_data.data.at(a).at("IoU Disc"))) * 100, digits: 1)%, with ASPP-UNet reaching #calc.round(comparison_data.data.ASPP-UNet.at("IoU Disc") * 100, digits: 2)%
+
+- *Background:* High performance across all methods (>#calc.round(calc.min(..approaches.map(a => comparison_data.data.at(a).at("IoU BG"))) * 100, digits: 1)%), with ASPP-UNet reaching #calc.round(comparison_data.data.ASPP-UNet.at("IoU BG") * 100, digits: 2)%
+
+
 
 = Discussion
 
 = Conclusions and Future Work
+
+// TODO: irgendwie gibt es so ein satz von machinelearning so nach dem Motto "Keep it simple"

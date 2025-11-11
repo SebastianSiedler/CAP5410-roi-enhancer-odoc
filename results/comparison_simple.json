@@ -1,0 +1,66 @@
+{
+  "timestamp": "2025-11-11",
+  "approaches": [
+    "Baseline UNet",
+    "CLAHE",
+    "Baseline + Std Enhancer",
+    "Baseline + Atrous Enhancer",
+    "ASPP-UNet"
+  ],
+  "metrics": [
+    "Loss",
+    "IoU BG",
+    "IoU Disc",
+    "IoU Cup",
+    "mIoU",
+    "Parameters",
+    "\u0394 mIoU"
+  ],
+  "data": {
+    "Baseline UNet": {
+      "Loss": 0.15220202326774598,
+      "IoU BG": 0.8893363428115845,
+      "IoU Disc": 0.8529115343093872,
+      "IoU Cup": 0.7857532978057862,
+      "mIoU": 0.8426670583089194,
+      "Parameters": 31043651,
+      "\u0394 mIoU": 0.0
+    },
+    "CLAHE": {
+      "Loss": null,
+      "IoU BG": 0.8836178744447075,
+      "IoU Disc": 0.8420836929782527,
+      "IoU Cup": 0.7800905155861247,
+      "mIoU": 0.835264027669695,
+      "Parameters": null,
+      "\u0394 mIoU": -0.007403030639224428
+    },
+    "Baseline + Std Enhancer": {
+      "Loss": 0.15322268962860108,
+      "IoU BG": 0.8885573077201844,
+      "IoU Disc": 0.8519319200515747,
+      "IoU Cup": 0.7847189283370972,
+      "mIoU": 0.8417360520362854,
+      "Parameters": 31095926,
+      "\u0394 mIoU": -0.0009310062726339829
+    },
+    "Baseline + Atrous Enhancer": {
+      "Loss": 0.15422669768333436,
+      "IoU BG": 0.8870114326477051,
+      "IoU Disc": 0.8500249767303467,
+      "IoU Cup": 0.782647213935852,
+      "mIoU": 0.8398945411046346,
+      "Parameters": 31069798,
+      "\u0394 mIoU": -0.002772517204284841
+    },
+    "ASPP-UNet": {
+      "Loss": 0.14589669615030287,
+      "IoU BG": 0.900882043838501,
+      "IoU Disc": 0.8619835233688354,
+      "IoU Cup": 0.789929277896881,
+      "mIoU": 0.8509316150347391,
+      "Parameters": 21461507,
+      "\u0394 mIoU": 0.008264556725819716
+    }
+  }
+}

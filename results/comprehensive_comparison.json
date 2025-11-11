@@ -1,0 +1,110 @@
+{
+  "metadata": {
+    "description": "Comprehensive comparison of 5 approaches for optic disc/cup segmentation",
+    "date_created": "2025-11-11",
+    "dataset": "G1020 + ORIGA + REFUGE (combined)",
+    "evaluation_set": "Validation set (except CLAHE uses test set)",
+    "metrics_description": {
+      "Loss": "Combined CE + Dice loss (lower is better)",
+      "IoU BG": "Intersection over Union for background class",
+      "IoU Disc": "Intersection over Union for optic disc class",
+      "IoU Cup": "Intersection over Union for optic cup class",
+      "mIoU": "Mean IoU across all three classes (higher is better)",
+      "Parameters": "Total model parameters (lower is better)",
+      "\u0394 mIoU": "Improvement/degradation vs Baseline UNet (higher is better)"
+    }
+  },
+  "approaches": {
+    "Baseline UNet": {
+      "description": "Standard UNet with 5 levels, 31.0M parameters",
+      "architecture": "Encoder-Decoder with skip connections",
+      "training": "Single-phase training from scratch"
+    },
+    "CLAHE": {
+      "description": "Contrast Limited Adaptive Histogram Equalization preprocessing",
+      "architecture": "Traditional image processing (no neural network)",
+      "training": "N/A - preprocessing only"
+    },
+    "Baseline + Std Enhancer": {
+      "description": "UNet + lightweight encoder-decoder enhancer (52K additional params)",
+      "architecture": "Two-stage: enhancer \u2192 UNet",
+      "training": "Two-phase: enhancer-only \u2192 joint fine-tuning"
+    },
+    "Baseline + Atrous Enhancer": {
+      "description": "UNet + ASPP-based multi-scale enhancer (26K additional params)",
+      "architecture": "Two-stage: atrous enhancer \u2192 UNet",
+      "training": "Two-phase: enhancer-only \u2192 joint fine-tuning"
+    },
+    "ASPP-UNet": {
+      "description": "UNet with ASPP bottleneck for multi-scale features (21.5M total params)",
+      "architecture": "Single-stage: UNet with dilated convolutions",
+      "training": "Single-phase training from scratch"
+    }
+  },
+  "results": {
+    "Baseline UNet": {
+      "Loss": 0.15220202326774598,
+      "IoU BG": 0.8893363428115845,
+      "IoU Disc": 0.8529115343093872,
+      "IoU Cup": 0.7857532978057862,
+      "mIoU": 0.8426670583089194,
+      "Parameters": 31043651,
+      "\u0394 mIoU": 0.0
+    },
+    "CLAHE": {
+      "Loss": null,
+      "IoU BG": 0.8836178744447075,
+      "IoU Disc": 0.8420836929782527,
+      "IoU Cup": 0.7800905155861247,
+      "mIoU": 0.835264027669695,
+      "Parameters": null,
+      "\u0394 mIoU": -0.007403030639224428
+    },
+    "Baseline + Std Enhancer": {
+      "Loss": 0.15322268962860108,
+      "IoU BG": 0.8885573077201844,
+      "IoU Disc": 0.8519319200515747,
+      "IoU Cup": 0.7847189283370972,
+      "mIoU": 0.8417360520362854,
+      "Parameters": 31095926,
+      "\u0394 mIoU": -0.0009310062726339829
+    },
+    "Baseline + Atrous Enhancer": {
+      "Loss": 0.15422669768333436,
+      "IoU BG": 0.8870114326477051,
+      "IoU Disc": 0.8500249767303467,
+      "IoU Cup": 0.782647213935852,
+      "mIoU": 0.8398945411046346,
+      "Parameters": 31069798,
+      "\u0394 mIoU": -0.002772517204284841
+    },
+    "ASPP-UNet": {
+      "Loss": 0.14589669615030287,
+      "IoU BG": 0.900882043838501,
+      "IoU Disc": 0.8619835233688354,
+      "IoU Cup": 0.789929277896881,
+      "mIoU": 0.8509316150347391,
+      "Parameters": 21461507,
+      "\u0394 mIoU": 0.008264556725819716
+    }
+  },
+  "summary_statistics": {
+    "best_approach": "ASPP-UNet",
+    "best_miou": 0.850932,
+    "worst_approach": "CLAHE",
+    "worst_miou": 0.835264,
+    "performance_range": 0.015668000000000015,
+    "parameter_range": {
+      "min": 21461507,
+      "max": 31095926,
+      "reduction_achieved": 30.982897888295724
+    },
+    "key_findings": [
+      "ASPP-UNet achieves best performance with 30.9% fewer parameters",
+      "Learned enhancement approaches marginally degrade performance",
+      "CLAHE preprocessing performs worse than baseline UNet",
+      "Architectural multi-scale features outperform preprocessing approaches",
+      "Optic cup segmentation remains the most challenging class"
+    ]
+  }
+}
