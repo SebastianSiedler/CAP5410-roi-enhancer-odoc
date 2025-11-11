@@ -1,7 +1,7 @@
 #import "@preview/charged-ieee:0.1.4": ieee
 
 #show: ieee.with(
-  title: [TITLE TODO:],
+  title: [ROI Enhancer for Optic Disc and Cup Segmentation in Fundus Images using Task-Aware Multi-Scale Feature Learning],
   abstract: [
     TODO:
   ],
@@ -21,7 +21,16 @@
       email: "sullmann3121@floridapoly.edu",
     ),
   ),
-  index-terms: ("Glaucoma", "TODO:"),
+  index-terms: (
+    "Medical image segmentation",
+    "optic disc",
+    "optic cup",
+    "glaucoma",
+    "UNet",
+    "ASPP",
+    "multi-scale learning",
+    "deep learning",
+  ),
   bibliography: bibliography("works.bib"),
   figure-supplement: [Fig.],
 )
@@ -257,12 +266,32 @@ We report mIoU as the primary metric for fair comparison across approaches.
 #let metrics = comparison_data.metrics
 #let data = comparison_data.data
 
+// Header mapping for display
+#let header_map = (
+  "loss": "Loss",
+  "iou_bg": "IoU BG",
+  "iou_disc": "IoU Disc",
+  "iou_cup": "IoU Cup",
+  "miou": "mIoU",
+  "parameters": "Parameters",
+  "delta_miou": "Δ mIoU",
+)
+
+// Approach display mapping
+#let approach_display = (
+  "baseline_unet": "Baseline UNet",
+  "clahe": "CLAHE",
+  "baseline_std_enhancer": "Baseline + Std Enhancer",
+  "baseline_atrous_enhancer": "Baseline + Atrous Enhancer",
+  "aspp_unet": "ASPP-UNet",
+)
+
 // Helper function to format numbers
 #let format_number(value, metric) = {
   if value == none {
     "---"
   } else if type(value) == float {
-    if metric == "Δ mIoU" {
+    if metric == "delta_miou" {
       // Format as percentage with + sign for positive values
       let percent = calc.round(value * 100, digits: 2)
       if percent == 0 {
@@ -291,10 +320,10 @@ We report mIoU as the primary metric for fair comparison across approaches.
     align: center,
     table.header(
       [*Approach*],
-      ..metrics.map(m => [*#m*]),
+      ..metrics.map(m => [*#(header_map.at(m))*]),
     ),
     ..for approach in approaches {
-      let row = ([*#approach*],)
+      let row = ([*#(approach_display.at(approach))*],)
       for metric in metrics {
         let value = data.at(approach).at(metric)
         row.push(format_number(value, metric))
@@ -307,24 +336,24 @@ We report mIoU as the primary metric for fair comparison across approaches.
 
 
 Key Observations:
-+ *Best Performance:* ASPP-UNet achieves #calc.round(comparison_data.data.ASPP-UNet.mIoU * 100, digits: 2)% mIoU, improving upon baseline by #calc.round(comparison_data.data.ASPP-UNet.at("Δ mIoU") * 100, digits: 2) percentage points (relative improvement: #calc.round((comparison_data.data.ASPP-UNet.mIoU - comparison_data.data.at("Baseline UNet").mIoU) / comparison_data.data.at("Baseline UNet").mIoU * 100, digits: 2)%).
++ *Best Performance:* ASPP-UNet achieves #calc.round(comparison_data.data.aspp_unet.miou * 100, digits: 2)% mIoU, improving upon baseline by #calc.round(comparison_data.data.aspp_unet.delta_miou * 100, digits: 2) percentage points (relative improvement: #calc.round((comparison_data.data.aspp_unet.miou - comparison_data.data.baseline_unet.miou) / comparison_data.data.baseline_unet.miou * 100, digits: 2)%).
 
-+ *Parameter Efficiency:* ASPP-UNet uses #calc.round((1 - comparison_data.data.ASPP-UNet.Parameters / comparison_data.data.at("Baseline UNet").Parameters) * 100, digits: 2)% fewer parameters (#calc.round(comparison_data.data.ASPP-UNet.Parameters / 1000000, digits: 2)M vs #calc.round(comparison_data.data.at("Baseline UNet").Parameters / 1000000, digits: 2)M) while outperforming all other approaches
++ *Parameter Efficiency:* ASPP-UNet uses #calc.round((1 - comparison_data.data.aspp_unet.parameters / comparison_data.data.baseline_unet.parameters) * 100, digits: 2)% fewer parameters (#calc.round(comparison_data.data.aspp_unet.parameters / 1000000, digits: 2)M vs #calc.round(comparison_data.data.baseline_unet.parameters / 1000000, digits: 2)M) while outperforming all other approaches
 
 + *Enhancement Degradation:* Both standard and atrous enhancer approaches show slight performance drops compared to the baseline UNet
-  - Standard enhancer: #calc.round(comparison_data.data.at("Baseline + Std Enhancer").at("Δ mIoU") * 100, digits: 2)%
-  - Atrous enhancer: #calc.round(comparison_data.data.at("Baseline + Atrous Enhancer").at("Δ mIoU") * 100, digits: 2)%
+  - Standard enhancer: #calc.round(comparison_data.data.baseline_std_enhancer.delta_miou * 100, digits: 2)%
+  - Atrous enhancer: #calc.round(comparison_data.data.baseline_atrous_enhancer.delta_miou * 100, digits: 2)%
 
 // TODO: why is clahe worse?
-+ *CLAHE Preprocessing*: Surprisingly, CLAHE preprocessing leads to a minor decrease in performance compared to the baseline UNet. (#calc.round(comparison_data.data.CLAHE.at("Δ mIoU") * 100, digits: 2)% points)
++ *CLAHE Preprocessing*: Surprisingly, CLAHE preprocessing leads to a minor decrease in performance compared to the baseline UNet. (#calc.round(comparison_data.data.clahe.delta_miou * 100, digits: 2)% points)
 
 // TODO: we should check this. This could also be just margin of error
 + *Multi-Scale Enhancement*: Altrous enhancer performs worse than standard enhancer, contradicting the hypothesis that multi-scale preprocessing helps
 
 + *Class-Specific Analysis*:
-  - Background: ASPP-UNET shows largest improvement (+#calc.round((comparison_data.data.ASPP-UNet.at("IoU BG") - comparison_data.data.at("Baseline UNet").at("IoU BG")) * 100, digits: 2)% points)
-  - Disc: ASPP-Unet improves by +#calc.round((comparison_data.data.ASPP-UNet.at("IoU Disc") - comparison_data.data.at("Baseline UNet").at("IoU Disc")) * 100, digits: 2)% points
-  - ASPP-UNet improves by +#calc.round((comparison_data.data.ASPP-UNet.at("IoU Cup") - comparison_data.data.at("Baseline UNet").at("IoU Cup")) * 100, digits: 2)% points (most challenging class)
+  - Background: ASPP-UNET shows largest improvement (+#calc.round((comparison_data.data.aspp_unet.iou_bg - comparison_data.data.baseline_unet.iou_bg) * 100, digits: 2)% points)
+  - Disc: ASPP-Unet improves by +#calc.round((comparison_data.data.aspp_unet.iou_disc - comparison_data.data.baseline_unet.iou_disc) * 100, digits: 2)% points
+  - ASPP-UNet improves by +#calc.round((comparison_data.data.aspp_unet.iou_cup - comparison_data.data.baseline_unet.iou_cup) * 100, digits: 2)% points (most challenging class)
 
 == Training Convergence Analysis
 // TODO:
@@ -332,9 +361,9 @@ Key Observations:
 
 == Per-Class Performance Analysis
 
-#let baseline_iou_bg = comparison_data.data.at("Baseline UNet").at("IoU BG")
-#let baseline_iou_disc = comparison_data.data.at("Baseline UNet").at("IoU Disc")
-#let baseline_iou_cup = comparison_data.data.at("Baseline UNet").at("IoU Cup")
+#let baseline_iou_bg = comparison_data.data.baseline_unet.iou_bg
+#let baseline_iou_disc = comparison_data.data.baseline_unet.iou_disc
+#let baseline_iou_cup = comparison_data.data.baseline_unet.iou_cup
 
 #figure(
   table(
@@ -342,37 +371,42 @@ Key Observations:
     align: center,
     table.header([*Approach*], [*ΔIoU BG*], [*ΔIoU Disc*], [*ΔIoU Cup*]),
     [CLAHE],
-    format_number(comparison_data.data.CLAHE.at("IoU BG") - baseline_iou_bg, "Δ mIoU"),
-    format_number(comparison_data.data.CLAHE.at("IoU Disc") - baseline_iou_disc, "Δ mIoU"),
-    format_number(comparison_data.data.CLAHE.at("IoU Cup") - baseline_iou_cup, "Δ mIoU"),
+    format_number(comparison_data.data.clahe.iou_bg - baseline_iou_bg, "Δ mIoU"),
+    format_number(comparison_data.data.clahe.iou_disc - baseline_iou_disc, "Δ mIoU"),
+    format_number(comparison_data.data.clahe.iou_cup - baseline_iou_cup, "Δ mIoU"),
 
     [#sym.plus Std Enhancer],
-    format_number(comparison_data.data.at("Baseline + Std Enhancer").at("IoU BG") - baseline_iou_bg, "Δ mIoU"),
-    format_number(comparison_data.data.at("Baseline + Std Enhancer").at("IoU Disc") - baseline_iou_disc, "Δ mIoU"),
-    format_number(comparison_data.data.at("Baseline + Std Enhancer").at("IoU Cup") - baseline_iou_cup, "Δ mIoU"),
+    format_number(comparison_data.data.baseline_std_enhancer.iou_bg - baseline_iou_bg, "Δ mIoU"),
+    format_number(comparison_data.data.baseline_std_enhancer.iou_disc - baseline_iou_disc, "Δ mIoU"),
+    format_number(comparison_data.data.baseline_std_enhancer.iou_cup - baseline_iou_cup, "Δ mIoU"),
 
     [#sym.plus Atrous Enhancer],
-    format_number(comparison_data.data.at("Baseline + Atrous Enhancer").at("IoU BG") - baseline_iou_bg, "Δ mIoU"),
-    format_number(comparison_data.data.at("Baseline + Atrous Enhancer").at("IoU Disc") - baseline_iou_disc, "Δ mIoU"),
-    format_number(comparison_data.data.at("Baseline + Atrous Enhancer").at("IoU Cup") - baseline_iou_cup, "Δ mIoU"),
+    format_number(comparison_data.data.baseline_atrous_enhancer.iou_bg - baseline_iou_bg, "Δ mIoU"),
+    format_number(comparison_data.data.baseline_atrous_enhancer.iou_disc - baseline_iou_disc, "Δ mIoU"),
+    format_number(comparison_data.data.baseline_atrous_enhancer.iou_cup - baseline_iou_cup, "Δ mIoU"),
 
     [ASPP-UNet],
-    format_number(comparison_data.data.ASPP-UNet.at("IoU BG") - baseline_iou_bg, "Δ mIoU"),
-    format_number(comparison_data.data.ASPP-UNet.at("IoU Disc") - baseline_iou_disc, "Δ mIoU"),
-    format_number(comparison_data.data.ASPP-UNet.at("IoU Cup") - baseline_iou_cup, "Δ mIoU"),
+    format_number(comparison_data.data.aspp_unet.iou_bg - baseline_iou_bg, "Δ mIoU"),
+    format_number(comparison_data.data.aspp_unet.iou_disc - baseline_iou_disc, "Δ mIoU"),
+    format_number(comparison_data.data.aspp_unet.iou_cup - baseline_iou_cup, "Δ mIoU"),
   ),
   caption: [Class-specific IoU improvements over baseline UNet. ASPP-UNet shows consistent improvements across all classes, with the largest gains in background segmentation.],
 ) <fig_class_specific>
 
 *Analysis:*
 
-- *Cup Segmentation (most challenging):* ASPP-UNet achieves #calc.round(comparison_data.data.ASPP-UNet.at("IoU Cup") * 100, digits: 2)% IoU vs. #calc.round(baseline_iou_cup * 100, digits: 2)% baseline (#format_number(comparison_data.data.ASPP-UNet.at("IoU Cup") - baseline_iou_cup, "Δ mIoU")), demonstrating that multi-scale features help with the hardest class
+- *Cup Segmentation (most challenging):* ASPP-UNet achieves #calc.round(comparison_data.data.aspp_unet.iou_cup * 100, digits: 2)% IoU vs. #calc.round(baseline_iou_cup * 100, digits: 2)% baseline (#format_number(comparison_data.data.aspp_unet.iou_cup - baseline_iou_cup, "Δ mIoU")), demonstrating that multi-scale features help with the hardest class
 
-- *Disc Segmentation:* All approaches achieve >#calc.round(calc.min(..approaches.map(a => comparison_data.data.at(a).at("IoU Disc"))) * 100, digits: 1)%, with ASPP-UNet reaching #calc.round(comparison_data.data.ASPP-UNet.at("IoU Disc") * 100, digits: 2)%
+- *Disc Segmentation:* All approaches achieve >#calc.round(calc.min(..approaches.map(a => comparison_data.data.at(a).iou_disc)) * 100, digits: 1)%, with ASPP-UNet reaching #calc.round(comparison_data.data.aspp_unet.iou_disc * 100, digits: 2)%
 
-- *Background:* High performance across all methods (>#calc.round(calc.min(..approaches.map(a => comparison_data.data.at(a).at("IoU BG"))) * 100, digits: 1)%), with ASPP-UNet reaching #calc.round(comparison_data.data.ASPP-UNet.at("IoU BG") * 100, digits: 2)%
+- *Background:* High performance across all methods (>#calc.round(calc.min(..approaches.map(a => comparison_data.data.at(a).iou_bg)) * 100, digits: 1)%), with ASPP-UNet reaching #calc.round(comparison_data.data.aspp_unet.iou_bg * 100, digits: 2)%
 
+== Qualitative Results
+Visual inspection of predictions reveals:
 
+// TODO: was genau machen wir hier rein?
+// - wir können z.B. zeigen, dass die Edges bei asp-unet besser definiert sind. Nicht so franzig
+//
 
 = Discussion
 
