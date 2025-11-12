@@ -407,7 +407,7 @@ Key Observations:
 == Qualitative Results
 Visual inspection of predictions reveals:
 
-=== Frayed Edges
+=== Frayed Edges <chapt_frayed_edges>
 #figure(
   image("../results/sample_comparison_160.png"),
   caption: [
@@ -422,16 +422,20 @@ In @fig_sample_comparison_160, we compare segmentation outputs from the baseline
 #figure(
   image("../results/sample_comparison_13.png"),
   caption: [
-    TODO:
+    Segmentation output for test sample 13, which has low contrast and poor cup visibility. .
   ],
 ) <fig_sample_comparison_13>
 
+In @fig_sample_comparison_13, we observe that both models perform reasonably well, with ASPP-UNet capturing the cup boundary edges less frayed than the baseline like already shown in
+
+
 
 === Extreme Cases
+In general both models perform very well with small to medium sized optic discs. However, in the case of extremely large optic discs and cups, both models sometimes struggle to accurately capture the full extent of the cup region.
 #figure(
   image("../results/sample_comparison_52.png"),
   caption: [
-    TODO:
+    Segmentation output for test sample 52, which has an extremely large optic cup making accurate segmentation very challenging. Both models struggle to capture the full extent of the cup.
   ],
 ) <fig_sample_comparison_52>
 
@@ -439,25 +443,31 @@ In @fig_sample_comparison_160, we compare segmentation outputs from the baseline
 #figure(
   image("../results/sample_comparison_56.png"),
   caption: [
-    TODO:
+    Segmentation output for test sample 56, which has a very large optic disc and cup. Both models perform reasonably well, but ASPP-UNet captures the cup boundary more accurately.
   ],
 ) <fig_sample_comparison_56>
 
-==
+=== Enhancement Visualization
+To understand how the enhancers modify input images, we visualize enhanced outputs and difference heatmaps for representative test samples. The heatmaps highlight regions where the enhancer made significant changes compared to the original image. The heatmap is computed as the mean absolute difference across RGB channels. Dark areas indicate minimal changes, while bright areas show strong modifications. Because the images are normalized with ImageNet, but for the visualization denormalized back to [0, 1] range, a e.g. 0.15 difference would mean a 15% change in pixel intensity.
+
+
 #figure(
-  image("../results/std_enhancer_top5_sample_391.png"),
+  image("../results/std_enhancer_top5_sample_218.png"),
   caption: [
-    TODO:
+    Standard enhanced image (middle) next to the original (left) and the difference heatmap (right) for test sample 218.
   ],
-) <fig_std_enhancer_top5_sample_391>
+) <fig_std_enhancer_top5_sample_218>
+
+In @fig_std_enhancer_top5_sample_218, the standard enhancer focuses on lightening the background and blood vessels, whilst the optic disc and cup regions see less modification. The difference heatmap also shows a checkerboard pattern, indicating that the enhancer applies localized contrast adjustments to enhance vessel visibility.
+
 #figure(
   image("../results/atrous_enhancer_top2_sample_391.png"),
   caption: [
-    TODO:
+    Atrous enhanced image (middle) next to the original (left) and the difference heatmap (right) for test sample 391.
   ],
 ) <fig_atrous_enhancer_top2_sample_391>
 
-
+In @fig_atrous_enhancer_top2_sample_391, the atrous enhancer also applies more significant changes to the background and vessels, with less focus on the disc and cup areas. In comparision to the standard enhancer, the atrous version does not show the checkers pattern, indicating a different enhancement strategy.
 
 
 // TODO: zeigen, dass auch verrauschte bilder gut funktionieren. Das liegt daran, dass wir gut mit Augmentation gearbeitet haben
