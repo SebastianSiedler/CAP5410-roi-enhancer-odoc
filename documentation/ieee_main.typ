@@ -43,7 +43,7 @@ TODO:
 = Methodology
 == Dataset
 We combined three publicly available glaucoma datasets:
-+ *G1020 Dataset*: 1,020 fundus images with optic disc and cup annotations from the Shanghai First People's Hospital @src_bajwa2020g1020benchmarkretinalfundus.
++ *G1020 Dataset*: 1,020 fundus images with optic disc and cup annotations from private clinical practice in Kaiserslautern @src_bajwa2020g1020benchmarkretinalfundus.
 
 + *ORIGA Dataset*: 650 fundus images (482 normal, 168 glaucoma) from the Singapore Eye Research Institute @src_Origa.
 
@@ -78,91 +78,25 @@ To improve generatlization and robustness of our model, we applied the following
 The implementation was done using the Albumentations library @src_2018arXiv180906839B in the file `transforms.py`. Validation and test sets use only normalization without augmenation.
 
 == Network Architectures
-// TODO: hier noch mal kurz dazuschreiben, wie wir überhaupt darauf gekommen sind. Also grundidee der enhancer mit unet vergleich clahe. weil aber in dem aktuellen paper das mit dem aspp so krass sein soll, haben wir geschaut, wie sich der enhancer dann verhält, wenn wir das mit atrous machen.
-We evaluate five distinct approaches: // TODO: add clahe
 
-+ Standard UNet (Baseline) \
-  *Classic encoder-decoder architecture* @src_ronneberger2015unetconvolutionalnetworksbiomedical:
+We investigate whether task-specific architectural improvements or learned preprocessing enhancements are more effective for optic disc and cup segmentation. We compare five approaches: (1) Standard UNet baseline, (2) CLAHE preprocessing + UNet, (3) learned standard enhancer + UNet, (4) learned atrous (ASPP-based) enhancer + UNet, and (5) ASPP-UNet with architectural multi-scale integration. This design allows us to isolate the contributions of preprocessing-based vs. architecture-based multi-scale feature learning.
 
-  *Encoder:*
-  - 4 downsampling stages via max pooking
-  - Channels: 64 → 128 → 256 → 512 → 1024
-  - Each stage: (Conv3×3 + BN + ReLU) × 2
+=== Baseline Architecture
 
-  *Bottleneck:*
-  - Double convolution block (Conv3×3 + BN + ReLU) × 2
+Our baseline follows the standard UNet architecture @src_ronneberger2015unetconvolutionalnetworksbiomedical with four encoder-decoder levels. The encoder progressively downsamples the input through max pooling while increasing channel dimensions (64 → 128 → 256 → 512 → 1024). Each encoder stage consists of two 3×3 convolutions with batch normalization and ReLU activation. The decoder uses transposed convolutions for upsampling, concatenating skip connections from corresponding encoder stages. The final 1×1 convolution produces three-class segmentation (background, disc, cup). This baseline contains 31.0M parameters.
 
-  *Decoder:*
-  - 4 upsampling stages via transposed convolution
-  - Skip connections from corresponding encoder stages
-  - Channels: 1024 → 512 → 256 → 128 → 64
+=== Preprocessing-Based Approaches
 
-  *Output:*
-  - 1x1 convolution to 3 classes
+*CLAHE-UNet:* Applies Contrast Limited Adaptive Histogram Equalization (CLAHE) preprocessing to enhance local contrast before feeding images to the baseline UNet. This traditional computer vision technique aims to improve visibility of disc and cup boundaries in low-contrast fundus images.
 
-  *Parameters*:
-  - 31,043,651
+*Standard Enhancer:* A lightweight encoder-decoder network (52K parameters) that learns to enhance input images for improved segmentation. The enhancer has three encoder blocks (64, 128, 256 channels) with max pooling, followed by two decoder blocks with transposed convolutions. Enhanced images are combined with originals via learnable residual connection: $I_"enhanced" = alpha dot "Enhancer"(I) + beta dot I$. The system uses two-phase training: Phase 1 trains only the enhancer with frozen UNet; Phase 2 jointly fine-tunes both components.
 
+*Atrous Enhancer:* Replaces the standard enhancer with an ASPP-based multi-scale enhancer (26K parameters). Instead of spatial downsampling, it uses parallel atrous convolutions with dilation rates [1, 3, 6] to capture features at multiple scales simultaneously. The ASPP module concatenates outputs from: (1) 1×1 convolution, (2) 3×3 atrous convolutions at different rates, and (3) global average pooling. This enables the enhancer to learn multi-scale image transformations without losing spatial resolution.
 
-+ UNet + Standard Enhancer \
-  A lightweight encoder-decoder enhancer preceding the UNet: \
-  *Input* $(3, 256, 256)$ \
-  *Encoder*:
-  - Conv Block (64) -> MaxPool
-  - Conv Block (128) -> MaxPool
-  - Conv Block (256)
-  - Decoder:
-    - ConvTranspose + Conv Block (128)
-    - ConvTranspose + Conv Block (64)
-    - Conv 1x1 -> (3, 256, 256)
-  - Residual: Enhanced = $alpha dot "Enhancer"(x) + beta dot x$ \
+=== Architecture-Based Approach
 
+*ASPP-UNet:* Integrates multi-scale feature learning directly into the segmentation architecture by replacing the UNet bottleneck with an ASPP module. The ASPP operates on 1024-channel features with dilation rates [1, 6, 12, 18], capturing fine details, medium structures, and global context simultaneously. Crucially, these multi-scale features are learned end-to-end for the segmentation task, not for generic image enhancement. Despite the additional multi-scale processing, ASPP-UNet contains only 21.5M parameters (30.9% fewer than baseline), as the ASPP module is more parameter-efficient than the baseline's double convolution bottleneck.
 
-  *Additional Parameters*: 52,275 (enhancer only)
-
-  *Total System*: Enhancer → UNet (frozen in Phase 1, joint in Phase 2)
-
-+ UNet + Atrous Enhancer
-  Replaces standard enhancer with an ASPP-based multi-scale enhancer:
-
-  *Atrous Enhancer Architecture:*
-
-  Input (3, 256, 256) \
-  ↓ \
-  Initial Conv Block (64) \
-  ↓ \
-  ASPP Module (dilation rates: [1, 3, 6]):
-  - 1×1 convolution
-  - 3×3 dilated conv (rate=3)
-  - 3×3 dilated conv (rate=6)
-  - Global average pooling
-  Concatenate → Project to 64 channels \
-  ↓ \
-  Final Conv → (3, 256, 256) \
-  ↓ \
-  Residual: $"Enhanced" = alpha dot "Enhancer"(x) + beta dot x$
-  *Additional Parameters*: 26,147 (atrous enhancer only) \
-  *Key Difference*: Captures features at multiple scales simultaneously (fine vessels, disc boundaries, global illumination) without downsampling.
-
-+ ASPP-UNet (Architectural Improvement) \
-  Integrates multi-scale features directly into the UNet architecture:
-
-  Modified Bottleneck: \
-
-  Standard UNet bottleneck: \
-  DoubleConv(1024) → DoubleConv(1024) \
-
-  ASPP-UNet bottleneck: \
-  ASPP(1024, dilation_rates=[1, 6, 12, 18]) \
-  ├─ 1×1 conv \
-  ├─ 3×3 dilated (rate=6) \
-  ├─ 3×3 dilated (rate=12) \
-  ├─ 3×3 dilated (rate=18) \
-  └─ Global pooling \
-  Concatenate → Project to 1024 \
-  Parameters: 21,461,507 (30.9% reduction vs. standard UNet) \
-
-  Key Advantage: Multi-scale features are learned specifically for the segmentation task, not generic image quality.
 
 
 
@@ -400,19 +334,22 @@ Key Observations:
 
 The enhancer-based approaches employ a two-phase training strategy: Phase 1 trains only the enhancer with a frozen pretrained UNet, while Phase 2 performs joint fine-tuning of both components. @fig_std_enhancer_two_phase and @fig_atrous_enhancer_two_phase illustrate the complete training journey for each enhancer model, showing the transition from Phase 1 to Phase 2.
 
+
+*Standard Enhancer*: Phase 1 (#conv.std_enhancer.phase1_epochs epochs with early stopping) achieved modest loss reduction (#conv.std_enhancer.phase1_reduction_percent%), while Phase 2 joint fine-tuning (#conv.std_enhancer.phase2_epochs epochs) yielded #conv.std_enhancer.phase2_reduction_percent% additional reduction. The total training time of #conv.std_enhancer.total_epochs epochs is substantially lower than single-phase models. However, the final performance was marginally worse than baseline UNet, suggesting that the learned image enhancements do not provide task-specific improvements for segmentation.
+
 #figure(
   image("../results/standard_enhancer_two_phase.png", width: 80%),
   caption: [Two-phase training curve for Standard Enhancer. Phase 1 (blue/purple, UNet frozen) and Phase 2 (orange/red, joint training) are shown with a clear transition point at epoch #conv.std_enhancer.phase1_epochs. The model completed training in #conv.std_enhancer.total_epochs total epochs.],
 ) <fig_std_enhancer_two_phase>
 
+
+*Atrous Enhancer*: Phase 1 required the full planned #conv.atrous_enhancer.phase1_epochs epochs and achieved substantial loss reduction (#conv.atrous_enhancer.phase1_reduction_percent%), demonstrating that the multi-scale ASPP-based enhancer requires more training to learn effective transformations across different receptive fields. Phase 2 (#conv.atrous_enhancer.phase2_epochs epochs) provided an additional #conv.atrous_enhancer.phase2_reduction_percent% reduction. Despite the extended training (#conv.atrous_enhancer.total_epochs total epochs), performance remained below baseline, indicating that even sophisticated multi-scale preprocessing cannot match task-specific architectural improvements.
+
+
 #figure(
   image("../results/atrous_enhancer_two_phase.png", width: 80%),
   caption: [Two-phase training curve for Atrous Enhancer. Phase 1 (blue/purple, UNet frozen) and Phase 2 (orange/red, joint training) are shown with a clear transition point at epoch #conv.atrous_enhancer.phase1_epochs. The model required #conv.atrous_enhancer.total_epochs total epochs.],
 ) <fig_atrous_enhancer_two_phase>
-
-*Standard Enhancer*: Phase 1 (#conv.std_enhancer.phase1_epochs epochs with early stopping) achieved modest loss reduction (#conv.std_enhancer.phase1_reduction_percent%), while Phase 2 joint fine-tuning (#conv.std_enhancer.phase2_epochs epochs) yielded #conv.std_enhancer.phase2_reduction_percent% additional reduction. The total training time of #conv.std_enhancer.total_epochs epochs is substantially lower than single-phase models. However, the final performance was marginally worse than baseline UNet, suggesting that the learned image enhancements do not provide task-specific improvements for segmentation.
-
-*Atrous Enhancer*: Phase 1 required the full planned #conv.atrous_enhancer.phase1_epochs epochs and achieved substantial loss reduction (#conv.atrous_enhancer.phase1_reduction_percent%), demonstrating that the multi-scale ASPP-based enhancer requires more training to learn effective transformations across different receptive fields. Phase 2 (#conv.atrous_enhancer.phase2_epochs epochs) provided an additional #conv.atrous_enhancer.phase2_reduction_percent% reduction. Despite the extended training (#conv.atrous_enhancer.total_epochs total epochs), performance remained below baseline, indicating that even sophisticated multi-scale preprocessing cannot match task-specific architectural improvements.
 
 *Key Convergence Insights:*
 
