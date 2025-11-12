@@ -36,10 +36,14 @@
 )
 
 = Introduction
-TODO:
+Glaucoma is one of the leading causes of irreversible blindness worldwide @Wagner.2022. It is often progressing without noticeable symptoms until significant vision loss has occurred. Therefore, accurate and early detection is essential for effective treatment of the disease @Wagner.2022. Fundus imaging is a non-invasive technique that captures detailed images of the retina, showing the optic disc (OD) and optic cup (OC), which are critical for detecting glaucoma diagnosis. The Cup-to-Disc Ratio (CDR) is a crucial metric used to diagnose glaucoma by measuring the relative size of the OC to the OD.
 
-optic disc (OD)
-optic cup (OC)
+Automated segmentation of the OD and OC in fundus images has become an important research area in medical image analysis. However, accurate segmentation remains challenging due to imperfections in the images, such as low contrast, uneven illumination, and blur @Lin.2025. To mitigate these issues, the images are often preprocessed using image enhancement techniques, improving the visibility of relevant anatomical features and therefore more accurate segmentation results @Lin.2025. Most existing enhancement methods are designed as independent preprocessing modules that are optimized separately from the actual segmentation task. As a result, the enhancement focuses primarily on visual quality rather than task-specific feature optimization.
+
+In this work, we propose a task-aware learned multi-scale enhancement model that is jointly trained with the segmentation model, allowing the enhancer to learn features that are specifically relevant for accurate OD and OC segmentation.
+
+The paper is structured as follows: Section II reviews related work on glaucoma image segmentation, showing the gap in existing enhancement methods. Section III describes the proposed methodology, including details about the dataset, network architectures, loss functions, training strategy, and evaluation metrics. Section IV presents experimental results comparing different approaches. Finally, Section V discusses the findings and concludes the paper with future work suggestions.
+
 
 = Related Work
 == Glaucoma Image Segmentation
