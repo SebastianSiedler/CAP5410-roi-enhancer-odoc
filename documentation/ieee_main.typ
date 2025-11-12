@@ -48,7 +48,7 @@ The paper is structured as follows: Section II reviews related work on glaucoma 
 = Related Work
 == Glaucoma Image Segmentation
 // Which models used for OD/OC Segmentation?
-Most segmentation models used in related works are based on the UNet architecture due to its encoder-decoder architecture with skip connections that preserve high-level semantic information while also retaining low-level spatial details @ronneberger2015unetconvolutionalnetworksbiomedical. 
+Most segmentation models used in related works are based on the UNet architecture due to its encoder-decoder architecture with skip connections that preserve high-level semantic information while also retaining low-level spatial details @src_ronneberger2015unetconvolutionalnetworksbiomedical. 
 // --> We also use UNet as baseline
 
 Xiong et al. @HaorenXiong.2025 proposed the multi-task deep learning model Multi-GlaucNet to simultaneously perform OD and blood vessel segmentation as well as glaucoma detection. The architecture is based on UNet with bottleneck layers in the encoder, pixel shuffle and a channel attention mechanism in the decoder. The final diagnosis is made by a ResNet50-based classification module. It achieves a high accuracy of 0.967 for glaucoma detection on the REFUGE dataset.
@@ -82,22 +82,23 @@ To address this gap, we propose a task-aware learned enhancement approach to joi
 
 = Methodology
 == Dataset
-We combined three publicly available glaucoma datasets:
-+ *G1020 Dataset*: 1,020 fundus images with optic disc and cup annotations from the Shanghai First People's Hospital @src_bajwa2020g1020benchmarkretinalfundus.
+The dataset used in this study is a combination of three publicly available glaucoma fundus image datasets to increase the diversity and size of the training data:
++ G1020 Dataset: 1,020 fundus images with optic disc and cup annotations from the Shanghai First People's Hospital @src_bajwa2020g1020benchmarkretinalfundus.
 
-+ *ORIGA Dataset*: 650 fundus images (482 normal, 168 glaucoma) from the Singapore Eye Research Institute @src_Origa.
++ ORIGA Dataset: 650 fundus images (482 normal, 168 glaucoma) from the Singapore Eye Research Institute @src_Origa.
 
-+ *REFUGE Challenge Dataset*: 1,200 fundus images from the Retinal Fundus Glaucoma Challenge @src_REFUGE_dataset, including training, validation, and test sets.
++ REFUGE Challenge Dataset: 1,200 fundus images from the Retinal Fundus Glaucoma Challenge @src_REFUGE_dataset, including training, validation, and test sets.
 
-*Preprocessing:* \
-We obtained these three datasets from the "Glaucoma Fundus Imaging Datasets" Kaggle repository#footnote("https://www.kaggle.com/datasets/arnavjain1/glaucoma-datasets/data"). They were already preprocessed to a certain extent, including pre-propped ROI images centered on the optic disc. The masks are labeled with three classes:
-
+//*Preprocessing:* \
+We obtained these three datasets from the "Glaucoma Fundus Imaging Datasets" Kaggle repository#footnote("https://www.kaggle.com/datasets/arnavjain1/glaucoma-datasets/data"). They were already preprocessed to a certain extent, including cropping around the Region of Interest (ROI) centered on the optic disc. The masks are labeled with three classes: background, optic disc, and optic cup.
+/*
 - 0: background
 - 1: optic disc
 - 2: optic cup
+*/
 
-*Data Split:* \
-We used a 70/15/15 split with random seed 42 for training, validation, and testing, respectively. After combining the datasets, we had a total of 2,870 images. We ensured that the splits were stratified to maintain the proportion of glaucoma and normal cases across all sets. Also some of the images had incomplete masks (234), e.g. missing optic cup or disc annotations. We filtered out these images to ensure the quality of our training data.
+//*Data Split:* \
+The dataset was divided into training, validation, and testing sets with a 70/15/15 split, using a random seed of 42 to ensure reproducibility The combination of all datasets, led to a total number of 2,870 images. We ensured that the splits were stratified to maintain the proportion of glaucoma and normal cases across all sets. Also 234 images had incomplete masks, e.g. missing optic cup or disc annotations which we filtered out to ensure the quality of the training data.
 
 This resulted in the following distribution:
 - Total images before filtering: 2870
@@ -562,6 +563,7 @@ To understand how the enhancers modify input images, we visualize enhanced outpu
 
 In @fig_std_enhancer_top5_sample_218, the standard enhancer focuses on lightening the background and blood vessels, whilst the optic disc and cup regions see less modification. The difference heatmap also shows a checkerboard pattern, indicating that the enhancer applies localized contrast adjustments to enhance vessel visibility.
 
+/*
 #figure(
   image("../results/atrous_enhancer_top2_sample_391.png"),
   caption: [
@@ -569,8 +571,9 @@ In @fig_std_enhancer_top5_sample_218, the standard enhancer focuses on lightenin
   ],
 ) <fig_atrous_enhancer_top2_sample_391>
 
-In @fig_atrous_enhancer_top2_sample_391, the atrous enhancer also applies more significant changes to the background and vessels, with less focus on the disc and cup areas. In comparision to the standard enhancer, the atrous version does not show the checkers pattern, indicating a different enhancement strategy.
 
+In @fig_atrous_enhancer_top2_sample_391, the atrous enhancer also applies more significant changes to the background and vessels, with less focus on the disc and cup areas. In comparision to the standard enhancer, the atrous version does not show the checkers pattern, indicating a different enhancement strategy.
+*/
 
 // TODO: zeigen, dass auch verrauschte bilder gut funktionieren. Das liegt daran, dass wir gut mit Augmentation gearbeitet haben
 

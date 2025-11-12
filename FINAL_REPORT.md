@@ -19,7 +19,7 @@ Glaucoma is a leading cause of irreversible blindness worldwide, with diagnosis 
 
 ### A. Clinical Motivation
 
-Glaucoma affects over 80 million people worldwide and is projected to impact 111.8 million individuals by 2040 [1]. As the second leading cause of blindness globally, early detection and monitoring of glaucoma progression are critical for preventing irreversible vision loss. The Cup-to-Disc Ratio (CDR), defined as the ratio of the optic cup diameter to the optic disc diameter, serves as a key diagnostic indicator. A CDR exceeding 0.3 is generally considered abnormal and may indicate glaucomatous damage [2].
+Glaucoma affects over 80 million people worldwide and is projected to impact 111.8 million individuals by 2040 [1]. As the second leading cause of blindness globally, early detection and monitoring of glaucoma progression are critical for preventing irreversible vision loss. The Cup-to-Disc Ratio (CDR), defined as the ratio of the pppp, serves as a key diagnostic indicator. A CDR exceeding 0.3 is generally considered abnormal and may indicate glaucomatous damage [2].
 
 Manual assessment of CDR by ophthalmologists is time-consuming, subjective, and prone to inter-observer variability. Automated segmentation of the optic disc and cup from fundus images can provide consistent, reproducible measurements to assist in glaucoma screening and diagnosis, particularly in resource-limited settings where specialist access is restricted.
 
