@@ -456,13 +456,12 @@ To understand how the enhancers modify input images, we visualize enhanced outpu
 In @fig_std_enhancer_top5_sample_218, the standard enhancer focuses on lightening the background and blood vessels, whilst the optic disc and cup regions see less modification. The difference heatmap also shows a checkerboard pattern, indicating that the enhancer applies localized contrast adjustments to enhance vessel visibility.
 
 #figure(
-  image("../results/atrous_enhancer_top2_sample_391.png"),
+  image("../results/atrous_enhancer_top1_sample_391.png"),
   caption: [
     Atrous enhanced image (middle) next to the original (left) and the difference heatmap (right) for test sample 391.
   ],
-) <fig_atrous_enhancer_top2_sample_391>
-
-In @fig_atrous_enhancer_top2_sample_391, the atrous enhancer also applies more significant changes to the background and vessels, with less focus on the disc and cup areas. In comparision to the standard enhancer, the atrous version does not show the checkers pattern, indicating a different enhancement strategy.
+) <fig_atrous_enhancer_top1_sample_391>
+In @fig_atrous_enhancer_top1_sample_391, the atrous enhancer also applies more significant changes to the background and vessels, with less focus on the disc and cup areas. In comparision to the standard enhancer, the atrous version does not show the checkers pattern, indicating a different enhancement strategy.
 
 
 // TODO: zeigen, dass auch verrauschte bilder gut funktionieren. Das liegt daran, dass wir gut mit Augmentation gearbeitet haben
