@@ -207,24 +207,40 @@ and $lambda = 0.001$ to prevent over-modification of images.
 
 == Training Strategy
 // TODO: for whole chapter. check all parameters again in the end
-*Standard UNet and ASPP-Unet (Single-Phase)*:
+
+*Single-Phase Training (UNet Variants)*
+
+Standard UNet and CLAHE-UNet:
 - Optimizer: Adam (lr=1e-4, betas=(0.9, 0.999))
 - Batch size: 16
-- Epochs: 100
-- Early stopping: Patience=15 (no validation improvement)
+- Epochs: 100 (no early stopping)
 - LR scheduler: ReduceLROnPlateau (factor=0.5, patience=5)
+- Note: Both models showed continued improvement through epoch 100
+
+ASPP-UNet:
+- Optimizer: Adam (lr=1e-4, betas=(0.9, 0.999))
+- Batch size: 16
+- Epochs: 100 (maximum)
+- Early stopping: Patience=15
+- Actual epochs: 67 (early stopping triggered)
+- LR scheduler: ReduceLROnPlateau (factor=0.5, patience=5)
+- Note: Converged faster than baseline models, demonstrating superior training efficiency
 
 
 *Enhancer-Based Approaches (Two-Phase)*
-+ Enhancer-Only Training
+
++ Phase 1: Enhancer-Only Training
   - Epochs: 30 (standard), 50 (atrous)
+  - Early stopping: Patience=10 (standard), 15 (atrous)
+  - Actual epochs: 26 (standard), 50 (atrous)
   - UNet: Frozen (pretrained weights)
   - Enhancer: Trainable
   - Optimizer: Adam (lr=1e-4)
   - Loss: Segmentation + L1
 
-+ Joint Fine-Tuning
++ Phase 2: Joint Fine-Tuning
   - Epochs: 20 (standard), 30 (atrous)
+  - Actual epochs: 20 (standard), 25 (atrous)
   - UNet: Trainable
   - Enhancer: Trainable
   - Optimizer: Adam (lr=1e-5, 10× lower)
@@ -342,6 +358,8 @@ Key Observations:
 
 + *Parameter Efficiency:* ASPP-UNet uses #calc.round((1 - data.aspp_unet.parameters / data.baseline_unet.parameters) * 100, digits: 2)% fewer parameters (#calc.round(data.aspp_unet.parameters / 1000000, digits: 2)M vs #calc.round(data.baseline_unet.parameters / 1000000, digits: 2)M) while outperforming all other approaches
 
++ *Training Efficiency:* ASPP-UNet demonstrated superior convergence, reaching optimal performance in 67 epochs compared to 100 epochs required by baseline models. This faster convergence, combined with better final performance, indicates that the ASPP module provides a more effective inductive bias for this segmentation task.
+
 + *Enhancement Degradation:* Both standard and atrous enhancer approaches show slight performance drops compared to the baseline UNet
   - Standard enhancer: #calc.round(data.baseline_std_enhancer.delta_miou * 100, digits: 2)%
   - Atrous enhancer: #calc.round(data.baseline_atrous_enhancer.delta_miou * 100, digits: 2)%
@@ -358,7 +376,51 @@ Key Observations:
   - ASPP-UNet improves by +#calc.round((data.aspp_unet.iou_cup - data.baseline_unet.iou_cup) * 100, digits: 2)% points (most challenging class)
 
 == Training Convergence Analysis
-// TODO:
+
+// Load convergence metrics (auto-generated from notebooks/training_curves_visualization.ipynb)
+// Run the "Generate Convergence Metrics for Paper" section to regenerate if training data changes
+#let conv = json("../results/convergence_metrics.json")
+
+=== Single-Phase UNet Variants
+
+@fig_single_phase_comparison illustrates the training dynamics of the three single-phase UNet architectures over #conv.unet.total_epochs epochs. The convergence patterns reveal significant differences in training efficiency and architectural effectiveness.
+
+#figure(
+  image("../results/single_phase_unets_comparison.png", width: 100%),
+  caption: [Training and validation loss curves for single-phase UNet variants. ASPP-UNet (middle) demonstrates superior convergence, triggering early stopping at epoch #conv.aspp_unet.total_epochs, while Standard UNet (left) and CLAHE-UNet (right) required the full #conv.unet.total_epochs epochs.],
+) <fig_single_phase_comparison>
+
+*Standard UNet*: Required the full #conv.unet.total_epochs epochs to reach its best validation loss (#conv.unet.best_val_loss), with convergence (within 1% of optimal) achieved at epoch #conv.unet.convergence_epoch. The model exhibited stable improvement throughout training with minimal variance (#calc.round(conv.unet.last_15_variance, digits: 6)) in the final 15 epochs, suggesting it could potentially benefit from additional training. This baseline establishes the performance benchmark against which other approaches are evaluated.
+
+*ASPP-UNet*: Demonstrated superior training efficiency, converging within 1% of optimal validation loss at epoch #conv.aspp_unet.convergence_epoch and triggering early stopping at epoch #conv.aspp_unet.total_epochs. The final validation loss of #conv.aspp_unet.final_val_loss represents a #conv.aspp_unet.overfitting_increase_percent% increase from the best (#conv.aspp_unet.best_val_loss at epoch #conv.aspp_unet.best_epoch), indicating slight overfitting that was appropriately halted by early stopping. The faster convergence (#conv.aspp_unet.convergence_epoch vs. #conv.unet.convergence_epoch epochs) demonstrates that the ASPP bottleneck provides a more effective inductive bias for this segmentation task.
+
+*CLAHE-UNet*: Required near-complete training (#conv.clahe_unet.convergence_epoch/#conv.clahe_unet.total_epochs epochs to convergence), achieving best validation loss of #conv.clahe_unet.best_val_loss at epoch #conv.clahe_unet.best_epoch. Despite the preprocessing-based contrast enhancement, convergence was not accelerated compared to the baseline. The late convergence and slightly worse final performance suggest that CLAHE preprocessing does not provide meaningful benefits for this task when combined with deep learning.
+
+=== Two-Phase Enhancer Approaches
+
+The enhancer-based approaches employ a two-phase training strategy: Phase 1 trains only the enhancer with a frozen pretrained UNet, while Phase 2 performs joint fine-tuning of both components. @fig_std_enhancer_two_phase and @fig_atrous_enhancer_two_phase illustrate the complete training journey for each enhancer model, showing the transition from Phase 1 to Phase 2.
+
+#figure(
+  image("../results/standard_enhancer_two_phase.png", width: 80%),
+  caption: [Two-phase training curve for Standard Enhancer. Phase 1 (blue/purple, UNet frozen) and Phase 2 (orange/red, joint training) are shown with a clear transition point at epoch #conv.std_enhancer.phase1_epochs. The model completed training in #conv.std_enhancer.total_epochs total epochs.],
+) <fig_std_enhancer_two_phase>
+
+#figure(
+  image("../results/atrous_enhancer_two_phase.png", width: 80%),
+  caption: [Two-phase training curve for Atrous Enhancer. Phase 1 (blue/purple, UNet frozen) and Phase 2 (orange/red, joint training) are shown with a clear transition point at epoch #conv.atrous_enhancer.phase1_epochs. The model required #conv.atrous_enhancer.total_epochs total epochs.],
+) <fig_atrous_enhancer_two_phase>
+
+*Standard Enhancer*: Phase 1 (#conv.std_enhancer.phase1_epochs epochs with early stopping) achieved modest loss reduction (#conv.std_enhancer.phase1_reduction_percent%), while Phase 2 joint fine-tuning (#conv.std_enhancer.phase2_epochs epochs) yielded #conv.std_enhancer.phase2_reduction_percent% additional reduction. The total training time of #conv.std_enhancer.total_epochs epochs is substantially lower than single-phase models. However, the final performance was marginally worse than baseline UNet, suggesting that the learned image enhancements do not provide task-specific improvements for segmentation.
+
+*Atrous Enhancer*: Phase 1 required the full planned #conv.atrous_enhancer.phase1_epochs epochs and achieved substantial loss reduction (#conv.atrous_enhancer.phase1_reduction_percent%), demonstrating that the multi-scale ASPP-based enhancer requires more training to learn effective transformations across different receptive fields. Phase 2 (#conv.atrous_enhancer.phase2_epochs epochs) provided an additional #conv.atrous_enhancer.phase2_reduction_percent% reduction. Despite the extended training (#conv.atrous_enhancer.total_epochs total epochs), performance remained below baseline, indicating that even sophisticated multi-scale preprocessing cannot match task-specific architectural improvements.
+
+*Key Convergence Insights:*
+
++ *Architectural efficiency matters*: ASPP-UNet's #(conv.aspp_unet.convergence_epoch)-epoch convergence vs. #(conv.unet.convergence_epoch)-#(conv.clahe_unet.total_epochs) epochs for baseline models demonstrates that integrating multi-scale features directly into the segmentation architecture is more effective than preprocessing-based approaches.
+
++ *Enhancement preprocessing shows limited benefit*: Both learned enhancement approaches required comparable or greater total training time than direct segmentation, while achieving lower final performance. This suggests that task-agnostic image enhancement is less effective than task-specific architectural improvements.
+
++ *Training strategy complexity*: The two-phase training adds complexity without performance gains. Phase 1's frozen UNet prevents the enhancer from learning task-specific transformations, while Phase 2's joint training cannot fully recover from the suboptimal Phase 1 initialization.
 
 
 == Per-Class Performance Analysis

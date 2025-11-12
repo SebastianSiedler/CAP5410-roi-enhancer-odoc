@@ -1,0 +1,50 @@
+{
+  "unet": {
+    "total_epochs": 100,
+    "best_val_loss": 0.1542,
+    "best_epoch": 100,
+    "final_val_loss": 0.1542,
+    "convergence_epoch": 87,
+    "last_15_variance": 1.5047356495790993e-06
+  },
+  "aspp_unet": {
+    "total_epochs": 67,
+    "best_val_loss": 0.1528,
+    "best_epoch": 52,
+    "final_val_loss": 0.1589,
+    "convergence_epoch": 52,
+    "last_15_variance": 3.2387814704199735e-06,
+    "overfitting_increase_percent": 3.98
+  },
+  "clahe_unet": {
+    "total_epochs": 100,
+    "best_val_loss": 0.1614,
+    "best_epoch": 95,
+    "final_val_loss": 0.1615,
+    "convergence_epoch": 79,
+    "last_15_variance": 1.3365194925215426e-06,
+    "overfitting_increase_percent": 0.05
+  },
+  "std_enhancer": {
+    "phase1_epochs": 26,
+    "phase2_epochs": 20,
+    "total_epochs": 46,
+    "phase1_initial_loss": 0.1561,
+    "phase1_final_loss": 0.1544,
+    "phase1_reduction_percent": 1.03,
+    "phase2_initial_loss": 0.159,
+    "phase2_final_loss": 0.1555,
+    "phase2_reduction_percent": 2.19
+  },
+  "atrous_enhancer": {
+    "phase1_epochs": 50,
+    "phase2_epochs": 25,
+    "total_epochs": 75,
+    "phase1_initial_loss": 0.1678,
+    "phase1_final_loss": 0.155,
+    "phase1_reduction_percent": 7.63,
+    "phase2_initial_loss": 0.1588,
+    "phase2_final_loss": 0.1531,
+    "phase2_reduction_percent": 3.57
+  }
+}
