@@ -38,7 +38,43 @@
 = Introduction
 TODO:
 
+optic disc (OD)
+optic cup (OC)
+
 = Related Work
+== Glaucoma Image Segmentation
+// Which models used for OD/OC Segmentation?
+Most segmentation models used in related works are based on the UNet architecture due to its encoder-decoder architecture with skip connections that preserve high-level semantic information while also retaining low-level spatial details @ronneberger2015unetconvolutionalnetworksbiomedical. 
+// --> We also use UNet as baseline
+
+Xiong et al. @HaorenXiong.2025 proposed the multi-task deep learning model Multi-GlaucNet to simultaneously perform OD and blood vessel segmentation as well as glaucoma detection. The architecture is based on UNet with bottleneck layers in the encoder, pixel shuffle and a channel attention mechanism in the decoder. The final diagnosis is made by a ResNet50-based classification module. It achieves a high accuracy of 0.967 for glaucoma detection on the REFUGE dataset.
+
+Liu et al. @Liu.2025 introduced EE-TransUNet for improved segmentation accuracy around the edges of the OD and OC. The model builds upon the TransUNet architecture including a Cascaded Convolutional Fusion (CCF) block to enhance feature abstraction, preserve original feature information, and improve the model's non-linear fitting ability. The model also incorporated a Channel Shuffling Multiple Expansion Fusion (CSMF) block to improve the network's capacity to perceive and characterize image features. EE-TransUNet demonstrated superior segmentation performance compared to other state-of-the-art models on multiple datasets.
+
+Outstanding results were obtained by Zedan et al. @Zedan.2025 with the proposed RMHA-Net, a U-shaped encoder-decoder network for robust OD and OC segmentation. Through Residual-Atrous-Conv (RAC) modules and Atrous Spatial Pyramid Pooling (ASPP) blocks, the model effectively captures multi-scale features and contextual information, enhancing segmentation accuracy in fundus images. Furthermore, the model incorporates a Hybrid Attention Mechanism (Spatial and Channel Attention) to dynamically prioritize relevant features and suppress noise. The RMHA-Net demonstrated the best performance against benchmark models across multiple datasets.
+// --> We also use ASPP blocks
+
+
+== Fundus Image Enhancement Techniques
+// What techniques used for fundus image enhancement?
+Medical images are often affected by various artifacts such as low contrast, distortions, and noise, which can hinder accurate analysis and diagnosis @Zedan.2025. To address these issues, image preprocessing techniques are applied to enhance image quality by removing artifacts. Several ways of image enhancement are commonly used in the literature.
+
+Traditional static enhancement methods such as Contrast Limited Adaptive Histogram Equalization (CLAHE) are the most widely used in fundus imaging. The previous mentioned works @HaorenXiong.2025 and @Zedan.2025 applied CLAHE as a preprocessing step before feeding the images into their segmentation models to achieve their remarkable results. CLAHE enhances the image contrast by applying histogram equalization in small regions of the image. This improves visibility of features of the blood vessels and the OD, leading to improved segmentation performance @HaorenXiong.2025.
+
+In contrast to static preprocessing methods like CLAHE, only few works employ learned image enhancement models. Generative Adversarial Networks (GANs) are often used for image-to-image translation, including image enhancement tasks. Due to limited availability of paired training data in medical imaging, various adaptions have been proposed, such as CycleGAN @Zhu.2017 which employs an encoder–decoder-based generator architecture and enables unpaired image-to-image translation through cycle consistency.
+
+You et al. @You.2019 further enhanced this method and proposed the Cycle-CBAM method for retinal image enhancement to translate poor-quality fundus images to high-quality images. Based on CycleGAN, it also integrates a Convolutional Block Attention Module (CBAM) into the Residual Blocks of the CycleGAN generators to preserve image textures and color details more effectively. The attention technique uses channel and spatial attention to adaptively emphasize important features and suppress irrelevant ones. The model was trained using unpaired low- and high-quality fundus images from the EyePACS and PD datasets. In comparison to static enhancement methods, Cycle-CBAM produced more natural and detailed images and also improved the accuracy of diabetic retinopathy classification when using the enhanced images.
+// --> Enhancer trained independently and is not trained task-aware, not applied for Glaucoma segmentation
+// --> We also train enhancer jointly with segmentation model to be task-aware
+
+Other enhancement models are also based on the encoder-decoder architecture such as the UNet. It is designed for medical image segmentation tasks but is also widely used for image enhancement tasks @Lin.2025. However, Liu et al. @Liu.2025 demonstrated superior results using their previously mentioned EE-TransUNet without explicit image enhancement by focusing on architectural improvements to their segmentation model.
+// --> correlates with our final result that architectural improvements are more effective than preprocessing
+
+// Show gap:
+While both static and learned enhancement methods have shown benefits in improving fundus image quality, most enhancement techniques are designed as independent preprocessing modules that are optimized separately from the actual analysis task. As a result, the enhancement focuses primarily on visual quality rather than task-specific feature optimization. This limits their effectiveness when they are integrated into diagnostic pipelines such as glaucoma detection and segmentation, where the final goal is accurate analysis rather than just improved image appearance.
+
+To address this gap, we propose a task-aware learned enhancement approach to jointly train the enhancement model together with the segmentation model. By optimizing both modules end-to-end, the enhancer learns to emphasize features that are relevant for accurate OD and OC segmentation.
+
 
 = Methodology
 == Dataset

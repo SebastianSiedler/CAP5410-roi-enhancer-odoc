@@ -65,7 +65,8 @@ Our key contributions are:
 
 ### A. Optic Disc and Cup Segmentation
 
-Early approaches relied on traditional computer vision techniques including active contours [5], graph cuts [6], and superpixel-based methods [7]. These methods required extensive feature engineering and struggled with image variability.
+Early approaches relied on traditional computer vision techniques including active contours [5
+], graph cuts [6], and superpixel-based methods [7]. These methods required extensive feature engineering and struggled with image variability.
 
 The advent of deep learning revolutionized medical image segmentation. Fu et al. [8] introduced a polar transformation-based approach that converts the segmentation problem to a boundary detection task. Sevastopolsky [9] applied standard UNet architecture with multi-scale loss functions. More recent works have explored attention mechanisms [10], adversarial training [11], and semi-supervised learning [12] to improve performance.
 
