@@ -82,7 +82,7 @@ The implementation was done using the Albumentations library @src_2018arXiv18090
 We evaluate five distinct approaches: // TODO: add clahe
 
 + Standard UNet (Baseline) \
-  *Classic encoder-decoder architecture* @ronneberger2015unetconvolutionalnetworksbiomedical:
+  *Classic encoder-decoder architecture* @src_ronneberger2015unetconvolutionalnetworksbiomedical:
 
   *Encoder:*
   - 4 downsampling stages via max pooking
@@ -407,9 +407,71 @@ Key Observations:
 == Qualitative Results
 Visual inspection of predictions reveals:
 
-// TODO: was genau machen wir hier rein?
-// - wir können z.B. zeigen, dass die Edges bei asp-unet besser definiert sind. Nicht so franzig
-//
+=== Frayed Edges
+#figure(
+  image("../results/sample_comparison_160.png"),
+  caption: [
+    Visualization of segmentation (OD in blue; OC in red) outputs from Baseline UNet (left) and ASPP-UNet (right) on a sample image next to the raw image and ground truth mask.
+  ],
+) <fig_sample_comparison_160>
+
+In @fig_sample_comparison_160, we compare segmentation outputs from the baseline UNet and ASPP-UNet on representative test images. Similar to the findings from #cite(<src_zedan2025rmhanetrobustoptic>, form: "prose"), ASPP-UNet produces smoother and more anatomically plausible boundaries for both the optic disc and cup in comparison to the frayed edges produced by the baseline UNet. The multi-scale features learned by the ASPP module help capture fine vessel structures and disc edges that the baseline UNet often misses or segments poorly.
+
+
+=== Challenging Samples
+#figure(
+  image("../results/sample_comparison_13.png"),
+  caption: [
+    TODO:
+  ],
+) <fig_sample_comparison_13>
+
+
+=== Extreme Cases
+#figure(
+  image("../results/sample_comparison_52.png"),
+  caption: [
+    TODO:
+  ],
+) <fig_sample_comparison_52>
+
+
+#figure(
+  image("../results/sample_comparison_56.png"),
+  caption: [
+    TODO:
+  ],
+) <fig_sample_comparison_56>
+
+==
+#figure(
+  image("../results/std_enhancer_top5_sample_391.png"),
+  caption: [
+    TODO:
+  ],
+) <fig_std_enhancer_top5_sample_391>
+#figure(
+  image("../results/atrous_enhancer_top2_sample_391.png"),
+  caption: [
+    TODO:
+  ],
+) <fig_atrous_enhancer_top2_sample_391>
+
+
+
+
+// TODO: zeigen, dass auch verrauschte bilder gut funktionieren. Das liegt daran, dass wir gut mit Augmentation gearbeitet haben
+
+// TODO: auch mal 1-2 failure cases zeigen.
+
+// dieses differenz bild zeigen, wie die enhancer arbeiten
+
+// 13 hat sehr undeutlich; trotzdem gute segmentierung
+
+// 52 ultra schlecht. Da hab ich von der ground truth fast nichts erwischt.
+
+// 56 aber z.B. auch große gt; aber da hab ich nicht so schlecht performed
+
 
 = Discussion
 
@@ -435,3 +497,8 @@ Visual inspection of predictions reveals:
 
 // TODO: Link github repo:
 // should we also upload the trained models somewhere?
+
+
+// TODO: ganz am Ende schauen, ob wir noch irgendwo fest zahlen haben
+
+// Oben wo clahe erklärt wird kann man bestimmt mal schön ein vergleichsbild rein machen.
