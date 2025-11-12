@@ -71,9 +71,9 @@ This resulted in the following distribution:
 To improve generatlization and robustness of our model, we applied the following augmenations durting training:
 - Random horizontal flip (p=0.5)
 - Random vertical flip (p=0.5)
-- Random rotation (±20 degrees)
-- Random brightness adjustment (±0.2)
-- Random contrast adjustment (±0.2)
+- Random rotation ($plus.minus$20 degrees)
+- Random brightness adjustment ($plus.minus$0.2)
+- Random contrast adjustment ($plus.minus$0.2)
 - Normalization (ImageNet statistics)
 The implementation was done using the Albumentations library @src_2018arXiv180906839B in the file `transforms.py`. Validation and test sets use only normalization without augmenation.
 
@@ -282,7 +282,7 @@ We report mIoU as the primary metric for fair comparison across approaches.
         row
       },
     ),
-    caption: [Quantitative comparison of all five approaches on the validation set. ASPP-UNet achieves the best performance with 85.09% mIoU while using 30.9% fewer parameters than the baseline. Learned enhancement approaches show marginal degradation, suggesting that preprocessing-based methods are less effective than architectural improvements for this task.], // Caption TODO:
+    caption: [Quantitative comparison of all five approaches on the test set. ],
   ) <fig_quantitative_comparison>
 ]
 
@@ -294,15 +294,11 @@ Key Observations:
 
 + *Training Efficiency:* ASPP-UNet demonstrated superior convergence, reaching optimal performance in 67 epochs compared to 100 epochs required by baseline models. This faster convergence, combined with better final performance, indicates that the ASPP module provides a more effective inductive bias for this segmentation task.
 
-+ *Enhancement Degradation:* Both standard and atrous enhancer approaches show slight performance drops compared to the baseline UNet
-  - Standard enhancer: #calc.round(data.baseline_std_enhancer.delta_miou * 100, digits: 2)%
-  - Atrous enhancer: #calc.round(data.baseline_atrous_enhancer.delta_miou * 100, digits: 2)%
++ *Enhancement Performance:* The standard enhancer shows slight performance improvements (+#calc.round(data.baseline_std_enhancer.delta_miou * 100, digits: 2)%) compared to the baseline UNet, demonstrating that learned preprocessing can provide marginal benefits.
 
-// TODO: why is clahe worse?
-+ *CLAHE Preprocessing*: Surprisingly, CLAHE preprocessing leads to a minor decrease in performance compared to the baseline UNet. (#calc.round(data.clahe.delta_miou * 100, digits: 2)% points)
++ *CLAHE Preprocessing*: Surprisingly, CLAHE preprocessing leads to a minor decrease in performance compared to the baseline UNet (#calc.round(data.clahe.delta_miou * 100, digits: 2) percentage points), suggesting that traditional contrast enhancement techniques may not be optimal when combined with deep learning models that can learn their own feature representations.
 
-// TODO: we should check this. This could also be just margin of error
-+ *Multi-Scale Enhancement*: Altrous enhancer performs worse than standard enhancer, contradicting the hypothesis that multi-scale preprocessing helps
++ *Multi-Scale Enhancement Limitation*: The atrous enhancer shows marginal degradation (#calc.round(data.baseline_atrous_enhancer.delta_miou * 100, digits: 2)%) compared to baseline, performing worse than the standard enhancer. This contradicts the hypothesis that multi-scale preprocessing helps segmentation performance. The result suggests that task-agnostic multi-scale image enhancement does not translate to improved segmentation accuracy, even when using sophisticated ASPP-based architectures
 
 + *Class-Specific Analysis*:
   - Background: ASPP-UNET shows largest improvement (+#calc.round((data.aspp_unet.iou_bg - data.baseline_unet.iou_bg) * 100, digits: 2)% points)
@@ -310,9 +306,7 @@ Key Observations:
   - ASPP-UNet improves by +#calc.round((data.aspp_unet.iou_cup - data.baseline_unet.iou_cup) * 100, digits: 2)% points (most challenging class)
 
 == Training Convergence Analysis
-
-// Load convergence metrics (auto-generated from notebooks/training_curves_visualization.ipynb)
-// Run the "Generate Convergence Metrics for Paper" section to regenerate if training data changes
+The training dynamics of each approach provide insights into their learning efficiency and stability. We analyze convergence patterns using loss curves and key metrics such as best validation loss, convergence epoch, and overfitting behavior.
 #let conv = json("../results/convergence_metrics.json")
 
 === Single-Phase UNet Variants
@@ -335,7 +329,7 @@ Key Observations:
 The enhancer-based approaches employ a two-phase training strategy: Phase 1 trains only the enhancer with a frozen pretrained UNet, while Phase 2 performs joint fine-tuning of both components. @fig_std_enhancer_two_phase and @fig_atrous_enhancer_two_phase illustrate the complete training journey for each enhancer model, showing the transition from Phase 1 to Phase 2.
 
 
-*Standard Enhancer*: Phase 1 (#conv.std_enhancer.phase1_epochs epochs with early stopping) achieved modest loss reduction (#conv.std_enhancer.phase1_reduction_percent%), while Phase 2 joint fine-tuning (#conv.std_enhancer.phase2_epochs epochs) yielded #conv.std_enhancer.phase2_reduction_percent% additional reduction. The total training time of #conv.std_enhancer.total_epochs epochs is substantially lower than single-phase models. However, the final performance was marginally worse than baseline UNet, suggesting that the learned image enhancements do not provide task-specific improvements for segmentation.
+*Standard Enhancer*: Phase 1 (#conv.std_enhancer.phase1_epochs epochs with early stopping) achieved modest loss reduction (#conv.std_enhancer.phase1_reduction_percent%), while Phase 2 joint fine-tuning (#conv.std_enhancer.phase2_epochs epochs) yielded #conv.std_enhancer.phase2_reduction_percent% additional reduction. The total training time of #conv.std_enhancer.total_epochs epochs is substantially lower than single-phase models. The final performance shows marginal improvement over baseline UNet (+0.26 pp), suggesting that learned image enhancements provide only limited task-specific benefits for segmentation.
 
 #figure(
   image("../results/standard_enhancer_two_phase.png", width: 80%),
@@ -343,7 +337,7 @@ The enhancer-based approaches employ a two-phase training strategy: Phase 1 trai
 ) <fig_std_enhancer_two_phase>
 
 
-*Atrous Enhancer*: Phase 1 required the full planned #conv.atrous_enhancer.phase1_epochs epochs and achieved substantial loss reduction (#conv.atrous_enhancer.phase1_reduction_percent%), demonstrating that the multi-scale ASPP-based enhancer requires more training to learn effective transformations across different receptive fields. Phase 2 (#conv.atrous_enhancer.phase2_epochs epochs) provided an additional #conv.atrous_enhancer.phase2_reduction_percent% reduction. Despite the extended training (#conv.atrous_enhancer.total_epochs total epochs), performance remained below baseline, indicating that even sophisticated multi-scale preprocessing cannot match task-specific architectural improvements.
+*Atrous Enhancer*: Phase 1 required the full planned #conv.atrous_enhancer.phase1_epochs epochs and achieved substantial loss reduction (#conv.atrous_enhancer.phase1_reduction_percent%), demonstrating that the multi-scale ASPP-based enhancer requires more training to learn effective transformations across different receptive fields. Phase 2 (#conv.atrous_enhancer.phase2_epochs epochs) provided an additional #conv.atrous_enhancer.phase2_reduction_percent% reduction. Despite the extended training (#conv.atrous_enhancer.total_epochs total epochs), performance shows marginal degradation compared to baseline (-0.01 pp), indicating that even sophisticated multi-scale preprocessing cannot match task-specific architectural improvements. This result challenges the assumption that multi-scale preprocessing inherently benefits segmentation tasks.
 
 
 #figure(
@@ -355,9 +349,9 @@ The enhancer-based approaches employ a two-phase training strategy: Phase 1 trai
 
 + *Architectural efficiency matters*: ASPP-UNet's #(conv.aspp_unet.convergence_epoch)-epoch convergence vs. #(conv.unet.convergence_epoch)-#(conv.clahe_unet.total_epochs) epochs for baseline models demonstrates that integrating multi-scale features directly into the segmentation architecture is more effective than preprocessing-based approaches.
 
-+ *Enhancement preprocessing shows limited benefit*: Both learned enhancement approaches required comparable or greater total training time than direct segmentation, while achieving lower final performance. This suggests that task-agnostic image enhancement is less effective than task-specific architectural improvements.
++ *Enhancement preprocessing shows limited benefit*: The standard enhancer achieved only marginal improvement (+0.26 pp), while the atrous enhancer showed slight degradation (-0.01 pp). Both approaches required comparable or greater total training time than direct segmentation. This demonstrates that task-agnostic image enhancement—even with sophisticated multi-scale architectures—provides minimal benefits compared to task-specific architectural improvements.
 
-+ *Training strategy complexity*: The two-phase training adds complexity without performance gains. Phase 1's frozen UNet prevents the enhancer from learning task-specific transformations, while Phase 2's joint training cannot fully recover from the suboptimal Phase 1 initialization.
++ *Training strategy complexity*: The two-phase training adds complexity without substantial performance gains. Phase 1's frozen UNet prevents the enhancer from learning task-specific transformations, while Phase 2's joint training cannot fully recover from the suboptimal Phase 1 initialization. The multi-scale atrous enhancer paradoxically underperforms the simpler standard enhancer, suggesting that architectural complexity in the preprocessing stage does not translate to better segmentation performance.
 
 
 == Per-Class Performance Analysis
@@ -407,6 +401,8 @@ The enhancer-based approaches employ a two-phase training strategy: Phase 1 trai
 Visual inspection of predictions reveals:
 
 === Frayed Edges <chapt_frayed_edges>
+In @fig_sample_comparison_160, we compare segmentation outputs from the baseline UNet and ASPP-UNet on representative test images. Similar to the findings from #cite(<src_zedan2025rmhanetrobustoptic>, form: "prose"), ASPP-UNet produces smoother and more anatomically plausible boundaries for both the optic disc and cup in comparison to the frayed edges produced by the baseline UNet. The multi-scale features learned by the ASPP module help capture fine vessel structures and disc edges that the baseline UNet often misses or segments poorly.
+
 #figure(
   image("../results/sample_comparison_160.png"),
   caption: [
@@ -414,19 +410,19 @@ Visual inspection of predictions reveals:
   ],
 ) <fig_sample_comparison_160>
 
-In @fig_sample_comparison_160, we compare segmentation outputs from the baseline UNet and ASPP-UNet on representative test images. Similar to the findings from #cite(<src_zedan2025rmhanetrobustoptic>, form: "prose"), ASPP-UNet produces smoother and more anatomically plausible boundaries for both the optic disc and cup in comparison to the frayed edges produced by the baseline UNet. The multi-scale features learned by the ASPP module help capture fine vessel structures and disc edges that the baseline UNet often misses or segments poorly.
+
 
 
 === Challenging Samples
+
+In @fig_sample_comparison_13, we observe that both models perform reasonably well, with ASPP-UNet capturing the cup boundary edges less frayed than the baseline like already shown in
+
 #figure(
   image("../results/sample_comparison_13.png"),
   caption: [
     Segmentation output for test sample 13, which has low contrast and poor cup visibility. .
   ],
 ) <fig_sample_comparison_13>
-
-In @fig_sample_comparison_13, we observe that both models perform reasonably well, with ASPP-UNet capturing the cup boundary edges less frayed than the baseline like already shown in
-
 
 
 === Extreme Cases
