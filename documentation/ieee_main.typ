@@ -40,7 +40,7 @@ Glaucoma is one of the leading causes of irreversible blindness worldwide @Wagne
 
 Automated segmentation of the OD and OC in fundus images has become an important research area in medical image analysis. However, accurate segmentation remains challenging due to imperfections in the images, such as low contrast, uneven illumination, and blur @Lin.2025. To mitigate these issues, the images are often preprocessed using image enhancement techniques, improving the visibility of relevant anatomical features and therefore more accurate segmentation results @Lin.2025. Most existing enhancement methods are designed as independent preprocessing modules that are optimized separately from the actual segmentation task. As a result, the enhancement focuses primarily on visual quality rather than task-specific feature optimization.
 
-In this work, we propose a task-aware learned multi-scale enhancement model that is jointly trained with the segmentation model, allowing the enhancer to learn features that are specifically relevant for accurate OD and OC segmentation.
+In this work, we propose a task-aware learned multi-scale enhancement model that is jointly trained with the segmentation model, allowing the enhancer to learn features that are specifically relevant for accurate OD and OC segmentation.#footnote[Code available at: #link("https://github.com/SebastianSiedler/CAP5410-roi-enhancer-odoc")] // TODO: check at the end
 
 The paper is structured as follows: Section II reviews related work on glaucoma image segmentation, showing the gap in existing enhancement methods. Section III describes the proposed methodology, including details about the dataset, network architectures, loss functions, training strategy, and evaluation metrics. Section IV presents experimental results comparing different approaches. Finally, Section V discusses the findings and concludes the paper with future work suggestions.
 
@@ -461,7 +461,7 @@ In @fig_sample_comparison_160, we compare segmentation outputs from the baseline
 
 === Challenging Samples
 
-In @fig_sample_comparison_13, we observe that both models perform reasonably well, with ASPP-UNet capturing the cup boundary edges less frayed than the baseline like already shown in
+In @fig_sample_comparison_13, we observe that both models perform reasonably well, with ASPP-UNet capturing the cup boundary edges less frayed than the baseline like already shown in @chapt_frayed_edges. Despite the low contrast and poor cup visibility in this sample, both models manage to segment the optic disc and cup regions effectively, demonstrating robustness to challenging imaging conditions. This is likely due to the diverse training data and effective data augmentation strategies employed during training.
 
 #figure(
   image("../results/sample_comparison_13.png"),
@@ -510,24 +510,66 @@ In @fig_std_enhancer_top5_sample_218, the standard enhancer focuses on lightenin
 ) <fig_atrous_enhancer_top1_sample_391>
 In @fig_atrous_enhancer_top1_sample_391, the atrous enhancer also applies more significant changes to the background and vessels, with less focus on the disc and cup areas. In comparision to the standard enhancer, the atrous version does not show the checkers pattern, indicating a different enhancement strategy.
 
-// TODO: zeigen, dass auch verrauschte bilder gut funktionieren. Das liegt daran, dass wir gut mit Augmentation gearbeitet haben
-
-// TODO: auch mal 1-2 failure cases zeigen.
-
-// dieses differenz bild zeigen, wie die enhancer arbeiten
-
-// 13 hat sehr undeutlich; trotzdem gute segmentierung
-
-// 52 ultra schlecht. Da hab ich von der ground truth fast nichts erwischt.
-
-// 56 aber z.B. auch große gt; aber da hab ich nicht so schlecht performed
-
 
 = Discussion
+== Main Finding: Architecture vs. Preprocessing
+Our results demonstrate, that ASPP-UNet (+ #calc.round(data.aspp_unet.delta_miou * 100, digits: 2)% mIoU improvement) outperforms both enhancer-based approaches (standard: +0.26 pp; atrous: -0.01 pp) and the CLAHE preprocessing (#calc.round(data.clahe.delta_miou * 100, digits: 2)% decrease). This indicates that task-specific architectural improvements are more effective than preprocessing-based enhancements for OD and OC segmentation. This could be because architectural changes allow the model to learn multi-scale features directly optimized for segmentation, while preprocessing focuses on generic image quality that may not align with task needs.
+
+== The Preprocessing Paradox
+Surprisingly, CLAHE preprocessing led to a performance decrease (#calc.round(data.clahe.delta_miou * 100, digits: 2)%) compared to the baseline UNet. Similar finings were reported by #cite(<src_huang2022identifyingkeycomponentsresnet50>, form: "prose") who observed, that CLAHE also decreased test Kappa for their classification pipeline. This suggests, that deep networks already learn contrast normalization in early layers, making explicit contrast enhancement redundant or even detrimental. // TODO: maybe use a source for the last sentence
+
+For the other two learned enhancers, the added minimal improvement (+0.26 pp for standard; -0.01 pp for atrous) indicates that task-agnostic image enhancement provides limited benefits. Using a different seed the standard enhancer even decresed performance compared to baseline.
+
+== Why ASPP-UNET Succeeds
+ASPP-UNet's superior performance (+ #calc.round(data.aspp_unet.delta_miou * 100, digits: 2)%) can be attributed to its ability to learn multi-scale features directly optimized for segmentation. The ASPP module captures fine details, medium structures, and global context simultaneously, which is crucial for accurately delineating the optic disc and cup boundaries. Also the parameter efficiency (30.9% fewer parameters) likely aids generalization by reducing overfitting risk.
+
+== Class-Specific Insights
+The most challenging class for all models was the segmentation of the optic cup, due to its small size and low contrast boundaries (especially in glaucoma cases). Also the high anatomical variability of the cup shape makes accurate segmentation difficult.
+
+== Qualitative Observations
+Visual inspection revealed that ASPP-UNet produces smoother and more anatomically plausible boundaries, particularly for the optic cup. The multi-scale features help capture fine vessel structures and disc edges that the baseline UNet often misses or segments poorly. Both models struggled with extremely large optic discs and cups, indicating areas for future improvement. The extrem cases could also be due to the low 256x256 resolution we used for training.
+
+== Comparison with State-of-the-Art // TODO: @SteffEng-lab
 
 = Conclusions and Future Work
 
+This work systematically investigated whether learned image enhancement or direct architectural improvements better support optic disc and cup segmentation in fundus images. Our findings decisively demonstrate that task-specific architectural integration is superior to preprocessing-based approaches—whether traditional or learned.
+
+== The Failure of Enhancement-Based Approaches
+
+The comprehensive evaluation reveals that all three enhancement strategies failed to provide meaningful improvements:
+
+*Traditional Preprocessing (CLAHE):* Despite widespread use in medical imaging literature @HaorenXiong.2025 @Zedan.2025, CLAHE preprocessing yielded #calc.round(data.clahe.delta_miou * 100, digits: 2)% mIoU decrease compared to baseline (#calc.round(data.clahe.miou * 100, digits: 2)% vs. #calc.round(data.baseline_unet.miou * 100, digits: 2)%). This contradicts the common assumption that contrast enhancement benefits deep learning pipelines and suggests that modern CNNs already learn optimal feature representations in early layers.
+
+*Learned Standard Enhancer:* Even with end-to-end joint training, the standard enhancer achieved only +#calc.round(data.baseline_std_enhancer.delta_miou * 100, digits: 2)% improvement—a marginal gain that falls within typical performance variance. The #calc.round((data.baseline_std_enhancer.parameters - data.baseline_unet.parameters) / 1000, digits: 0)K additional parameters and two-phase training complexity provide negligible benefit.
+
+*Learned Multi-Scale Enhancer:* Most critically, the ASPP-based atrous enhancer—designed to learn multi-scale image transformations—actually degraded performance by #calc.round(calc.abs(data.baseline_atrous_enhancer.delta_miou) * 100, digits: 2)% (#calc.round(data.baseline_atrous_enhancer.miou * 100, digits: 2)% mIoU). This demonstrates that sophisticated multi-scale preprocessing architectures do not translate to improved segmentation accuracy, even when trained jointly with the segmentation model.
+
+The fundamental issue is that enhancers optimize for task-agnostic image quality rather than segmentation-relevant features. The two-phase training strategy further limits effectiveness: Phase 1's frozen UNet prevents the enhancer from learning task-specific transformations, while Phase 2 cannot fully recover from suboptimal initialization. Visualization of enhanced images (@fig_std_enhancer_top5_sample_218, @fig_atrous_enhancer_top1_sample_391) confirms that enhancers primarily modify backgrounds and vessels rather than critical disc/cup boundaries.
+
+== Architectural Integration: The Superior Approach
+
+In stark contrast, ASPP-UNet achieved #calc.round(data.aspp_unet.delta_miou * 100, digits: 2)% mIoU improvement (#calc.round(data.aspp_unet.miou * 100, digits: 2)%) through direct architectural integration of multi-scale features. Critically, this was accomplished with #calc.round((1 - data.aspp_unet.parameters / data.baseline_unet.parameters) * 100, digits: 2)% fewer parameters (#calc.round(data.aspp_unet.parameters / 1000000, digits: 2)M vs. #calc.round(data.baseline_unet.parameters / 1000000, digits: 2)M) and faster convergence (67 vs. 100 epochs). The ASPP bottleneck learns multi-scale representations directly optimized for segmentation through true end-to-end training, proving more effective than any preprocessing-based approach.
+
+This finding challenges the prevalent practice of treating enhancement as a separate preprocessing step in medical image analysis pipelines. Our results suggest that architectural improvements targeting the specific analysis task should be prioritized over generic image enhancement techniques.
+
+== Limitations and Future Work
+
+*Resolution Constraints:* Hardware limitations restricted training to 256×256 resolution. Higher-resolution training may improve performance, particularly for extreme cases with very large optic discs and cups where both baseline and ASPP-UNet struggled.
+
+*Dataset Quality:* Visual inspection revealed substantial annotation ambiguity in training data, particularly for challenging cases with indistinct cup boundaries. Incorporating annotation uncertainty into the loss function (e.g., weighting by inter-annotator agreement in REFUGE dataset) could improve model robustness.
+
+*Extreme CDR Cases:* Both models showed reduced accuracy for cup-to-disc ratios approaching 1.0, suggesting that severe glaucoma cases may benefit from specialized loss weighting or dedicated model branches.
+
+*Future Directions:* Beyond addressing these limitations, future work should explore whether our findings generalize to other medical image segmentation tasks. We hypothesize that task-specific architectural integration will consistently outperform preprocessing-based enhancement across medical imaging domains, but systematic validation is needed.
+
+
+
+
+
 // TODO: irgendwie gibt es so ein satz von machinelearning so nach dem Motto "Keep it simple"
+
+
 
 
 
@@ -543,10 +585,10 @@ In @fig_atrous_enhancer_top1_sample_391, the atrous enhancer also applies more s
 
 
 
+
+
 // TODO: großes problem würde ich wirklich sagen, die trainingsdaten. Ich bin selbst kein augenarzt, aber das ist schon teilweise wirklich sehr sehr schwer zu erkennen.
 
-// TODO: Link github repo:
-// should we also upload the trained models somewhere?
 
 
 // TODO: ganz am Ende schauen, ob wir noch irgendwo fest zahlen haben
