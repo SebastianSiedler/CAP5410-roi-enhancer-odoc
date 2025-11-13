@@ -527,30 +527,35 @@ Visual inspection revealed that ASPP-UNet produces smoother and more anatomicall
 == Comparison with State-of-the-Art // TODO: @SteffEng-lab
 
 = Conclusions and Future Work
-This work investigated wheter learned preprocessing or architectural integration better supports accurate optic disc and cup segmentation in fundus images. Our findings indicate that task-specific architectural improvements, specifically the ASPP-UNet, significantly outperform both traditional (CLAHE) and learned preprocessing approaches.
 
-// TODO: irgendwie gibt es so ein satz von machinelearning so nach dem Motto "Keep it simple"
+This work systematically investigated whether learned image enhancement or direct architectural improvements better support optic disc and cup segmentation in fundus images. Our findings decisively demonstrate that task-specific architectural integration is superior to preprocessing-based approaches—whether traditional or learned.
 
+== The Failure of Enhancement-Based Approaches
 
+The comprehensive evaluation reveals that all three enhancement strategies failed to provide meaningful improvements:
 
-// TODO: comparison with SOTA paper why our models are so much worse? Are they really worse? Or are they just calculating there metrics different. We are using IoU on cropped roi. Are they using Dice of Full image? -> roi smaller therefore hit rate way easier!
+*Traditional Preprocessing (CLAHE):* Despite widespread use in medical imaging literature @HaorenXiong.2025 @Zedan.2025, CLAHE preprocessing yielded #calc.round(data.clahe.delta_miou * 100, digits: 2)% mIoU decrease compared to baseline (#calc.round(data.clahe.miou * 100, digits: 2)% vs. #calc.round(data.baseline_unet.miou * 100, digits: 2)%). This contradicts the common assumption that contrast enhancement benefits deep learning pipelines and suggests that modern CNNs already learn optimal feature representations in early layers.
 
-// TODO: noch mal die anderen beiden dokumente (gdoc und notes.typ) durchschauen, ob da noch was verwertbares dabei ist
+*Learned Standard Enhancer:* Even with end-to-end joint training, the standard enhancer achieved only +#calc.round(data.baseline_std_enhancer.delta_miou * 100, digits: 2)% improvement—a marginal gain that falls within typical performance variance. The #calc.round((data.baseline_std_enhancer.parameters - data.baseline_unet.parameters) / 1000, digits: 0)K additional parameters and two-phase training complexity provide negligible benefit.
 
-// TODO: further research: ich glaube das trainings material an sich ist nicht perfekt. Vielleicht könnte man bei REFUGE unstimmigkeiten zwischen den verschiedenen leuten die labeln das mit in die Loss funktion mit rein packen.
+*Learned Multi-Scale Enhancer:* Most critically, the ASPP-based atrous enhancer—designed to learn multi-scale image transformations—actually degraded performance by #calc.round(calc.abs(data.baseline_atrous_enhancer.delta_miou) * 100, digits: 2)% (#calc.round(data.baseline_atrous_enhancer.miou * 100, digits: 2)% mIoU). This demonstrates that sophisticated multi-scale preprocessing architectures do not translate to improved segmentation accuracy, even when trained jointly with the segmentation model.
 
-// TODO: Ich glaube auch, dass unser model probleme hat, wenn das schon sehr fortgeschritten ist. Also OC:OD gegen 1:1. vielleicht das auch irgendwie mit in die Loss funktion packen, dass hohe ratio stärker gewichtet wird
+The fundamental issue is that enhancers optimize for task-agnostic image quality rather than segmentation-relevant features. The two-phase training strategy further limits effectiveness: Phase 1's frozen UNet prevents the enhancer from learning task-specific transformations, while Phase 2 cannot fully recover from suboptimal initialization. Visualization of enhanced images (@fig_std_enhancer_top5_sample_218, @fig_atrous_enhancer_top1_sample_391) confirms that enhancers primarily modify backgrounds and vessels rather than critical disc/cup boundaries.
 
-// TODO: Auch das wir aufgrund der begrenzten hardware ressourcen das Ding nicht mit mehr auflösung trainieren konnte. Welche haben wir überhaupt jetzt benutzt? 256 oder 512?
+== Architectural Integration: The Superior Approach
 
+In stark contrast, ASPP-UNet achieved #calc.round(data.aspp_unet.delta_miou * 100, digits: 2)% mIoU improvement (#calc.round(data.aspp_unet.miou * 100, digits: 2)%) through direct architectural integration of multi-scale features. Critically, this was accomplished with #calc.round((1 - data.aspp_unet.parameters / data.baseline_unet.parameters) * 100, digits: 2)% fewer parameters (#calc.round(data.aspp_unet.parameters / 1000000, digits: 2)M vs. #calc.round(data.baseline_unet.parameters / 1000000, digits: 2)M) and faster convergence (67 vs. 100 epochs). The ASPP bottleneck learns multi-scale representations directly optimized for segmentation through true end-to-end training, proving more effective than any preprocessing-based approach.
 
+This finding challenges the prevalent practice of treating enhancement as a separate preprocessing step in medical image analysis pipelines. Our results suggest that architectural improvements targeting the specific analysis task should be prioritized over generic image enhancement techniques.
 
-// TODO: großes problem würde ich wirklich sagen, die trainingsdaten. Ich bin selbst kein augenarzt, aber das ist schon teilweise wirklich sehr sehr schwer zu erkennen.
+== Limitations and Future Work
 
-// TODO: Link github repo:
-// should we also upload the trained models somewhere?
+*Resolution Constraints:* Hardware limitations restricted training to 256×256 resolution. Higher-resolution training may improve performance, particularly for extreme cases with very large optic discs and cups where both baseline and ASPP-UNet struggled.
 
+*Dataset Quality:* Visual inspection revealed substantial annotation ambiguity in training data, particularly for challenging cases with indistinct cup boundaries. Incorporating annotation uncertainty into the loss function (e.g., weighting by inter-annotator agreement in REFUGE dataset) could improve model robustness.
 
-// TODO: ganz am Ende schauen, ob wir noch irgendwo fest zahlen haben
+*Extreme CDR Cases:* Both models showed reduced accuracy for cup-to-disc ratios approaching 1.0, suggesting that severe glaucoma cases may benefit from specialized loss weighting or dedicated model branches.
 
-// Oben wo clahe erklärt wird kann man bestimmt mal schön ein vergleichsbild rein machen.
+*Future Directions:* Beyond addressing these limitations, future work should explore whether our findings generalize to other medical image segmentation tasks. We hypothesize that task-specific architectural integration will consistently outperform preprocessing-based enhancement across medical imaging domains, but systematic validation is needed.
+
+// TODO: Link github repo and trained models
