@@ -11,9 +11,8 @@ import sys
 from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.patches import Patch, Rectangle
+from matplotlib.patches import Patch
 import torch
-from PIL import Image
 from tqdm import tqdm
 
 # Add src to path
@@ -304,49 +303,3 @@ def visualize_worst_predictions(
     plt.show()
 
     return fig, worst_samples
-
-
-def main():
-    """Main function for standalone usage."""
-    import argparse
-
-    parser = argparse.ArgumentParser(
-        description='Visualize worst model predictions')
-    parser.add_argument('--checkpoint', type=str, default='checkpoints/best_model.pth',
-                        help='Path to model checkpoint')
-    parser.add_argument('--root-dir', type=str, default='.',
-                        help='Project root directory')
-    parser.add_argument('--num-worst', type=int, default=8,
-                        help='Number of worst samples to visualize')
-    parser.add_argument('--metric', type=str, default='cup', choices=['cup', 'disc', 'mean'],
-                        help='Metric to use for finding worst samples')
-    parser.add_argument('--save-path', type=str, default='results/worst_predictions.png',
-                        help='Path to save visualization')
-    parser.add_argument('--device', type=str, default='cuda',
-                        help='Device to use (cuda/cpu)')
-    parser.add_argument('--image-size', type=int, default=256,
-                        help='Image size used during training')
-    parser.add_argument('--seed', type=int, default=42,
-                        help='Random seed')
-
-    args = parser.parse_args()
-
-    # Ensure save directory exists
-    save_dir = Path(args.save_path).parent
-    save_dir.mkdir(parents=True, exist_ok=True)
-
-    # Run visualization
-    visualize_worst_predictions(
-        checkpoint_path=args.checkpoint,
-        root_dir=args.root_dir,
-        num_worst=args.num_worst,
-        metric=args.metric,
-        save_path=args.save_path,
-        device=args.device,
-        image_size=args.image_size,
-        seed=args.seed
-    )
-
-
-if __name__ == '__main__':
-    main()

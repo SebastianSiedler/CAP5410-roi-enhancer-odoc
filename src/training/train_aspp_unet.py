@@ -6,14 +6,11 @@ from training.train import train_epoch, validate_epoch, CombinedLoss, plot_train
 from data_loader.transforms import get_training_transforms, get_validation_transforms
 from data_loader.dataset import get_dataloaders
 from models.aspp_unet import ASPPUNet, LightweightASPPUNet
-import os
 import sys
 from pathlib import Path
 import numpy as np
 import torch
-import torch.nn as nn
 import torch.optim as optim
-from tqdm import tqdm
 import matplotlib.pyplot as plt
 
 # Add src to path
@@ -219,20 +216,3 @@ def train_aspp_unet(
     print(f"Best validation loss: {best_val_loss:.4f}")
 
     return model, history
-
-
-if __name__ == '__main__':
-    """Example usage"""
-    root_dir = '/path/to/your/project'
-    model, history = train_aspp_unet(
-        root_dir=root_dir,
-        num_epochs=100,
-        batch_size=16,
-        learning_rate=1e-4,
-        model_type='full',
-        dilation_rates=[1, 6, 12, 18]
-    )
-
-    from training.train import plot_training_history
-    plot_training_history(history, save_path='aspp_unet_training_history.png')
-    plt.show()

@@ -286,38 +286,3 @@ def evaluate_test_set(
         print(f"\nResults saved to: {save_path}")
 
     return results
-
-
-def main():
-    """Main function for standalone usage."""
-    import argparse
-
-    parser = argparse.ArgumentParser(description='Evaluate model on test set')
-    parser.add_argument('--checkpoint', type=str, default='checkpoints/best_model.pth',
-                        help='Path to model checkpoint')
-    parser.add_argument('--root-dir', type=str, default='.',
-                        help='Project root directory')
-    parser.add_argument('--device', type=str, default='cuda',
-                        help='Device to use (cuda/cpu)')
-    parser.add_argument('--image-size', type=int, default=256,
-                        help='Image size used during training')
-    parser.add_argument('--seed', type=int, default=42,
-                        help='Random seed')
-    parser.add_argument('--save-path', type=str, default='results/test_evaluation.json',
-                        help='Path to save results JSON')
-
-    args = parser.parse_args()
-
-    # Run evaluation
-    evaluate_test_set(
-        checkpoint_path=args.checkpoint,
-        root_dir=args.root_dir,
-        device=args.device,
-        image_size=args.image_size,
-        seed=args.seed,
-        save_path=args.save_path
-    )
-
-
-if __name__ == '__main__':
-    main()

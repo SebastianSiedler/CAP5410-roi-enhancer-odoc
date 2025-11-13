@@ -1,9 +1,3 @@
-"""
-Data augmentation transforms for optic disc/cup segmentation.
-
-Provides standard transforms for training and validation/testing.
-"""
-
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
 
@@ -69,6 +63,7 @@ def get_training_transforms(image_size: int = 512, use_clahe: bool = False):
         ], p=0.3),
 
         # Normalize using ImageNet stats (standard practice)
+        # values from https://docs.pytorch.org/vision/stable/transforms.html#torchvision.transforms.Normalize
         A.Normalize(
             mean=(0.485, 0.456, 0.406),
             std=(0.229, 0.224, 0.225)
@@ -119,24 +114,3 @@ def get_validation_transforms(image_size: int = 512, use_clahe: bool = False):
     ])
 
     return A.Compose(transforms_list)
-
-
-def get_minimal_transforms(image_size: int = 512):
-    """
-    Get minimal transforms (resize + normalize only).
-    Useful for quick testing or inference.
-
-    Args:
-        image_size: Target image size (will resize to image_size x image_size)
-
-    Returns:
-        Albumentations Compose transform
-    """
-    return A.Compose([
-        A.Resize(image_size, image_size),
-        A.Normalize(
-            mean=(0.485, 0.456, 0.406),
-            std=(0.229, 0.224, 0.225)
-        ),
-        ToTensorV2()
-    ])

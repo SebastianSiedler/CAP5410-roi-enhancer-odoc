@@ -1,4 +1,3 @@
-import os
 import numpy as np
 from pathlib import Path
 from typing import Tuple, Optional, Callable, List
@@ -349,40 +348,3 @@ def get_dataloaders(
     )
 
     return train_loader, val_loader, test_loader
-
-
-if __name__ == '__main__':
-    """Example usage and testing."""
-    import sys
-
-    if len(sys.argv) < 2:
-        print("Usage: python dataset.py <root_dir>")
-        print("Example: python dataset.py datasets")
-        sys.exit(1)
-
-    root_dir = sys.argv[1]
-
-    print("Creating datasets...")
-    train_dataset = GlaucomaDataset(root_dir, split='train')
-    val_dataset = GlaucomaDataset(root_dir, split='val')
-    test_dataset = GlaucomaDataset(root_dir, split='test')
-
-    print("\nDataset Statistics:")
-    print("="*50)
-    for split_name, dataset in [('Train', train_dataset),
-                                ('Val', val_dataset),
-                                ('Test', test_dataset)]:
-        stats = dataset.get_dataset_stats()
-        print(f"\n{split_name}:")
-        print(f"  Total: {stats['total_samples']}")
-        print(f"  G1020: {stats['g1020_samples']}")
-        print(f"  ORIGA: {stats['origa_samples']}")
-        print(f"  REFUGE: {stats['refuge_samples']}")
-
-    # Test loading a sample
-    print("\n" + "="*50)
-    print("Testing sample loading...")
-    image, mask = train_dataset[5]
-    print(f"Image shape: {image.shape}")
-    print(f"Mask shape: {mask.shape}")
-    print(f"Mask unique values: {torch.unique(mask)}")
