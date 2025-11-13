@@ -16,7 +16,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 import torch
-from PIL import Image
 
 # Add src to path if needed
 project_root = Path(__file__).parent.parent.parent

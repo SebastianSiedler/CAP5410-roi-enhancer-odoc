@@ -5,14 +5,12 @@ Training and evaluation functions for UNet segmentation.
 from data_loader.transforms import get_training_transforms, get_validation_transforms
 from data_loader.dataset import get_dataloaders
 from models.unet import UNet
-import os
 import sys
 from pathlib import Path
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.utils.data import DataLoader
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 

@@ -11,9 +11,8 @@ import sys
 from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.patches import Patch, Rectangle
+from matplotlib.patches import Patch
 import torch
-from PIL import Image
 from tqdm import tqdm
 
 # Add src to path
