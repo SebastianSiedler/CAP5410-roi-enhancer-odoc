@@ -1,5 +1,12 @@
 #import "@preview/charged-ieee:0.1.4": ieee
 
+
+// Load comparison data from JSON
+#let data = json("../results/test_comparison.json")
+#let approaches = data.keys()
+#let metrics = data.aspp_unet.keys() // just any approach to get metric names
+
+
 #show: ieee.with(
   title: [ROI Enhancer for Optic Disc and Cup Segmentation in Fundus Images using Task-Aware Multi-Scale Feature Learning],
   abstract: [
@@ -136,7 +143,7 @@ Our baseline follows the standard UNet architecture @src_ronneberger2015unetconv
 
 === Architecture-Based Approach
 
-*ASPP-UNet:* Integrates multi-scale feature learning directly into the segmentation architecture by replacing the UNet bottleneck with an ASPP module. The ASPP operates on 1024-channel features with dilation rates [1, 6, 12, 18], capturing fine details, medium structures, and global context simultaneously. Crucially, these multi-scale features are learned end-to-end for the segmentation task, not for generic image enhancement. Despite the additional multi-scale processing, ASPP-UNet contains only 21.5M parameters (30.9% fewer than baseline), as the ASPP module is more parameter-efficient than the baseline's double convolution bottleneck.
+*ASPP-UNet:* Integrates multi-scale feature learning directly into the segmentation architecture by replacing the UNet bottleneck with an ASPP module. The ASPP operates on 1024-channel features with dilation rates [1, 6, 12, 18], capturing fine details, medium structures, and global context simultaneously. Crucially, these multi-scale features are learned end-to-end for the segmentation task, not for generic image enhancement. Despite the additional multi-scale processing, ASPP-UNet contains only #calc.round(data.aspp_unet.parameters / 1000000, digits: 2)M parameters (#calc.round((1 - data.aspp_unet.parameters / data.baseline_unet.parameters) * 100, digits: 2)% fewer than baseline), as the ASPP module is more parameter-efficient than the baseline's double convolution bottleneck.
 
 
 
@@ -251,11 +258,6 @@ We report mIoU as the primary metric for fair comparison across approaches.
 
 @fig_quantitative_comparison presents comprehensive validation set results for all five approaches.
 
-// Load comparison data from JSON
-#let data = json("../results/test_comparison.json")
-#let approaches = data.keys()
-#let metrics = data.aspp_unet.keys() // just any approach to get metric names
-
 // Header mapping for display
 #let header_map = (
   "loss": "Loss",
@@ -303,8 +305,6 @@ We report mIoU as the primary metric for fair comparison across approaches.
   }
 }
 
-// TODO: Maybe spread this table across whole page width
-// TODO: Missing values for CLAHE
 #place(top + center, scope: "parent", float: true)[
   #figure(
     table(
@@ -507,16 +507,33 @@ In @fig_atrous_enhancer_top1_sample_391, the atrous enhancer also applies more s
 
 
 = Discussion
-== Main Finding: Architecture vs. Preprocessing
-Our results demonstrate, that ASPP-UNet (+ #calc.round(data.aspp_unet.delta_miou * 100, digits: 2)% mIoU improvement) outperforms both enhancer-based approaches (standard: +0.26 pp; atrous: -0.01 pp) and the CLAHE preprocessing (#calc.round(data.clahe.delta_miou * 100, digits: 2)% decrease). This indicates that task-specific architectural improvements are more effective than preprocessing-based enhancements for OD and OC segmentation. This could be because architectural changes allow the model to learn multi-scale features directly optimized for segmentation, while preprocessing focuses on generic image quality that may not align with task needs.
+== Main Finding: Efficiency Through Architectural Integration
 
-== The Preprocessing Paradox
-Surprisingly, CLAHE preprocessing led to a performance decrease (#calc.round(data.clahe.delta_miou * 100, digits: 2)%) compared to the baseline UNet. Similar finings were reported by #cite(<src_huang2022identifyingkeycomponentsresnet50>, form: "prose") who observed, that CLAHE also decreased test Kappa for their classification pipeline. This suggests, that deep networks already learn contrast normalization in early layers, making explicit contrast enhancement redundant or even detrimental. // TODO: maybe use a source for the last sentence
+Our results demonstrate that ASPP-UNet represents a more efficient approach than preprocessing-based methods for OD and OC segmentation. While the quantitative improvement is modest (+#calc.round(data.aspp_unet.delta_miou * 100, digits: 2)% mIoU), the efficiency gains are substantial and practically meaningful:
 
-For the other two learned enhancers, the added minimal improvement (+0.26 pp for standard; -0.01 pp for atrous) indicates that task-agnostic image enhancement provides limited benefits. Using a different seed the standard enhancer even decresed performance compared to baseline.
+*Parameter Efficiency:* ASPP-UNet achieves #calc.round(data.aspp_unet.miou * 100, digits: 2)% mIoU with #calc.round((1 - data.aspp_unet.parameters / data.baseline_unet.parameters) * 100, digits: 2)% fewer parameters than the baseline (#calc.round(data.aspp_unet.parameters / 1000000, digits: 2)M vs. #calc.round(data.baseline_unet.parameters / 1000000, digits: 2)M). This dramatic reduction enables deployment on resource-constrained devices and allows for larger batch sizes during training.
 
-== Why ASPP-UNET Succeeds
-ASPP-UNet's superior performance (+ #calc.round(data.aspp_unet.delta_miou * 100, digits: 2)%) can be attributed to its ability to learn multi-scale features directly optimized for segmentation. The ASPP module captures fine details, medium structures, and global context simultaneously, which is crucial for accurately delineating the optic disc and cup boundaries. Also the parameter efficiency (30.9% fewer parameters) likely aids generalization by reducing overfitting risk.
+*Training Efficiency:* ASPP-UNet converged in #conv.aspp_unet.total_epochs epochs compared to #conv.unet.total_epochs epochs for the baseline—a #calc.round((1 - conv.aspp_unet.total_epochs / conv.unet.total_epochs) * 100, digits: 0)% reduction in training time. This faster convergence translates to reduced computational costs and faster iteration cycles during model development.
+
+*Comparison with Enhancement Approaches:* The preprocessing-based methods showed minimal or negative impact: CLAHE (#calc.round(data.clahe.delta_miou * 100, digits: 2)%), standard enhancer (+0.26 pp), and atrous enhancer (-0.01 pp). These marginal differences suggest that task-agnostic image enhancement provides limited benefits when combined with deep learning models that can learn their own feature representations.
+
+The key insight is that architectural changes allowing the model to learn multi-scale features directly optimized for segmentation prove more efficient than separating enhancement and segmentation into distinct preprocessing and analysis stages. ASPP-UNet's multi-scale features are learned end-to-end specifically to maximize segmentation performance, while preprocessing focuses on generic image quality that may not align with task-specific needs.
+
+== Revisiting the Role of Preprocessing
+
+*CLAHE Preprocessing:* Our results show that CLAHE preprocessing led to a performance decrease (#calc.round(data.clahe.delta_miou * 100, digits: 2)%) compared to the baseline UNet. This finding contrasts with some findings in the literature, where CLAHE has been reported as beneficial for optic disc and cup segmentation. Notably, RMHA-Net @Zedan.2025 and Multi-GlaucNet @HaorenXiong.2025—both already cited in this work—successfully employed CLAHE as a preprocessing step and achieved state-of-the-art results. Additional studies have also demonstrated CLAHE's effectiveness for various fundus image analysis and retinal segmentation tasks.
+
+This apparent contradiction may be explained by several factors. First, our 256×256 resolution may have reduced the need for explicit contrast enhancement, as important features are already visible at this scale. Second, the UNet baseline's convolutional layers may have learned sufficient contrast normalization internally, making explicit preprocessing redundant or even detrimental for our specific pipeline. Third, different datasets, architectures, and training procedures may respond differently to CLAHE preprocessing. Our finding suggests that CLAHE's benefits are not universal and depend on the specific modeling context.
+
+*Learned Enhancers:* The learned enhancement approaches showed minimal impact: the standard enhancer achieved only +0.26 percentage points improvement, while the atrous enhancer showed -0.01 percentage points degradation. These marginal differences fall within typical performance variance and suggest that task-agnostic image enhancement—even when jointly trained with the segmentation model—provides limited benefits for this task. In separate experiments with different random seeds, the standard enhancer sometimes degraded performance compared to baseline, further demonstrating the instability of this approach.
+
+== Why ASPP-UNet Succeeds: Efficiency and Task-Specific Features
+
+ASPP-UNet's superior performance stems from two key advantages: efficiency and task-specific multi-scale learning.
+
+*Parameter Efficiency:* ASPP-UNet achieves #calc.round(data.aspp_unet.miou * 100, digits: 2)% mIoU with only #calc.round(data.aspp_unet.parameters / 1000000, digits: 2)M parameters—#calc.round((1 - data.aspp_unet.parameters / data.baseline_unet.parameters) * 100, digits: 2)% fewer than the baseline's #calc.round(data.baseline_unet.parameters / 1000000, digits: 2)M parameters. This dramatic reduction in model size, while simultaneously improving performance, suggests that the ASPP bottleneck is a more efficient parameterization for capturing the relevant features for this task. The smaller parameter count likely aids generalization by reducing overfitting risk.
+
+*Training Efficiency:* ASPP-UNet converged in only #conv.aspp_unet.total_epochs epochs compared to #conv.unet.total_epochs epochs required by the baseline UNet—a #calc.round((1 - conv.aspp_unet.total_epochs / conv.unet.total_epochs) * 100, digits: 0)% reduction in training time. This faster convergence demonstrates that the ASPP module provides a better inductive bias for this segmentation task, enabling the model to learn effective representations more quickly.
 
 == Class-Specific Insights
 The most challenging class for all models was the segmentation of the optic cup, due to its small size and low contrast boundaries (especially in glaucoma cases). Also the high anatomical variability of the cup shape makes accurate segmentation difficult.
@@ -528,25 +545,27 @@ Visual inspection revealed that ASPP-UNet produces smoother and more anatomicall
 
 = Conclusions and Future Work
 
-This work systematically investigated whether learned image enhancement or direct architectural improvements better support optic disc and cup segmentation in fundus images. Our findings decisively demonstrate that task-specific architectural integration is superior to preprocessing-based approaches—whether traditional or learned.
+This work systematically investigated whether learned image enhancement or direct architectural improvements better support optic disc and cup segmentation in fundus images. Our findings suggest that task-specific architectural integration is a more efficient approach than preprocessing-based methods—whether traditional or learned. While the quantitative performance differences are modest, the efficiency gains in terms of parameters and training time represent a meaningful practical advantage.
 
-== The Failure of Enhancement-Based Approaches
+== The Limited Benefit of Enhancement-Based Approaches
 
-The comprehensive evaluation reveals that all three enhancement strategies failed to provide meaningful improvements:
+The comprehensive evaluation reveals that all three enhancement strategies provided minimal or negative performance impact:
 
-*Traditional Preprocessing (CLAHE):* Despite widespread use in medical imaging literature @HaorenXiong.2025 @Zedan.2025, CLAHE preprocessing yielded #calc.round(data.clahe.delta_miou * 100, digits: 2)% mIoU decrease compared to baseline (#calc.round(data.clahe.miou * 100, digits: 2)% vs. #calc.round(data.baseline_unet.miou * 100, digits: 2)%). This contradicts the common assumption that contrast enhancement benefits deep learning pipelines and suggests that modern CNNs already learn optimal feature representations in early layers.
+*Traditional Preprocessing (CLAHE):* Despite widespread use in medical imaging literature @HaorenXiong.2025 @Zedan.2025, CLAHE preprocessing yielded #calc.round(data.clahe.delta_miou * 100, digits: 2)% mIoU decrease compared to baseline (#calc.round(data.clahe.miou * 100, digits: 2)% vs. #calc.round(data.baseline_unet.miou * 100, digits: 2)%). This contrasts with findings from other works where CLAHE proved beneficial, and suggests that the utility of contrast enhancement may depend heavily on the specific architecture, dataset, and resolution used.
 
 *Learned Standard Enhancer:* Even with end-to-end joint training, the standard enhancer achieved only +#calc.round(data.baseline_std_enhancer.delta_miou * 100, digits: 2)% improvement—a marginal gain that falls within typical performance variance. The #calc.round((data.baseline_std_enhancer.parameters - data.baseline_unet.parameters) / 1000, digits: 0)K additional parameters and two-phase training complexity provide negligible benefit.
 
-*Learned Multi-Scale Enhancer:* Most critically, the ASPP-based atrous enhancer—designed to learn multi-scale image transformations—actually degraded performance by #calc.round(calc.abs(data.baseline_atrous_enhancer.delta_miou) * 100, digits: 2)% (#calc.round(data.baseline_atrous_enhancer.miou * 100, digits: 2)% mIoU). This demonstrates that sophisticated multi-scale preprocessing architectures do not translate to improved segmentation accuracy, even when trained jointly with the segmentation model.
+*Learned Multi-Scale Enhancer:* The ASPP-based atrous enhancer—designed to learn multi-scale image transformations—showed a slight performance degradation of #calc.round(calc.abs(data.baseline_atrous_enhancer.delta_miou) * 100, digits: 2)% (#calc.round(data.baseline_atrous_enhancer.miou * 100, digits: 2)% mIoU). This demonstrates that sophisticated multi-scale preprocessing architectures do not necessarily translate to improved segmentation accuracy, even when trained jointly with the segmentation model.
 
-The fundamental issue is that enhancers optimize for task-agnostic image quality rather than segmentation-relevant features. The two-phase training strategy further limits effectiveness: Phase 1's frozen UNet prevents the enhancer from learning task-specific transformations, while Phase 2 cannot fully recover from suboptimal initialization. Visualization of enhanced images (@fig_std_enhancer_top5_sample_218, @fig_atrous_enhancer_top1_sample_391) confirms that enhancers primarily modify backgrounds and vessels rather than critical disc/cup boundaries.
+The fundamental issue is that enhancers optimize for task-agnostic image quality rather than segmentation-relevant features. The two-phase training strategy may further limit effectiveness: Phase 1's frozen UNet prevents the enhancer from learning truly task-specific transformations from the outset, while Phase 2's joint training cannot fully compensate for this suboptimal initialization. Visualization of enhanced images (@fig_std_enhancer_top5_sample_218, @fig_atrous_enhancer_top1_sample_391) confirms that enhancers primarily modify backgrounds and vessels rather than critical disc/cup boundaries.
 
-== Architectural Integration: The Superior Approach
+== Architectural Integration: A More Efficient Approach
 
-In stark contrast, ASPP-UNet achieved #calc.round(data.aspp_unet.delta_miou * 100, digits: 2)% mIoU improvement (#calc.round(data.aspp_unet.miou * 100, digits: 2)%) through direct architectural integration of multi-scale features. Critically, this was accomplished with #calc.round((1 - data.aspp_unet.parameters / data.baseline_unet.parameters) * 100, digits: 2)% fewer parameters (#calc.round(data.aspp_unet.parameters / 1000000, digits: 2)M vs. #calc.round(data.baseline_unet.parameters / 1000000, digits: 2)M) and faster convergence (67 vs. 100 epochs). The ASPP bottleneck learns multi-scale representations directly optimized for segmentation through true end-to-end training, proving more effective than any preprocessing-based approach.
+ASPP-UNet achieved #calc.round(data.aspp_unet.delta_miou * 100, digits: 2)% mIoU improvement (#calc.round(data.aspp_unet.miou * 100, digits: 2)%) through direct architectural integration of multi-scale features. While this quantitative gain is modest, the true strength lies in the efficiency advantages: this performance was accomplished with #calc.round((1 - data.aspp_unet.parameters / data.baseline_unet.parameters) * 100, digits: 2)% fewer parameters (#calc.round(data.aspp_unet.parameters / 1000000, digits: 2)M vs. #calc.round(data.baseline_unet.parameters / 1000000, digits: 2)M) and #calc.round((1 - conv.aspp_unet.total_epochs / conv.unet.total_epochs) * 100, digits: 0)% faster convergence (#conv.aspp_unet.total_epochs vs. #conv.unet.total_epochs epochs).
 
-This finding challenges the prevalent practice of treating enhancement as a separate preprocessing step in medical image analysis pipelines. Our results suggest that architectural improvements targeting the specific analysis task should be prioritized over generic image enhancement techniques.
+These efficiency gains have practical implications for deployment and training at scale. A model with #calc.round((1 - data.aspp_unet.parameters / data.baseline_unet.parameters) * 100, digits: 2)% fewer parameters requires less memory, enables larger batch sizes, and can run on more resource-constrained devices. The #calc.round((1 - data.aspp_unet.parameters / data.baseline_unet.parameters) * 100, digits: 2)% reduction in training time translates to faster iteration cycles during model development. Combined with the improved or comparable segmentation accuracy, ASPP-UNet represents a more efficient solution than either the baseline or any of the preprocessing-enhanced approaches.
+
+The ASPP bottleneck learns multi-scale representations directly optimized for segmentation through true end-to-end training, which appears more effective than separating enhancement and segmentation into distinct optimization problems. This finding challenges the prevalent practice of treating enhancement as a separate preprocessing step in medical image analysis pipelines. Our results suggest that architectural improvements targeting the specific analysis task should be prioritized over generic image enhancement techniques, particularly when efficiency and deployment constraints are considerations.
 
 == Limitations and Future Work
 
