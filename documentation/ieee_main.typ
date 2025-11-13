@@ -79,6 +79,7 @@ While both static and learned enhancement methods have shown benefits in improvi
 
 To address this gap, we propose a task-aware learned enhancement approach to jointly train the enhancement model together with the segmentation model. By optimizing both modules end-to-end, the enhancer learns to emphasize features that are relevant for accurate OD and OC segmentation.
 
+//TODO: highlight that RMHA-Net also uses ASPP
 
 = Methodology
 == Dataset
@@ -90,7 +91,7 @@ The dataset used in this study is a combination of three publicly available glau
 + REFUGE Challenge Dataset: 1,200 fundus images from the Retinal Fundus Glaucoma Challenge @src_REFUGE_dataset, including training, validation, and test sets.
 
 //*Preprocessing:* \
-We obtained these three datasets from the "Glaucoma Fundus Imaging Datasets" Kaggle repository#footnote("https://www.kaggle.com/datasets/arnavjain1/glaucoma-datasets/data"). They were already preprocessed to a certain extent, including cropping around the Region of Interest (ROI) centered on the optic disc. The masks are labeled with three classes: background, optic disc, and optic cup.
+We obtained these three datasets from the "Glaucoma Fundus Imaging Datasets" Kaggle repository#footnote("https://www.kaggle.com/datasets/arnavjain1/glaucoma-datasets/data"). The images were already preprocessed to a certain extent, including cropping around the Region of Interest (ROI) centered on the optic disc. The labeling of the masks was done with three classes: background, optic disc, and optic cup.
 /*
 - 0: background
 - 1: optic disc
@@ -98,7 +99,7 @@ We obtained these three datasets from the "Glaucoma Fundus Imaging Datasets" Kag
 */
 
 //*Data Split:* \
-The dataset was divided into training, validation, and testing sets with a 70/15/15 split, using a random seed of 42 to ensure reproducibility The combination of all datasets, led to a total number of 2,870 images. We ensured that the splits were stratified to maintain the proportion of glaucoma and normal cases across all sets. Also 234 images had incomplete masks, e.g. missing optic cup or disc annotations which we filtered out to ensure the quality of the training data.
+The dataset was divided into training, validation, and testing sets with a 70/15/15 split, using a random seed of 42 to ensure reproducibility. The combination of all datasets, led to a total number of 2,870 images. The splits were stratified to maintain the proportion of glaucoma and normal cases across all subsets. Also, some images had incomplete masks, e.g. missing optic cup or disc annotations which we filtered out to ensure the quality of the training data.
 
 This resulted in the following distribution:
 - Total images before filtering: 2870
@@ -109,14 +110,9 @@ This resulted in the following distribution:
 - Test set: 396 images
 
 == Data Augmentation
-To improve generatlization and robustness of our model, we applied the following augmenations durting training:
-- Random horizontal flip (p=0.5)
-- Random vertical flip (p=0.5)
-- Random rotation ($plus.minus$20 degrees)
-- Random brightness adjustment ($plus.minus$0.2)
-- Random contrast adjustment ($plus.minus$0.2)
-- Normalization (ImageNet statistics)
-The implementation was done using the Albumentations library @src_2018arXiv180906839B in the file `transforms.py`. Validation and test sets use only normalization without augmenation.
+To improve the generalization and robustness of our model, we applied a series of data augmentations during training. These included flipping images randomly horizontally and vertically with a probability of 0.5, rotation within $plus.minus$20 degrees, as well as brightness and contrast adjustments within $plus.minus$0.2. All images were additionally normalized using ImageNet statistics.
+
+The augmentations were implemented using the Albumentations library [@src_2018arXiv180906839B] in the file transforms.py. For the validation and test sets, only normalization was applied, with no additional augmentations, to ensure consistent evaluation.
 
 == Network Architectures
 
@@ -126,17 +122,23 @@ We investigate whether task-specific architectural improvements or learned prepr
 
 Our baseline follows the standard UNet architecture @src_ronneberger2015unetconvolutionalnetworksbiomedical with four encoder-decoder levels. The encoder progressively downsamples the input through max pooling while increasing channel dimensions (64 → 128 → 256 → 512 → 1024). Each encoder stage consists of two 3×3 convolutions with batch normalization and ReLU activation. The decoder uses transposed convolutions for upsampling, concatenating skip connections from corresponding encoder stages. The final 1×1 convolution produces three-class segmentation (background, disc, cup). This baseline contains 31.0M parameters.
 
+
 === Preprocessing-Based Approaches
+// *CLAHE-UNet:*
+Three preprocessing approaches are evaluated by placing them before the baseline UNet.
 
-*CLAHE-UNet:* Applies Contrast Limited Adaptive Histogram Equalization (CLAHE) preprocessing to enhance local contrast before feeding images to the baseline UNet. This traditional computer vision technique aims to improve visibility of disc and cup boundaries in low-contrast fundus images.
+The first preprocessing approach applies traditional CLAHE to enhance local contrast before feeding images to the baseline UNet. This traditional computer vision technique aims to improve visibility of disc and cup boundaries in low-contrast fundus images.
 
-*Standard Enhancer:* A lightweight encoder-decoder network (52K parameters) that learns to enhance input images for improved segmentation. The enhancer has three encoder blocks (64, 128, 256 channels) with max pooling, followed by two decoder blocks with transposed convolutions. Enhanced images are combined with originals via learnable residual connection: $I_"enhanced" = alpha dot "Enhancer"(I) + beta dot I$. The system uses two-phase training: Phase 1 trains only the enhancer with frozen UNet; Phase 2 jointly fine-tunes both components.
+//*Standard Enhancer:* 
+As a second preprocessing technique a standard enhancer was tested. It consists out of a lightweight encoder-decoder network with 52K parameters that learns to enhance input images for improved segmentation. The enhancer has three encoder blocks (64, 128, 256 channels) with max pooling, followed by two decoder blocks with transposed convolutions. Enhanced images are combined with originals via learnable residual connection: $I_"enhanced" = alpha dot "Enhancer"(I) + beta dot I$. The system uses two-phase training: Phase 1 trains only the enhancer with frozen UNet; Phase 2 jointly fine-tunes both components.
 
-*Atrous Enhancer:* Replaces the standard enhancer with an ASPP-based multi-scale enhancer (26K parameters). Instead of spatial downsampling, it uses parallel atrous convolutions with dilation rates [1, 3, 6] to capture features at multiple scales simultaneously. The ASPP module concatenates outputs from: (1) 1×1 convolution, (2) 3×3 atrous convolutions at different rates, and (3) global average pooling. This enables the enhancer to learn multi-scale image transformations without losing spatial resolution.
+//*Atrous Enhancer:*
+Finally, the atrous enhancer was evaluated. The standard enhancer was replaced with an ASPP-based multi-scale enhancer with 26K parameters. Instead of spatial downsampling, it uses parallel atrous convolutions with dilation rates [1, 3, 6] to capture features at multiple scales simultaneously. The ASPP module concatenates outputs from: 1×1 convolution, 3×3 atrous convolutions at different rates, and global average pooling. This enables the enhancer to learn multi-scale image transformations without losing spatial resolution.
 
 === Architecture-Based Approach
 
-*ASPP-UNet:* Integrates multi-scale feature learning directly into the segmentation architecture by replacing the UNet bottleneck with an ASPP module. The ASPP operates on 1024-channel features with dilation rates [1, 6, 12, 18], capturing fine details, medium structures, and global context simultaneously. Crucially, these multi-scale features are learned end-to-end for the segmentation task, not for generic image enhancement. Despite the additional multi-scale processing, ASPP-UNet contains only 21.5M parameters (30.9% fewer than baseline), as the ASPP module is more parameter-efficient than the baseline's double convolution bottleneck.
+//*ASPP-UNet:*
+Instead of using a separate enhancement module, ASPP-UNet integrates multi-scale feature learning directly into the segmentation network by replacing the UNet bottleneck with an ASPP module. The ASPP operates on 1024-channel features with dilation rates [1, 6, 12, 18], capturing fine details, medium structures, and global context simultaneously. Crucially, these multi-scale features are learned end-to-end for the segmentation task, not for generic image enhancement. Despite the additional multi-scale processing, ASPP-UNet contains only 21.5M parameters, being 30.9% fewer than baseline, because the ASPP module is more parameter-efficient than the baseline's double convolution bottleneck.
 
 
 
@@ -243,6 +245,11 @@ We report mIoU as the primary metric for fair comparison across approaches.
 
 
 == Implementation Details // Brauchen wir das?
+
+
+
+
+
 
 
 = Experimental Results
