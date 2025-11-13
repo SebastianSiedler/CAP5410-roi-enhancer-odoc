@@ -146,46 +146,44 @@ Instead of using a separate enhancement module, ASPP-UNet integrates multi-scale
 == Loss Functions
 
 
-
-We employ a weighted combination of Cross-Entropy and Dice loss:
+The loss function for the segmentation model is based on a weighted combination of Cross-Entropy and Dice loss:
 
 $ L_"seg" = 0.5 dot L_"CE" + 0.5 dot L_"Dice" $
 
-*Cross-Entropy Loss* with class weights:
+The Cross-Entropy Loss is weighted by class weights:
 
 $ L_"CE" = -sum_(c=1)^C w_c sum_i y_"i,c" log(hat(y)_"i,c") $
 
 
 where $w_c$ are class weights: $[1.0, 1.0, 2.0]$ to handle cup class imbalance.
 
-*Dice Loss*:
+The Dice Loss is defined as
 
 $ L_"Dice" = 1 - (2 sum_i y_i hat(y)_i + epsilon)/(sum_i y_i + sum_i hat(y)_i + epsilon) $
 
-where $epsilon = 1$ for numerical stability.
+with $epsilon = 1$ for numerical stability.
 
 
+//==== Enhancement Loss (Approaches 2 & 3)
 
-
-
-==== Enhancement Loss (Approaches 2 & 3)
-
-For enhancer-based approaches, we add an L1 regularization term:
+For the enhancer-based approaches, we add an L1 regularization term to the segmentation loss:
 
 $ L_"total" = L_"seg" + lambda dot L_"L1" $
 
-where:
+with the L1 term defined as
 
-$ L_"L1" = 1/N sum_i |I_"enhanced"^(i) - I_"original"^(i)| $
+$ L_"L1" = 1/N sum_i |I_"enhanced"^(i) - I_"original"^(i)|. $
 
-and $lambda = 0.001$ to prevent over-modification of images.
+To encourage only minimal deviation from the original image, $lambda$ is set to $0.001$.
 
 
 
 == Training Strategy
 // TODO: for whole chapter. check all parameters again in the end
 
-*Single-Phase Training (UNet Variants)*
+//*Single-Phase Training (UNet Variants)*
+
+
 
 Standard UNet and CLAHE-UNet:
 - Optimizer: Adam (lr=1e-4, betas=(0.9, 0.999))
