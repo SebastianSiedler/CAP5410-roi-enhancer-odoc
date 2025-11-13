@@ -216,20 +216,3 @@ def train_aspp_unet(
     print(f"Best validation loss: {best_val_loss:.4f}")
 
     return model, history
-
-
-if __name__ == '__main__':
-    """Example usage"""
-    root_dir = '/path/to/your/project'
-    model, history = train_aspp_unet(
-        root_dir=root_dir,
-        num_epochs=100,
-        batch_size=16,
-        learning_rate=1e-4,
-        model_type='full',
-        dilation_rates=[1, 6, 12, 18]
-    )
-
-    from training.train import plot_training_history
-    plot_training_history(history, save_path='aspp_unet_training_history.png')
-    plt.show()

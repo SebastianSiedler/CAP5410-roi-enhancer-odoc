@@ -416,17 +416,3 @@ def plot_training_history(history, save_path=None):
         print(f"Plot saved to {save_path}")
 
     return fig
-
-
-if __name__ == '__main__':
-    """Example usage"""
-    root_dir = '/path/to/your/project'
-    model, history = train_model(
-        root_dir=root_dir,
-        num_epochs=50,
-        batch_size=8,
-        learning_rate=1e-4
-    )
-
-    plot_training_history(history, save_path='training_history.png')
-    plt.show()
