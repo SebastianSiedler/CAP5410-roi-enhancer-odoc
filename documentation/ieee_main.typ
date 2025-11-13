@@ -40,7 +40,7 @@ Glaucoma is one of the leading causes of irreversible blindness worldwide @Wagne
 
 Automated segmentation of the OD and OC in fundus images has become an important research area in medical image analysis. However, accurate segmentation remains challenging due to imperfections in the images, such as low contrast, uneven illumination, and blur @Lin.2025. To mitigate these issues, the images are often preprocessed using image enhancement techniques, improving the visibility of relevant anatomical features and therefore more accurate segmentation results @Lin.2025. Most existing enhancement methods are designed as independent preprocessing modules that are optimized separately from the actual segmentation task. As a result, the enhancement focuses primarily on visual quality rather than task-specific feature optimization.
 
-In this work, we propose a task-aware learned multi-scale enhancement model that is jointly trained with the segmentation model, allowing the enhancer to learn features that are specifically relevant for accurate OD and OC segmentation.
+In this work, we propose a task-aware learned multi-scale enhancement model that is jointly trained with the segmentation model, allowing the enhancer to learn features that are specifically relevant for accurate OD and OC segmentation.#footnote[Code available at: #link("https://github.com/SebastianSiedler/CAP5410-roi-enhancer-odoc")] // TODO: check at the end
 
 The paper is structured as follows: Section II reviews related work on glaucoma image segmentation, showing the gap in existing enhancement methods. Section III describes the proposed methodology, including details about the dataset, network architectures, loss functions, training strategy, and evaluation metrics. Section IV presents experimental results comparing different approaches. Finally, Section V discusses the findings and concludes the paper with future work suggestions.
 
@@ -558,4 +558,34 @@ This finding challenges the prevalent practice of treating enhancement as a sepa
 
 *Future Directions:* Beyond addressing these limitations, future work should explore whether our findings generalize to other medical image segmentation tasks. We hypothesize that task-specific architectural integration will consistently outperform preprocessing-based enhancement across medical imaging domains, but systematic validation is needed.
 
-// TODO: Link github repo and trained models
+
+
+
+
+// TODO: irgendwie gibt es so ein satz von machinelearning so nach dem Motto "Keep it simple"
+
+
+
+
+
+// TODO: comparison with SOTA paper why our models are so much worse? Are they really worse? Or are they just calculating there metrics different. We are using IoU on cropped roi. Are they using Dice of Full image? -> roi smaller therefore hit rate way easier!
+
+// TODO: noch mal die anderen beiden dokumente (gdoc und notes.typ) durchschauen, ob da noch was verwertbares dabei ist
+
+// TODO: further research: ich glaube das trainings material an sich ist nicht perfekt. Vielleicht könnte man bei REFUGE unstimmigkeiten zwischen den verschiedenen leuten die labeln das mit in die Loss funktion mit rein packen.
+
+// TODO: Ich glaube auch, dass unser model probleme hat, wenn das schon sehr fortgeschritten ist. Also OC:OD gegen 1:1. vielleicht das auch irgendwie mit in die Loss funktion packen, dass hohe ratio stärker gewichtet wird
+
+// TODO: Auch das wir aufgrund der begrenzten hardware ressourcen das Ding nicht mit mehr auflösung trainieren konnte. Welche haben wir überhaupt jetzt benutzt? 256 oder 512?
+
+
+
+
+
+// TODO: großes problem würde ich wirklich sagen, die trainingsdaten. Ich bin selbst kein augenarzt, aber das ist schon teilweise wirklich sehr sehr schwer zu erkennen.
+
+
+
+// TODO: ganz am Ende schauen, ob wir noch irgendwo fest zahlen haben
+
+// Oben wo clahe erklärt wird kann man bestimmt mal schön ein vergleichsbild rein machen.
