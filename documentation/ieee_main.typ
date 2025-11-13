@@ -456,7 +456,7 @@ In @fig_sample_comparison_160, we compare segmentation outputs from the baseline
 
 === Challenging Samples
 
-In @fig_sample_comparison_13, we observe that both models perform reasonably well, with ASPP-UNet capturing the cup boundary edges less frayed than the baseline like already shown in
+In @fig_sample_comparison_13, we observe that both models perform reasonably well, with ASPP-UNet capturing the cup boundary edges less frayed than the baseline like already shown in @chapt_frayed_edges. Despite the low contrast and poor cup visibility in this sample, both models manage to segment the optic disc and cup regions effectively, demonstrating robustness to challenging imaging conditions. This is likely due to the diverse training data and effective data augmentation strategies employed during training.
 
 #figure(
   image("../results/sample_comparison_13.png"),
@@ -505,22 +505,29 @@ In @fig_std_enhancer_top5_sample_218, the standard enhancer focuses on lightenin
 ) <fig_atrous_enhancer_top1_sample_391>
 In @fig_atrous_enhancer_top1_sample_391, the atrous enhancer also applies more significant changes to the background and vessels, with less focus on the disc and cup areas. In comparision to the standard enhancer, the atrous version does not show the checkers pattern, indicating a different enhancement strategy.
 
-// TODO: zeigen, dass auch verrauschte bilder gut funktionieren. Das liegt daran, dass wir gut mit Augmentation gearbeitet haben
-
-// TODO: auch mal 1-2 failure cases zeigen.
-
-// dieses differenz bild zeigen, wie die enhancer arbeiten
-
-// 13 hat sehr undeutlich; trotzdem gute segmentierung
-
-// 52 ultra schlecht. Da hab ich von der ground truth fast nichts erwischt.
-
-// 56 aber z.B. auch große gt; aber da hab ich nicht so schlecht performed
-
 
 = Discussion
+== Main Finding: Architecture vs. Preprocessing
+Our results demonstrate, that ASPP-UNet (+ #calc.round(data.aspp_unet.delta_miou * 100, digits: 2)% mIoU improvement) outperforms both enhancer-based approaches (standard: +0.26 pp; atrous: -0.01 pp) and the CLAHE preprocessing (#calc.round(data.clahe.delta_miou * 100, digits: 2)% decrease). This indicates that task-specific architectural improvements are more effective than preprocessing-based enhancements for OD and OC segmentation. This could be because architectural changes allow the model to learn multi-scale features directly optimized for segmentation, while preprocessing focuses on generic image quality that may not align with task needs.
+
+== The Preprocessing Paradox
+Surprisingly, CLAHE preprocessing led to a performance decrease (#calc.round(data.clahe.delta_miou * 100, digits: 2)%) compared to the baseline UNet. Similar finings were reported by #cite(<src_huang2022identifyingkeycomponentsresnet50>, form: "prose") who observed, that CLAHE also decreased test Kappa for their classification pipeline. This suggests, that deep networks already learn contrast normalization in early layers, making explicit contrast enhancement redundant or even detrimental. // TODO: maybe use a source for the last sentence
+
+For the other two learned enhancers, the added minimal improvement (+0.26 pp for standard; -0.01 pp for atrous) indicates that task-agnostic image enhancement provides limited benefits. Using a different seed the standard enhancer even decresed performance compared to baseline.
+
+== Why ASPP-UNET Succeeds
+ASPP-UNet's superior performance (+ #calc.round(data.aspp_unet.delta_miou * 100, digits: 2)%) can be attributed to its ability to learn multi-scale features directly optimized for segmentation. The ASPP module captures fine details, medium structures, and global context simultaneously, which is crucial for accurately delineating the optic disc and cup boundaries. Also the parameter efficiency (30.9% fewer parameters) likely aids generalization by reducing overfitting risk.
+
+== Class-Specific Insights
+The most challenging class for all models was the segmentation of the optic cup, due to its small size and low contrast boundaries (especially in glaucoma cases). Also the high anatomical variability of the cup shape makes accurate segmentation difficult.
+
+== Qualitative Observations
+Visual inspection revealed that ASPP-UNet produces smoother and more anatomically plausible boundaries, particularly for the optic cup. The multi-scale features help capture fine vessel structures and disc edges that the baseline UNet often misses or segments poorly. Both models struggled with extremely large optic discs and cups, indicating areas for future improvement. The extrem cases could also be due to the low 256x256 resolution we used for training.
+
+== Comparison with State-of-the-Art // TODO: @SteffEng-lab
 
 = Conclusions and Future Work
+This work investigated wheter learned preprocessing or architectural integration better supports accurate optic disc and cup segmentation in fundus images. Our findings indicate that task-specific architectural improvements, specifically the ASPP-UNet, significantly outperform both traditional (CLAHE) and learned preprocessing approaches.
 
 // TODO: irgendwie gibt es so ein satz von machinelearning so nach dem Motto "Keep it simple"
 
