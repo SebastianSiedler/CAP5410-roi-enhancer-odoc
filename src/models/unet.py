@@ -102,16 +102,3 @@ class UNet(nn.Module):
         # Output
         logits = self.outc(x)
         return logits
-
-
-if __name__ == '__main__':
-    """Test the model"""
-    model = UNet(n_channels=3, n_classes=3, base_channels=64)
-
-    # Test with random input
-    x = torch.randn(2, 3, 512, 512)
-    output = model(x)
-
-    print(f"Input shape: {x.shape}")
-    print(f"Output shape: {output.shape}")
-    print(f"Model parameters: {sum(p.numel() for p in model.parameters()):,}")
