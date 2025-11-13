@@ -45,6 +45,18 @@ In this work, we propose a task-aware learned multi-scale enhancement model that
 The paper is structured as follows: Section II reviews related work on glaucoma image segmentation, showing the gap in existing enhancement methods. Section III describes the proposed methodology, including details about the dataset, network architectures, loss functions, training strategy, and evaluation metrics. Section IV presents experimental results comparing different approaches. Finally, Section V discusses the findings and concludes the paper with future work suggestions.
 
 
+/*
+This design allows us to isolate the contributions of preprocessing-based vs. architecture-based multi-scale feature learning.
+
+This study investigates whether task-specific architectural improvements or learned preprocessing enhancements are more effective for optic disc and cup segmentation. Therefore, we compare five approaches:
+
++ Standard UNet baseline
++ CLAHE preprocessing + UNet
++ Learned standard enhancer + UNet
++ Learned atrous (ASPP-based) enhancer + UNet
++ ASPP-UNet with architectural multi-scale integration
+*/
+
 = Related Work
 == Glaucoma Image Segmentation
 // Which models used for OD/OC Segmentation?
@@ -99,7 +111,7 @@ We obtained these three datasets from the "Glaucoma Fundus Imaging Datasets" Kag
 */
 
 //*Data Split:* \
-The dataset was divided into training, validation, and testing sets with a 70/15/15 split, using a random seed of 42 to ensure reproducibility. The combination of all datasets, led to a total number of 2,870 images. The splits were stratified to maintain the proportion of glaucoma and normal cases across all subsets. Also, some images had incomplete masks, e.g. missing optic cup or disc annotations which we filtered out to ensure the quality of the training data.
+The dataset was divided into training, validation, and testing sets with a 70/15/15 split, using a random seed of 42 to ensure reproducibility. The combination of all datasets, led to a total number of 2,870 images. The splits were stratified to maintain the proportion of glaucoma and normal cases across all subsets. Also, a small number of images had incomplete masks, e.g. missing optic cup or disc annotations which we filtered out to ensure the quality of the training data.
 
 This resulted in the following distribution:
 - Total images before filtering: 2870
@@ -112,11 +124,23 @@ This resulted in the following distribution:
 == Data Augmentation
 To improve the generalization and robustness of our model, we applied a series of data augmentations during training. These included flipping images randomly horizontally and vertically with a probability of 0.5, rotation within $plus.minus$20 degrees, as well as brightness and contrast adjustments within $plus.minus$0.2. All images were additionally normalized using ImageNet statistics.
 
-The augmentations were implemented using the Albumentations library [@src_2018arXiv180906839B] in the file transforms.py. For the validation and test sets, only normalization was applied, with no additional augmentations, to ensure consistent evaluation.
+The augmentations were implemented using the Albumentations library @src_2018arXiv180906839B in the file transforms.py. For the validation and test sets, only normalization was applied, with no additional augmentations, to ensure consistent evaluation.
+// What is transform.py and should we mention it?
 
 == Network Architectures
 
-We investigate whether task-specific architectural improvements or learned preprocessing enhancements are more effective for optic disc and cup segmentation. We compare five approaches: (1) Standard UNet baseline, (2) CLAHE preprocessing + UNet, (3) learned standard enhancer + UNet, (4) learned atrous (ASPP-based) enhancer + UNet, and (5) ASPP-UNet with architectural multi-scale integration. This design allows us to isolate the contributions of preprocessing-based vs. architecture-based multi-scale feature learning.
+This study investigates whether task-specific architectural improvements or learned preprocessing enhancements are more effective for optic disc and cup segmentation. Therefore, we compare five approaches:
+
++ Standard UNet baseline
++ CLAHE preprocessing + UNet
++ Learned standard enhancer + UNet
++ Learned atrous (ASPP-based) enhancer + UNet
++ ASPP-UNet with architectural multi-scale integration
+
+/*
+(1) Standard UNet baseline, (2) CLAHE preprocessing + UNet, (3) learned standard enhancer + UNet, (4) learned atrous (ASPP-based) enhancer + UNet, and (5) ASPP-UNet with architectural multi-scale integration.
+*/
+This design allows us to isolate the contributions of preprocessing-based vs. architecture-based multi-scale feature learning.
 
 === Baseline Architecture
 
@@ -138,7 +162,7 @@ Finally, the atrous enhancer was evaluated. The standard enhancer was replaced w
 === Architecture-Based Approach
 
 //*ASPP-UNet:*
-Instead of using a separate enhancement module, ASPP-UNet integrates multi-scale feature learning directly into the segmentation network by replacing the UNet bottleneck with an ASPP module. The ASPP operates on 1024-channel features with dilation rates [1, 6, 12, 18], capturing fine details, medium structures, and global context simultaneously. Crucially, these multi-scale features are learned end-to-end for the segmentation task, not for generic image enhancement. Despite the additional multi-scale processing, ASPP-UNet contains only 21.5M parameters, being 30.9% fewer than baseline, because the ASPP module is more parameter-efficient than the baseline's double convolution bottleneck.
+Instead of using a separate enhancement module, ASPP-UNet integrates multi-scale feature learning directly into the segmentation network by replacing the UNet bottleneck with an ASPP module. The ASPP operates on 1024-channel features with dilation rates (1, 6, 12, 18), capturing fine details, medium structures, and global context simultaneously. Crucially, these multi-scale features are learned end-to-end for the segmentation task, not for generic image enhancement. Despite the additional multi-scale processing, ASPP-UNet contains only 21.5M parameters, being 30.9% fewer than baseline, because the ASPP module is more parameter-efficient than the baseline's double convolution bottleneck.
 
 
 
@@ -155,7 +179,7 @@ The Cross-Entropy Loss is weighted by class weights:
 $ L_"CE" = -sum_(c=1)^C w_c sum_i y_"i,c" log(hat(y)_"i,c") $
 
 
-where $w_c$ are class weights: $[1.0, 1.0, 2.0]$ to handle cup class imbalance.
+where $y_"i,c"$ represents the ground-truth label at pixel i for class c, and $hat(y)_"i,c"$ denotes the predicted probability for the same pixel and class, while $w_c$ are class weights $[1.0, 1.0, 2.0]$ to handle cup class imbalance.
 
 The Dice Loss is defined as
 
@@ -181,65 +205,46 @@ To encourage only minimal deviation from the original image, $lambda$ is set to 
 == Training Strategy
 // TODO: for whole chapter. check all parameters again in the end
 
-//*Single-Phase Training (UNet Variants)*
+=== Single-Phase Training for Baseline UNet Variants
+
+The training of the segmentation models was performed using a single-phase approach for the three UNet variants, namely the Standard UNet, CLAHE-UNet, and ASPP-UNet. In this setting, each model was trained in a single continuous phase without any separate pretraining or fine-tuning steps. All three networks were optimized using the Adam optimizer with a learning rate of $10^(-4)$ and $beta$ parameters of $(0.9, 0.999)$, with a batch size of 16. For stable convergence the ReduceLROnPlateau learning rate scheduler was applied with a factor of 0.5 and patience of 5 epochs.
+
+The Standard U-Net and CLAHE U-Net were both trained for 100 epochs without early stopping, as both models showed continued improvement throughout the entire training duration.
+
+The ASPP-UNet training used early stopping with a patience of 15 epochs to reduce overfitting. Although the maximum number of epochs was set to 100, the training stopped after 67 epochs due to early stopping. Despite this shorter training time, the ASPP-UNet converged faster than the baseline models, demonstrating superior training efficiency.  
 
 
+=== Two-Phase Training of Enhancer-Based Approaches
 
-Standard UNet and CLAHE-UNet:
-- Optimizer: Adam (lr=1e-4, betas=(0.9, 0.999))
-- Batch size: 16
-- Epochs: 100 (no early stopping)
-- LR scheduler: ReduceLROnPlateau (factor=0.5, patience=5)
-- Note: Both models showed continued improvement through epoch 100
+The enhancer-based models were trained in two phases.
 
-ASPP-UNet:
-- Optimizer: Adam (lr=1e-4, betas=(0.9, 0.999))
-- Batch size: 16
-- Epochs: 100 (maximum)
-- Early stopping: Patience=15
-- Actual epochs: 67 (early stopping triggered)
-- LR scheduler: ReduceLROnPlateau (factor=0.5, patience=5)
-- Note: Converged faster than baseline models, demonstrating superior training efficiency
+The first phase focused on only training the enhancer module while the UNet segmentation backbone remained frozen with pretrained weights. This phase aimed to let the enhancer learn useful image transformations without affecting the segmentation model. The Standard enhancer was trained for 30 epochs, but stopped early after 26 epochs, with an early stopping patience of 10 epochs. The Atrous enhancer required a longer training period with 50 epochs with no early stopping triggered. The patience was set to 15 epochs for this model. For both models the Adam optimizer with a learning rate of $10^(-4)$ and the combined segmentation + L1 loss were used.
 
+In the second phase, both the enhancement model and the segmentation model were trained jointly to fine-tune the entire pipeline. The Standard enhancer was trained for 20 epochs with no early stopping triggered, while the Atrous enhancer was trained for 30 epochs but stopped early after 25 epochs. The learning rate was reduced to $10^(-5)$ to allow gradual adaptation, while the same segmentation + L1 loss was applied.
 
-*Enhancer-Based Approaches (Two-Phase)*
-
-+ Phase 1: Enhancer-Only Training
-  - Epochs: 30 (standard), 50 (atrous)
-  - Early stopping: Patience=10 (standard), 15 (atrous)
-  - Actual epochs: 26 (standard), 50 (atrous)
-  - UNet: Frozen (pretrained weights)
-  - Enhancer: Trainable
-  - Optimizer: Adam (lr=1e-4)
-  - Loss: Segmentation + L1
-
-+ Phase 2: Joint Fine-Tuning
-  - Epochs: 20 (standard), 30 (atrous)
-  - Actual epochs: 20 (standard), 25 (atrous)
-  - UNet: Trainable
-  - Enhancer: Trainable
-  - Optimizer: Adam (lr=1e-5, 10× lower)
-  - Loss: Segmentation + L1
-
-Rationale: Phase 1 allows the enhancer to learn useful transformations without disrupting UNet weights. Phase 2 fine-tunes the entire pipeline jointly.
 
 
 == Evaluation Metrics
-*Intersection over Union (IoU)* per class:
+We evaluated segmentation performance using standard segmentation metrics, namely the Intersection over Union (IoU) and the Dice Coefficient.
+
+//*Intersection over Union (IoU)* per class:
+The IoU for each class $c$ is defined as
 
 $ "IoU"_c = (Y_c inter hat(Y)_c)/(Y_c union hat(Y)_c) $
 
-where $Y_c$ is ground truth for class c, $hat(Y)_c$ is prediction.
+where $Y_c$ is the ground truth mask for class c, while $hat(Y)_c$ denotes the predicted mask for class c.
 
-*Mean IoU (mIoU)*:
+//*Mean IoU (mIoU)*:
+The mean IoU (mIoU) is then computed as the average over all $C$ classes:
 
 $ "mIoU" = 1/C sum_(c=1)^C "IoU"_c $
 
-*Dice Coefficient* (alternative metric):
+//*Dice Coefficient* (alternative metric):
+As an additional metric, the Dice Coefficient was calculated for each class $c$ as an evaluation for segmentation overlap:
 
 $ "Dice"_c =(2 |Y_c inter hat(Y)_c|)/(|Y_c|+|hat(Y_c)|) $
 
-We report mIoU as the primary metric for fair comparison across approaches.
+We used mIoU as the primary evaluation metric throughout this study to enable fair and consistent comparison across all approaches.
 
 
 == Implementation Details // Brauchen wir das?
@@ -529,7 +534,11 @@ The most challenging class for all models was the segmentation of the optic cup,
 == Qualitative Observations
 Visual inspection revealed that ASPP-UNet produces smoother and more anatomically plausible boundaries, particularly for the optic cup. The multi-scale features help capture fine vessel structures and disc edges that the baseline UNet often misses or segments poorly. Both models struggled with extremely large optic discs and cups, indicating areas for future improvement. The extrem cases could also be due to the low 256x256 resolution we used for training.
 
-== Comparison with State-of-the-Art // TODO: @SteffEng-lab
+== Comparison with State-of-the-Art 
+
+// TODO: @SteffEng-lab
+
+
 
 = Conclusions and Future Work
 
