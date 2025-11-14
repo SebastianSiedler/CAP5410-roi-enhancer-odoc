@@ -3,6 +3,7 @@
 
 // Load comparison data from JSON
 #let data = json("../results/test_comparison.json")
+#let conv = json("../results/convergence_metrics.json")
 #let approaches = data.keys()
 #let metrics = data.aspp_unet.keys() // just any approach to get metric names
 
@@ -10,7 +11,7 @@
 #show: ieee.with(
   title: [ROI Enhancer for Optic Disc and Cup Segmentation in Fundus Images using Task-Aware Multi-Scale Feature Learning],
   abstract: [
-    TODO:
+    Accurate segmentation of the optic disc (OD) and optic cup (OC) in fundus images is crucial for glaucoma diagnosis, yet remains challenging due to image imperfections such as low contrast and uneven illumination. While preprocessing-based enhancement methods are widely used, they are typically optimized independently from the segmentation task, focusing on generic visual quality rather than task-specific features. This work systematically investigates whether task-aware learned enhancement or direct architectural improvements better support OD and OC segmentation. We compare five approaches: baseline UNet, CLAHE preprocessing, learned standard enhancer, ASPP-based atrous enhancer, and ASPP-UNet with integrated multi-scale features. Experiments on 2,636 fundus images from three datasets (G1020, ORIGA, REFUGE) reveal that architectural integration outperforms preprocessing-based methods. ASPP-UNet achieves #calc.round(data.aspp_unet.miou * 100, digits: 2)% mIoU with #calc.round((1 - data.aspp_unet.parameters / data.baseline_unet.parameters) * 100, digits: 2)% fewer parameters than baseline, while traditional CLAHE and learned enhancers provide minimal or negative impact. These findings demonstrate that multi-scale features learned end-to-end for segmentation are more efficient than task-agnostic preprocessing, challenging the prevalent practice of treating enhancement as a separate step in medical image analysis pipelines.
   ],
   authors: (
     (
@@ -90,7 +91,12 @@ Outstanding results were obtained by Zedan et al. @Zedan.2025 with the proposed 
 // What techniques used for fundus image enhancement?
 Medical images are often affected by various artifacts such as low contrast, distortions, and noise, which can hinder accurate analysis and diagnosis @Zedan.2025. To address these issues, image preprocessing techniques are applied to enhance image quality by removing artifacts. Several ways of image enhancement are commonly used in the literature.
 
-Traditional static enhancement methods such as Contrast Limited Adaptive Histogram Equalization (CLAHE) are the most widely used in fundus imaging. The previous mentioned works @HaorenXiong.2025 and @Zedan.2025 applied CLAHE as a preprocessing step before feeding the images into their segmentation models to achieve their remarkable results. CLAHE enhances the image contrast by applying histogram equalization in small regions of the image. This improves visibility of features of the blood vessels and the OD, leading to improved segmentation performance @HaorenXiong.2025.
+Traditional static enhancement methods such as Contrast Limited Adaptive Histogram Equalization (CLAHE) are the most widely used in fundus imaging. The previous mentioned works @HaorenXiong.2025 and @Zedan.2025 applied CLAHE as a preprocessing step before feeding the images into their segmentation models to achieve their remarkable results. CLAHE enhances the image contrast by applying histogram equalization in small regions of the image. This improves visibility of features of the blood vessels and the OD, leading to improved segmentation performance @HaorenXiong.2025. @fig:clahe_comparison illustrates the effect of CLAHE preprocessing on a representative fundus image, showing the enhanced local contrast particularly visible in the optic disc region.
+
+#figure(
+  image("../results/V0393_clahe_comparison.png", width: 90%),
+  caption: [Comparison of original and CLAHE-enhanced fundus image cropped to the optic disc region. The left panel shows the original fundus image, while the right panel displays the CLAHE-enhanced version. CLAHE increases local contrast and enhances the visibility of retinal structures, particularly around the optic disc.]
+)<fig:clahe_comparison>
 
 In contrast to static preprocessing methods like CLAHE, only few works employ learned image enhancement models. Generative Adversarial Networks (GANs) are often used for image-to-image translation, including image enhancement tasks. Due to limited availability of paired training data in medical imaging, various adaptions have been proposed, such as CycleGAN @Zhu.2017 which employs an encoder–decoder-based generator architecture and enables unpaired image-to-image translation through cycle consistency.
 
@@ -560,13 +566,11 @@ Visual inspection revealed that ASPP-UNet produces smoother and more anatomicall
 
 == Comparison with State-of-the-Art
 
-// TODO: @SteffEng-lab
-// TODO: comparison with SOTA paper why our models are so much worse? Are they really worse? Or are they just calculating there metrics different. We are using IoU on cropped roi. Are they using Dice of Full image? -> roi smaller therefore hit rate way easier!
-
+Direct numerical comparison with state-of-the-art methods requires careful interpretation due to differing evaluation metrics and data preparation strategies. Our models report mIoU of ~0.83-0.84 on ROI-cropped images, while papers like EE-TransUNet @Liu.2025 report Dice scores of 0.96+ on full images.
 
 To compare our results with existing methods, we use performance and architectural complexity as key criteria. The key finding is that while some competing models achieve higher absolute metrics, they often rely on auxiliary complexity or external preprocessing.
 
-This focus on architectural improvement is mirrored by models like EE-TransUNet @Liu.2025. This edge-focused model achieved high Dice scores (OD 0.967, OC 0.9056 on REFUGE) purely through internal feature enhancement modules (CCF and CSMF blocks) without relying on explicit image enhancement. This finding correlates with our conclusion that architectural improvements are more effective than decoupled preprocessing.
+The focus on architectural improvement is mirrored by models like EE-TransUNet @Liu.2025. This edge-focused model achieved high Dice scores (OD 0.967, OC 0.9056 on REFUGE) purely through internal feature enhancement modules (CCF and CSMF blocks) without relying on explicit image enhancement. This finding correlates with our conclusion that architectural improvements are more effective than decoupled preprocessing.
 
 Similar trends are observed in multi-scale extensions of UNet. For example, ASPP-enhanced variants like RMHA-Net @Zedan.2025 often yield smoother and more anatomically plausible OD and OC boundaries compared to the baseline UNet, which tends to produce incomplete edges. While simpler architectures often miss fine vascular structures and subtle disk contours, the added multi-scale features of this complex architecture help to capture these details.
 
@@ -602,30 +606,9 @@ The ASPP bottleneck learns multi-scale representations directly optimized for se
 
 *Resolution Constraints:* Hardware limitations restricted training to 256×256 resolution. Higher-resolution training may improve performance, particularly for extreme cases with very large optic discs and cups where both baseline and ASPP-UNet struggled.
 
-*Dataset Quality:* Visual inspection revealed substantial annotation ambiguity in training data, particularly for challenging cases with indistinct cup boundaries. Incorporating annotation uncertainty into the loss function (e.g., weighting by inter-annotator agreement in REFUGE dataset) could improve model robustness.
+*Dataset Quality:* Visual inspection revealed substantial annotation ambiguity in training data, particularly for challenging cases with indistinct cup boundaries. This is an inherent limitation of fundus imaging. Even expert ophthalmologists often disagree on precise cup boundaries in low-contrast or advanced glaucoma cases. The REFUGE dataset includes inter-annotator variability measurements, which could be incorporated into uncertainty-aware loss functions. Additionally, annotation quality varies significantly across our three combined datasets (G1020, ORIGA, REFUGE), with some images showing inconsistent labeling that may confuse the model during training. As non-ophthalmologists, we observed that many cases are extremely difficult to annotate even for human experts, suggesting that the problem extends beyond model limitations to fundamental challenges in the ground truth itself.
 
-*Extreme CDR Cases:* Both models showed reduced accuracy for cup-to-disc ratios approaching 1.0, suggesting that severe glaucoma cases may benefit from specialized loss weighting or dedicated model branches.
+*Extreme CDR Cases:* Both models showed reduced accuracy for cup-to-disc ratios approaching 1.0, suggesting that severe glaucoma cases may benefit from specialized loss weighting, e.g. increasing cup class weight adaptively based on CDR, or dedicated model branches that focus specifically on high-CDR samples.
 
-*Future Directions:* Beyond addressing these limitations, future work should explore whether our findings generalize to other medical image segmentation tasks. We hypothesize that task-specific architectural integration will consistently outperform preprocessing-based enhancement across medical imaging domains, but systematic validation is needed.
+*Future Directions:* Beyond addressing these limitations, future work should explore whether our findings generalize to other medical image segmentation tasks. We hypothesize that task-specific architectural integration will consistently outperform preprocessing-based enhancement across medical imaging domains, but systematic validation is needed. Specifically, incorporating inter-annotator agreement from datasets like REFUGE into uncertainty-aware loss functions could improve robustness—pixels with high annotator disagreement could be down-weighted or treated with specialized loss terms that account for label noise.
 
-
-
-
-
-
-
-
-
-
-
-// TODO: further research: ich glaube das trainings material an sich ist nicht perfekt. Vielleicht könnte man bei REFUGE unstimmigkeiten zwischen den verschiedenen leuten die labeln das mit in die Loss funktion mit rein packen.
-
-// TODO: Ich glaube auch, dass unser model probleme hat, wenn das schon sehr fortgeschritten ist. Also OC:OD gegen 1:1. vielleicht das auch irgendwie mit in die Loss funktion packen, dass hohe ratio stärker gewichtet wird
-
-
-
-
-// TODO: großes problem würde ich wirklich sagen, die trainingsdaten. Ich bin selbst kein augenarzt, aber das ist schon teilweise wirklich sehr sehr schwer zu erkennen.
-
-
-// TODO: Oben wo clahe erklärt wird kann man bestimmt mal schön ein vergleichsbild rein machen.
