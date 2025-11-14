@@ -218,7 +218,7 @@ The training of the segmentation models was performed using a single-phase appro
 
 The Standard UNet and CLAHE UNet were both trained for 100 epochs without early stopping, as both models showed continued improvement throughout the entire training duration.
 
-The ASPP-UNet training used early stopping with a patience of 15 epochs to reduce overfitting. Although the maximum number of epochs was set to 100, the training stopped after 67 epochs due to early stopping. Despite this shorter training time, the ASPP-UNet converged faster than the baseline models, demonstrating superior training efficiency.  
+The ASPP-UNet training used early stopping with a patience of 15 epochs to reduce overfitting. Although the maximum number of epochs was set to 100, the training stopped after 67 epochs due to early stopping. Despite this shorter training time, the ASPP-UNet converged faster than the baseline models, demonstrating superior training efficiency.
 
 
 === Two-Phase Training of Enhancer-Based Approaches
@@ -551,9 +551,13 @@ The most challenging class for all models was the segmentation of the optic cup,
 == Qualitative Observations
 Visual inspection revealed that ASPP-UNet produces smoother and more anatomically plausible boundaries, particularly for the optic cup. The multi-scale features help capture fine vessel structures and disc edges that the baseline UNet often misses or segments poorly. Both models struggled with extremely large optic discs and cups, indicating areas for future improvement. The extrem cases could also be due to the low 256x256 resolution we used for training.
 
-== Comparison with State-of-the-Art 
+== Comparison with State-of-the-Art
 
-To compare our results with existing methods, we use performance and architectural complexity as key criteria. The key finding is that while some competing models achieve higher absolute metrics, they often rely on auxiliary complexity or external preprocessing. 
+// TODO: @SteffEng-lab
+// TODO: comparison with SOTA paper why our models are so much worse? Are they really worse? Or are they just calculating there metrics different. We are using IoU on cropped roi. Are they using Dice of Full image? -> roi smaller therefore hit rate way easier!
+
+
+To compare our results with existing methods, we use performance and architectural complexity as key criteria. The key finding is that while some competing models achieve higher absolute metrics, they often rely on auxiliary complexity or external preprocessing.
 
 This focus on architectural improvement is mirrored by models like EE-TransUNet @Liu.2025. This edge-focused model achieved high Dice scores (OD 0.967, OC 0.9056 on REFUGE) purely through internal feature enhancement modules (CCF and CSMF blocks) without relying on explicit image enhancement. This finding correlates with our conclusion that architectural improvements are more effective than decoupled preprocessing.
 
@@ -607,13 +611,12 @@ The ASPP bottleneck learns multi-scale representations directly optimized for se
 
 
 
-// TODO: comparison with SOTA paper why our models are so much worse? Are they really worse? Or are they just calculating there metrics different. We are using IoU on cropped roi. Are they using Dice of Full image? -> roi smaller therefore hit rate way easier!
 
 // TODO: noch mal die anderen beiden dokumente (gdoc und notes.typ) durchschauen, ob da noch was verwertbares dabei ist
 
 // TODO: further research: ich glaube das trainings material an sich ist nicht perfekt. Vielleicht könnte man bei REFUGE unstimmigkeiten zwischen den verschiedenen leuten die labeln das mit in die Loss funktion mit rein packen.
 
-// TODO: Ich glaube auch, dass unser model probleme hat, wenn das schon sehr fortgeschritten ist. Also OC:OD gegen 1:1. vielleicht das auch irgendwie mit in die Loss funktion packen, dass hohe ratio stärker gewichtet wird
+// TODO: Ich glaube auch, dass unser model probleme hat, wenn das glaucom schon sehr fortgeschritten ist (sehr große OC). Also OC:OD gegen 1:1. vielleicht das auch irgendwie mit in die Loss funktion packen, dass hohe ratio stärker gewichtet wird
 
 // TODO: Auch das wir aufgrund der begrenzten hardware ressourcen das Ding nicht mit mehr auflösung trainieren konnte. Welche haben wir überhaupt jetzt benutzt? 256 oder 512?
 
@@ -627,4 +630,4 @@ The ASPP bottleneck learns multi-scale representations directly optimized for se
 
 // TODO: ganz am Ende schauen, ob wir noch irgendwo fest zahlen haben
 
-// Oben wo clahe erklärt wird kann man bestimmt mal schön ein vergleichsbild rein machen.
+// TODO: Oben wo clahe erklärt wird kann man bestimmt mal schön ein vergleichsbild rein machen.
