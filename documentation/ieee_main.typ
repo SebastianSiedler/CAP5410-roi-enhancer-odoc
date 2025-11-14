@@ -47,7 +47,7 @@ Glaucoma is one of the leading causes of irreversible blindness worldwide @Wagne
 
 Automated segmentation of the OD and OC in fundus images has become an important research area in medical image analysis. However, accurate segmentation remains challenging due to imperfections in the images, such as low contrast, uneven illumination, and blur @Lin.2025. To mitigate these issues, the images are often preprocessed using image enhancement techniques, improving the visibility of relevant anatomical features and therefore more accurate segmentation results @Lin.2025. Most existing enhancement methods are designed as independent preprocessing modules that are optimized separately from the actual segmentation task. As a result, the enhancement focuses primarily on visual quality rather than task-specific feature optimization.
 
-In this work, we propose a task-aware learned multi-scale enhancement model that is jointly trained with the segmentation model, allowing the enhancer to learn features that are specifically relevant for accurate OD and OC segmentation.#footnote[Code available at: #link("https://github.com/SebastianSiedler/CAP5410-roi-enhancer-odoc")] // TODO: check at the end
+In this work, we propose a task-aware learned multi-scale enhancement model that is jointly trained with the segmentation model, allowing the enhancer to learn features that are specifically relevant for accurate OD and OC segmentation#footnote[Code available at: #link("https://github.com/SebastianSiedler/CAP5410-roi-enhancer-odoc")]. // TODO: check at the end
 
 The paper is structured as follows: Section II reviews related work on glaucoma image segmentation, showing the gap in existing enhancement methods. Section III describes the proposed methodology, including details about the dataset, network architectures, loss functions, training strategy, and evaluation metrics. Section IV presents experimental results comparing different approaches. Finally, Section V discusses the findings and concludes the paper with future work suggestions.
 
@@ -132,7 +132,7 @@ This resulted in the following distribution:
 To improve the generalization and robustness of our model, we applied a series of data augmentations during training. These included flipping images randomly horizontally and vertically with a probability of 0.5, rotation within $plus.minus$20 degrees, as well as brightness and contrast adjustments within $plus.minus$0.2. All images were additionally normalized using ImageNet statistics.
 
 The augmentations were implemented using the Albumentations library @src_2018arXiv180906839B in the file transforms.py. For the validation and test sets, only normalization was applied, with no additional augmentations, to ensure consistent evaluation.
-// What is transform.py and should we mention it?
+// TODO What is transform.py and should we mention it?
 
 == Network Architectures
 
@@ -155,6 +155,7 @@ Our baseline follows the standard UNet architecture @src_ronneberger2015unetconv
 
 
 === Preprocessing-Based Approaches
+
 // *CLAHE-UNet:*
 Three preprocessing approaches are evaluated by placing them before the baseline UNet.
 
@@ -168,7 +169,7 @@ Finally, the atrous enhancer was evaluated. The standard enhancer was replaced w
 
 === Architecture-Based Approach
 
-Instead of using a separate enhancement module, ASPP-UNet integrates  multi-scale feature learning directly into the segmentation network by replacing the UNet bottleneck with an ASPP module. The ASPP operates on 1024-channel features with dilation rates (1, 6, 12, 18), capturing fine details, medium structures, and global context simultaneously. Crucially, these multi-scale features are learned end-to-end for the segmentation task, not for generic image enhancement. Despite the additional multi-scale processing, ASPP-UNet contains only #calc.round(data.aspp_unet.parameters / 1000000, digits: 2) parameters (#calc.round((1 - data.aspp_unet.parameters / data.baseline_unet.parameters) * 100, digits: 2)% fewer than baseline), as the ASPP module is more parameter-efficient than the baseline's double convolution bottleneck.
+Instead of using a separate enhancement module, ASPP-UNet integrates  multi-scale feature learning directly into the segmentation network by replacing the UNet bottleneck with an ASPP module. The ASPP operates on 1024-channel features with dilation rates [1, 6, 12, 18], capturing fine details, medium structures, and global context simultaneously. Crucially, these multi-scale features are learned end-to-end for the segmentation task, not for generic image enhancement. Despite the additional multi-scale processing, ASPP-UNet contains only #calc.round(data.aspp_unet.parameters / 1000000, digits: 2)M parameters (#calc.round((1 - data.aspp_unet.parameters / data.baseline_unet.parameters) * 100, digits: 2)% fewer than baseline), as the ASPP module is more parameter-efficient than the baseline's double convolution bottleneck.
 
 
 
@@ -255,11 +256,6 @@ We used mIoU as the primary evaluation metric throughout this study to enable fa
 
 == Implementation Details // Brauchen wir das?
 
-// evtl. Hardware: NVIDIA Geforce RTX 2080 Ti with 11GB VRAM
-// Intel(R) Core(TM) i7-8700K CPU @ 3.70GHz
-// 32 GB RAM
-// PyTorch
-
 All experiments were conducted on a workstation equipped with an NVIDIA GeForce RTX 2080 Ti GPU (11 GB VRAM), an Intel Core i7-8700K CPU (3.70 GHz), and 32 GB of system memory. The models were implemented and trained using the PyTorch deep learning framework.
 
 
@@ -343,7 +339,7 @@ All experiments were conducted on a workstation equipped with an NVIDIA GeForce 
 
 
 Key Observations:
-+ *Best Performance:* ASPP-UNet achieves #calc.round(data.aspp_unet.miou * 100, digits: 2)% mIoU, improving upon baseline by #calc.round(data.aspp_unet.delta_miou * 100, digits: 2) percentage points (relative improvement: #calc.round((data.aspp_unet.miou - data.baseline_unet.miou) / data.baseline_unet.miou * 100, digits: 2)%).
++ *Best Performance:* ASPP-UNet achieves #calc.round(data.aspp_unet.miou * 100, digits: 2)% mIoU, improving upon baseline by #calc.round(data.aspp_unet.delta_miou * 100, digits: 2) percentage points (pp), corresponding to a relative improvement of #calc.round((data.aspp_unet.miou - data.baseline_unet.miou) / data.baseline_unet.miou * 100, digits: 2)%.
 
 + *Parameter Efficiency:* ASPP-UNet uses #calc.round((1 - data.aspp_unet.parameters / data.baseline_unet.parameters) * 100, digits: 2)% fewer parameters (#calc.round(data.aspp_unet.parameters / 1000000, digits: 2)M vs #calc.round(data.baseline_unet.parameters / 1000000, digits: 2)M) while outperforming all other approaches
 
