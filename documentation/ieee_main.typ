@@ -215,7 +215,7 @@ To encourage only minimal deviation from the original image, $lambda$ is set to 
 
 The training of the segmentation models was performed using a single-phase approach for the three UNet variants, namely the Standard UNet, CLAHE-UNet, and ASPP-UNet. In this setting, each model was trained in a single continuous phase without any separate pretraining or fine-tuning steps. All three networks were optimized using the Adam optimizer with a learning rate of $10^(-4)$ and $beta$ parameters of $(0.9, 0.999)$, with a batch size of 16. For stable convergence the ReduceLROnPlateau learning rate scheduler was applied with a factor of 0.5 and patience of 5 epochs.
 
-The Standard U-Net and CLAHE U-Net were both trained for 100 epochs without early stopping, as both models showed continued improvement throughout the entire training duration.
+The Standard UNet and CLAHE UNet were both trained for 100 epochs without early stopping, as both models showed continued improvement throughout the entire training duration.
 
 The ASPP-UNet training used early stopping with a patience of 15 epochs to reduce overfitting. Although the maximum number of epochs was set to 100, the training stopped after 67 epochs due to early stopping. Despite this shorter training time, the ASPP-UNet converged faster than the baseline models, demonstrating superior training efficiency.  
 
@@ -255,7 +255,12 @@ We used mIoU as the primary evaluation metric throughout this study to enable fa
 
 == Implementation Details // Brauchen wir das?
 
+// evtl. Hardware: NVIDIA Geforce RTX 2080 Ti with 11GB VRAM
+// Intel(R) Core(TM) i7-8700K CPU @ 3.70GHz
+// 32 GB RAM
+// PyTorch
 
+All experiments were conducted on a workstation equipped with an NVIDIA GeForce RTX 2080 Ti GPU (11 GB VRAM), an Intel Core i7-8700K CPU (3.70 GHz), and 32 GB of system memory. The models were implemented and trained using the PyTorch deep learning framework.
 
 
 
@@ -451,7 +456,7 @@ The enhancer-based approaches employ a two-phase training strategy: Phase 1 trai
 Visual inspection of predictions reveals:
 
 === Frayed Edges <chapt_frayed_edges>
-In @fig_sample_comparison_160, we compare segmentation outputs from the baseline UNet and ASPP-UNet on representative test images. Similar to the findings from #cite(<src_zedan2025rmhanetrobustoptic>, form: "prose"), ASPP-UNet produces smoother and more anatomically plausible boundaries for both the optic disc and cup in comparison to the frayed edges produced by the baseline UNet. The multi-scale features learned by the ASPP module help capture fine vessel structures and disc edges that the baseline UNet often misses or segments poorly.
+In @fig_sample_comparison_160, we compare segmentation outputs from the baseline UNet and ASPP-UNet on representative test images. Similar to the findings from #cite(<Zedan.2025>, form: "prose"), ASPP-UNet produces smoother and more anatomically plausible boundaries for both the optic disc and cup in comparison to the frayed edges produced by the baseline UNet. The multi-scale features learned by the ASPP module help capture fine vessel structures and disc edges that the baseline UNet often misses or segments poorly.
 
 #figure(
   image("../results/sample_comparison_160.png"),
@@ -470,13 +475,13 @@ In @fig_sample_comparison_13, we observe that both models perform reasonably wel
 #figure(
   image("../results/sample_comparison_13.png"),
   caption: [
-    Segmentation output for test sample 13, which has low contrast and poor cup visibility. .
+    Segmentation output for test sample 13, which has low contrast and poor cup visibility.
   ],
 ) <fig_sample_comparison_13>
 
 
 === Extreme Cases
-In general both models perform very well with small to medium sized optic discs. However, in the case of extremely large optic discs and cups, both models sometimes struggle to accurately capture the full extent of the cup region.
+In general, both models perform very well with small to medium sized optic discs. However, in the case of extremely large optic discs and cups, both models sometimes struggle to accurately capture the full extent of the cup region.
 #figure(
   image("../results/sample_comparison_52.png"),
   caption: [
@@ -552,7 +557,13 @@ Visual inspection revealed that ASPP-UNet produces smoother and more anatomicall
 
 == Comparison with State-of-the-Art 
 
-// TODO: @SteffEng-lab
+To compare our results with existing methods, we use performance and architectural complexity as key criteria. The key finding is that while some competing models achieve higher absolute metrics, they often rely on auxiliary complexity or external preprocessing. 
+
+This focus on architectural improvement is mirrored by models like EE-TransUNet @Liu.2025. This edge-focused model achieved high Dice scores (OD 0.967, OC 0.9056 on REFUGE) purely through internal feature enhancement modules (CCF and CSMF blocks) without relying on explicit image enhancement. This finding correlates with our conclusion that architectural improvements are more effective than decoupled preprocessing.
+
+Similar trends are observed in multi-scale extensions of UNet. For example, ASPP-enhanced variants like RMHA-Net @Zedan.2025 often yield smoother and more anatomically plausible OD and OC boundaries compared to the baseline UNet, which tends to produce incomplete edges. While simpler architectures often miss fine vascular structures and subtle disk contours, the added multi-scale features of this complex architecture help to capture these details.
+
+Our assessment of CLAHE-based preprocessing further highlights the limitations of relying on separate enhancement steps. Our results show a measurable reduction in segmentation quality when applying CLAHE before training. This outcome stands in contrast to several state-of-the-art models such as RMHA-Net @Zedan.2025 and Multi-GlaucNet @HaorenXiong.2025, which successfully integrated CLAHE and achieved notable performance gains. While prior work has demonstrated that CLAHE can be beneficial for certain fundus-analysis tasks, our results suggest that its effectiveness is highly model-dependent and can be outweighed by stronger architectural refinements.
 
 
 
